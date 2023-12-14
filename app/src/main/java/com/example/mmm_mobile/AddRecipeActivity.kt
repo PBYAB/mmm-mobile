@@ -12,17 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -230,8 +226,6 @@ fun AddRecipe(modifier: Modifier = Modifier) {
                 onClick = {
                     recipeName = recipeName
                     recipeInstructions = recipeInstructions
-                    val recipeCaloriesPerServingInt = recipeCaloriesPerServing.toIntOrNull() ?: 0
-                    val recipeServingsInt = recipeServings.toIntOrNull() ?: 0
                 }
 
             ) {
@@ -244,36 +238,47 @@ fun AddRecipe(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Demo_DropDownMenu() {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .wrapContentSize(Alignment.TopEnd)
-    ) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = "Unit"
-            )
-        }
+    val unitList = IngredientUnit.entries.map { it.name }
+    val firstUnit = unitList[0]
+    var selectedText by remember { mutableStateOf(firstUnit) }
 
-        DropdownMenu(
+
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onExpandedChange = {
+                expanded = !expanded
+            }
         ) {
-            DropdownMenuItem(
-                text = { Text("ml") },
-                onClick = { Toast.makeText(context, "ml", Toast.LENGTH_SHORT).show() }
+            TextField(
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor(),
             )
-            DropdownMenuItem(
-                text = { Text("g") },
-                onClick = { Toast.makeText(context, "g", Toast.LENGTH_SHORT).show() }
-            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                unitList.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            expanded = false
+                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
         }
-    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
@@ -285,7 +290,6 @@ fun IngredientRow(
     onIngredientChange: (Ingredient) -> Unit,
     onRemoveIngredient: () -> Unit
 ) {
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Row(
@@ -297,7 +301,7 @@ fun IngredientRow(
             singleLine = true,
             shape = shapes.large,
             modifier = Modifier
-                .weight(1f)
+                .weight(2f)
                 .padding(end = 8.dp),
             colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
             onValueChange = { newValue ->
@@ -320,7 +324,7 @@ fun IngredientRow(
             singleLine = true,
             shape = shapes.large,
             modifier = Modifier
-                .weight(1f)
+                .weight(2f)
                 .padding(horizontal = 8.dp),
             colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
             onValueChange = { newValue ->
@@ -339,13 +343,18 @@ fun IngredientRow(
             )
         )
 
-       Demo_DropDownMenu()
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            Demo_DropDownMenu()
+        }
 
         IconButton(
             onClick = {
                 onRemoveIngredient()
                 keyboardController?.hide()
-            }
+            },
+            modifier = Modifier.weight(1f)
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
