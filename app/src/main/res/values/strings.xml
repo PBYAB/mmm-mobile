@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">mmm-mobile</string>
+    <string name="title_activity_recipe">RecipeActivity</string>
+    <string name="instructions">Wprowadz dane nowego przepisu</string>
+    <string name="enter_recipe_name">Dodaj nazwę przepisu</string>
+    <string name="add_recipe_title">Dodaj przepis</string>
+    <string name="submit">dodaj</string>
+    <string name="enter_recipe_instructions">Wprowadz instrukcje do przepisu</string>
+    <string name="enter_servings">Ilość porcji</string>
+    <string name="enter_calories">Ilość kalorii</string>
+    <string name="add_recipe_button">Dodaj</string>
+    <string name="title_activity_recipe_edit">RecipeEditActivity</string>
+    <string name="edit_recipe_title">Edytuj przepis</string>
+    <string name="edit_instructions">Zmień dane wybranego przepisu</string>
+    <string name="edit_recipe_name">Edytuj nazwe przepisu</string>
+    <string name="edit_recipe_instructions">Edytuj instrukcje</string>
+    <string name="edit_calories">Edytuj kalorie</string>
+    <string name="edit_servings">Edytuj porcje</string>
+    <string name="edit_recipe_button">Edytuj</string>
+    <string name="add_ingredient">Dodaj składnik</string>
+    <string name="delete">Usuń</string>
+    <string name="enter_ingredient_unit">Unit</string>
+    <string name="enter_ingredient_quantity">Ilość</string>
+    <string name="enter_ingredient_name">Nazwa</string>
 </resources>
