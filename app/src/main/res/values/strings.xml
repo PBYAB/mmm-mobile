@@ -22,4 +22,14 @@
     <string name="enter_ingredient_unit">Unit</string>
     <string name="enter_ingredient_quantity">Ilość</string>
     <string name="enter_ingredient_name">Nazwa</string>
+    <string name="title_activity_add_ingredient">AddIngredientActivity</string>
+    <string name="add_product_title">Dodaj produkt</string>
+    <string name="product_instructions">Wprowadz dane produktu</string>
+    <string name="enter_product_name">Wprowadz nazwę</string>
+    <string name="enter_barcode">wprowadz kod kreskowy</string>
+    <string name="enter_nutriscore">NutriScore</string>
+    <string name="enter_product_quantity">Wprowadź ilość</string>
+    <string name="enter_product_novaGroup">NovaGroup</string>
+    <string name="enter_product_nutriment_name">Kalorie na 100g</string>
+    <string name="enter_product_brand">Marka</string>
 </resources>

@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Button(
                         onClick = {
-                            val intent = Intent(this, AddRecipeActivity::class.java)
+                            val intent = Intent(this, AddProductActivity::class.java)
                             startActivity(intent)
                         },
                         modifier = Modifier
