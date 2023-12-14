@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">mmm-mobile</string>
+    <string name="recipe_image_info">Recipe image</string>
+    <string name="servings_count_info">Servings</string>
+    <string name="product_image_info">Product image</string>
+    <string name="nutri_score_image_info">Nutri score</string>
+    <string name="nova_group_image_info">Nova group</string>
 </resources>
