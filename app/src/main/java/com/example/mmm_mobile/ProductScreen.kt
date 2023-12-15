@@ -1,8 +1,5 @@
 package com.example.mmm_mobile
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,13 +12,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -33,10 +26,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
-class ProductListActivity : ComponentActivity() {
+@Composable
+fun ProductsScreen() {
 
 
-    private val products = listOf(
+    val products = listOf(
         "Android",
         "iOS",
         "macOS",
@@ -87,51 +81,14 @@ class ProductListActivity : ComponentActivity() {
         "ChromeOS"
     )
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            MmmmobileTheme {
-                // A surface container using the 'background' color from the theme
-
-                ProductListScreen(products = products)
-            }
-        }
+    Box(modifier = Modifier) {
+        ProductList(products = products)
     }
-
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun ProductListScreen(products: List<String>) {
-        Scaffold(
-            topBar = {
-                TopAppBar(title = { Text(text = "Products")
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    )
-                )},
-            content = { padding ->
-                Box(modifier = Modifier.padding(padding)
-                ) {
-                    ProductList(products = products)
-                }
-            },
-            floatingActionButton = {
-
-            },
-            bottomBar = {
-
-            }
-        )
-    }
-
+}
 
     @Composable
     fun ProductListItem(product: String) {
-
+        val context = LocalContext.current
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(data = "https://picsum.photos/200/300")
@@ -148,7 +105,7 @@ class ProductListActivity : ComponentActivity() {
         ) {
             Image(
                 painter = painter,
-                contentDescription = getText(R.string.product_image_info).toString(),
+                contentDescription = context.getText(R.string.product_image_info).toString(),
                 modifier = Modifier
                     .fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
@@ -174,7 +131,7 @@ class ProductListActivity : ComponentActivity() {
                         fontSize = MaterialTheme.typography.bodySmall.fontSize
                     )
                 }
-                
+
                 Surface(shape = MaterialTheme.shapes.medium,
                     shadowElevation = 1.dp,
                     modifier = Modifier
@@ -195,7 +152,7 @@ class ProductListActivity : ComponentActivity() {
                 .fillMaxWidth()) {
 
                 Image(painter = painterResource(id = R.drawable.nutri_score_a),
-                    contentDescription = getText(R.string.nutri_score_image_info).toString(),
+                    contentDescription = context.getText(R.string.nutri_score_image_info).toString(),
                     modifier = Modifier
                         .padding(2.dp)
                         .size(32.dp)
@@ -203,7 +160,7 @@ class ProductListActivity : ComponentActivity() {
                 )
 
                 Image(painter = painterResource(id = R.drawable.nova_group_1),
-                    contentDescription = getText(R.string.nova_group_image_info).toString(),
+                    contentDescription = context.getText(R.string.nova_group_image_info).toString(),
                     modifier = Modifier
                         .padding(2.dp)
                         .size(32.dp)
@@ -225,12 +182,11 @@ class ProductListActivity : ComponentActivity() {
         }
     }
 
-
     @Preview(showBackground = true, showSystemUi = true)
     @Composable
     fun GreetingPreview() {
+
         MmmmobileTheme {
-            ProductListScreen(products = products)
+            ProductsScreen()
         }
     }
-}
