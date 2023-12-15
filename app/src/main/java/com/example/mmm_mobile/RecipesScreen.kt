@@ -100,8 +100,8 @@ fun RecipesScreen() {
             ImageRequest.Builder(LocalContext.current)
                 .data(data = "https://picsum.photos/200/300")
                 .apply(block = fun ImageRequest.Builder.() {
-                    placeholder(R.drawable.baseline_breakfast_dining_24)
-                    error(R.drawable.baseline_breakfast_dining_24)
+                    placeholder(R.mipmap.ic_article_icon_foreground)
+                    error(R.mipmap.ic_article_icon_foreground)
                 }).build()
         )
         Card(

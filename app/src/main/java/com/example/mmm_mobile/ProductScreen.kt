@@ -151,7 +151,7 @@ fun ProductsScreen() {
                 .padding(4.dp)
                 .fillMaxWidth()) {
 
-                Image(painter = painterResource(id = R.drawable.nutri_score_a),
+                Image(painter = painterResource(id = R.drawable.nutri_score_1),
                     contentDescription = context.getText(R.string.nutri_score_image_info).toString(),
                     modifier = Modifier
                         .padding(2.dp)

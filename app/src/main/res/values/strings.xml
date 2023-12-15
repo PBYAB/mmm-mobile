@@ -12,7 +12,7 @@
     <string name="home_screen_icon_info">Home Panel</string>
     <string name="products_screen_icon_info">Products Panel</string>
     <string name="recipes_screen_icon_info">Recipes Panel</string>
+    <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="login">Login</string>
 </resources>

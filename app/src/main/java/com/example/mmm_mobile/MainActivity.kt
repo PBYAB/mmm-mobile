@@ -82,10 +82,11 @@ class MainActivity : ComponentActivity() {
                         icon = {
                             when (screen) {
                                 Screen.ProductList -> Icon(Icons.Filled.ShoppingCart, contentDescription = getText(R.string.products_screen_icon_info).toString())
-                                Screen.RecipeList -> Icon(painter = painterResource(R.mipmap.ic_knife_spoon_icon_foreground), contentDescription = getText(R.string.recipes_screen_icon_info).toString())
+                                Screen.RecipeList ->  Icon(painter = painterResource(R.mipmap.restaurant_black_24dp), contentDescription = getText(R.string.recipes_screen_icon_info).toString())
                                 else -> Icon(Icons.Filled.Home, contentDescription = getText(R.string.home_screen_icon_info).toString())
                             }
                         },
+                        label = { Text(text = screen.name) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
                             navController.navigate(screen.route) {

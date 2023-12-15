@@ -84,7 +84,7 @@ fun LoginScreen(navController: NavController) {
 }
 @Preview(
     showBackground = true,
-    showSystemUi = true
+    showSystemUi = true,
 )
 @Composable
 fun DefaultPreview() {
