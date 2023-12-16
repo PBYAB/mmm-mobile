@@ -25,11 +25,21 @@
     <string name="title_activity_add_ingredient">AddIngredientActivity</string>
     <string name="add_product_title">Dodaj produkt</string>
     <string name="product_instructions">Wprowadz dane produktu</string>
-    <string name="enter_product_name">Wprowadz nazwę</string>
-    <string name="enter_barcode">wprowadz kod kreskowy</string>
+    <string name="enter_product_name">Nazwa</string>
+    <string name="enter_barcode">Kod kreskowy</string>
     <string name="enter_nutriscore">NutriScore</string>
-    <string name="enter_product_quantity">Wprowadź ilość</string>
+    <string name="enter_product_quantity">Ilość</string>
     <string name="enter_product_novaGroup">NovaGroup</string>
-    <string name="enter_product_nutriment_name">Kalorie na 100g</string>
+    <string name="enter_product_nutriment_calorie">Kalorie</string>
     <string name="enter_product_brand">Marka</string>
+    <string name="enter_product_country">Kraj</string>
+    <string name="enter_product_nutriment_fat">Tłuszcze</string>
+    <string name="enter_product_nutriment_fiber">Błonnik</string>
+    <string name="enter_product_nutriment_salt">Sól</string>
+    <string name="enter_product_nutriment_proteins">Białko</string>
+    <string name="enter_product_nutriment_sugar">Cukry</string>
+    <string name="enter_product_nutriment_sodium">Sodium</string>
+    <string name="product_nutriment_information">Wartości odżywcze w 100g produktu</string>
+    <string name="enter_product_allergen">Allergeny</string>
+    <string name="enter_product_category">Kategorie</string>
 </resources>

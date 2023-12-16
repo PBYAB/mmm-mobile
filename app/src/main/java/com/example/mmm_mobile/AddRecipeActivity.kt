@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -95,6 +98,7 @@ fun AddRecipe(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(mediumPadding)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = stringResource(R.string.add_recipe_title),
@@ -373,22 +377,24 @@ fun AddIngredientRow(onAddIngredient: () -> Unit) {
             .padding(top = 8.dp),
         horizontalArrangement = Arrangement.Center
     ) {
-        Button(
+        IconButton(
             onClick = { onAddIngredient() },
             modifier = Modifier
                 .padding(top = 8.dp)
         ) {
-            Text(stringResource(R.string.add_ingredient))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(R.string.add_ingredient))
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AddRecipePreview() {
-    MmmmobileTheme {
-        AddRecipe(
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun AddRecipePreview() {
+//    MmmmobileTheme {
+//        AddRecipe(
+//            modifier = Modifier.fillMaxSize(),
+//        )
+//    }
+//}

@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
                             val intent = Intent(this, AddProductActivity::class.java)
                             startActivity(intent)
                         },
-                        modifier = Modifier
+                        modifier = Modifier.wrapContentSize()
                     ) {
                         Text("Go to AddRecipeActivity")
                     }
