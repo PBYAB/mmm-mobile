@@ -15,12 +15,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -425,22 +427,20 @@ data class Nutriment(
             )
 
 
-            Button(
-                modifier = Modifier
-                    .padding(top = mediumPadding),
+            ElevatedButtonExample(
                 onClick = {
                 }
-
-            ) {
-                Text(
-                    text = stringResource(R.string.add_recipe_button),
-                    fontSize = 16.sp
-                )
-            }
+            )
         }
     }
 }
 
+@Composable
+fun ElevatedButtonExample(onClick: () -> Unit) {
+    ElevatedButton(onClick = { onClick() }) {
+        Text("Dodaj")
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
     ExperimentalMaterial3Api::class
@@ -503,11 +503,14 @@ fun AddIngredientRow2(onAddIngredient: () -> Unit) {
             .padding(top = 8.dp),
         horizontalArrangement = Arrangement.Center
     ) {
-        Button(
+        IconButton(
             onClick = { onAddIngredient() },
             modifier = Modifier
                 .padding(top = 8.dp)
         ) {
+            Icon(
+                Icons.Default.Add,
+                contentDescription = stringResource(R.string.add_ingredient))
             Text(stringResource(R.string.add_ingredient))
         }
     }
