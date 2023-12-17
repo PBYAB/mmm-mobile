@@ -11,7 +11,9 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -59,15 +61,29 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(padding)
             ) {
                 composable(Screen.Login.route) { LoginScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen() }
-                composable(Screen.RecipeList.route) { RecipesScreen() }
+                composable(Screen.ProductList.route) { ProductsScreen(navController) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
+                composable(Screen.Search.route) { SearchScreen() }
+                composable("Product/{productId}") { backStackEntry ->
+                    val productId = backStackEntry.arguments?.getString("productId")?.toLongOrNull()
+                    ProductDetailScreen(productId) // Przekazujemy productId do ProductDetailScreen
+                }
+                composable("Recipe/{recipeId}") { backStackEntry ->
+                    val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
+                    RecipeDetailScreen(recipeId) // Przekazujemy recipeId do RecipeDetailScreen
+                }
+                composable(Screen.FavouriteRecipes.route) { FavouriteRecipesScreen(navController) }
+                composable("Favorite/{recipeId}") { backStackEntry ->
+                    val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
+                    RecipeDetailScreen(recipeId = recipeId) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
+                }
             }
         }
     }
 
     @Composable
     fun BottomNavBar(navController: NavController) {
-        val items = listOf(Screen.ProductList, Screen.RecipeList)
+        val items = listOf(Screen.ProductList, Screen.RecipeList, Screen.Search, Screen.FavouriteRecipes)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
@@ -83,10 +99,12 @@ class MainActivity : ComponentActivity() {
                             when (screen) {
                                 Screen.ProductList -> Icon(Icons.Filled.ShoppingCart, contentDescription = getText(R.string.products_screen_icon_info).toString())
                                 Screen.RecipeList ->  Icon(painter = painterResource(R.mipmap.restaurant_black_24dp), contentDescription = getText(R.string.recipes_screen_icon_info).toString())
+                                Screen.Search -> Icon(Icons.Filled.Search, contentDescription = getText(R.string.search_icon_info).toString())
+                                Screen.FavouriteRecipes -> Icon( Icons.Filled.Favorite, contentDescription = getText(R.string.favourite_recipes_icon_info).toString())
                                 else -> Icon(Icons.Filled.Home, contentDescription = getText(R.string.home_screen_icon_info).toString())
                             }
                         },
-                        label = { Text(text = screen.name) },
+                        label = { Text(text = screen.route) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
                             navController.navigate(screen.route) {
