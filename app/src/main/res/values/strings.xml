@@ -42,4 +42,6 @@
     <string name="product_nutriment_information">Wartości odżywcze w 100g produktu</string>
     <string name="enter_product_allergen">Allergeny</string>
     <string name="enter_product_category">Kategorie</string>
+    <string name="title_activity_edit_product">EditProductActivity</string>
+    <string name="title_activity_barcode">BarcodeActivity</string>
 </resources>

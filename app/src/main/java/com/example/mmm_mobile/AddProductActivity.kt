@@ -1,5 +1,6 @@
 package com.example.mmm_mobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -80,6 +82,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
+
 class AddProductActivity : ComponentActivity() {
 
 
@@ -102,16 +105,6 @@ data class ProductIngredient(
     var name: String = "",
 )
 
-data class Nutriment(
-    var energyKcalPer100g: String = "",
-    var fatPer100g: String = "",
-    var fiberPer100g: String = "",
-    var proteinsPer100g: String = "",
-    var saltPer100g: String = "",
-    var sugarsPer100g: String = "",
-    var sodiumPer100g: String = ""
-
-)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -208,6 +201,12 @@ fun AddProduct(modifier: Modifier = Modifier) {
                     onDone = { }
                 )
             )
+//            Button(onClick = {
+//                val intent = Intent(this, BarcodeActivity::class.java)
+//                startActivity(intent)
+//            }) {
+//
+//            }
 
             OutlinedTextField(
                 value = quantity,
@@ -237,8 +236,8 @@ fun AddProduct(modifier: Modifier = Modifier) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = {Text(text =(stringResource(R.string.enter_product_brand)))},
-                    onDropDownItemSelected = {item ->
+                    placeholder = { Text(text = (stringResource(R.string.enter_product_brand))) },
+                    onDropDownItemSelected = { item ->
                         item.name
                     },
                     dropdownItem = { test ->
@@ -259,8 +258,8 @@ fun AddProduct(modifier: Modifier = Modifier) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = {Text(text =(stringResource(R.string.enter_product_allergen)))},
-                    onDropDownItemSelected = {item ->
+                    placeholder = { Text(text = (stringResource(R.string.enter_product_allergen))) },
+                    onDropDownItemSelected = { item ->
                         item.name
                     },
                     dropdownItem = { test ->
@@ -281,8 +280,8 @@ fun AddProduct(modifier: Modifier = Modifier) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = {Text(text =(stringResource(R.string.enter_product_category)))},
-                        onDropDownItemSelected = {item ->
+                    placeholder = { Text(text = (stringResource(R.string.enter_product_category))) },
+                    onDropDownItemSelected = { item ->
                         item.name
                     },
                     dropdownItem = { test ->
@@ -304,9 +303,9 @@ fun AddProduct(modifier: Modifier = Modifier) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = {Text(text =(stringResource(R.string.enter_product_country)))},
+                    placeholder = { Text(text = (stringResource(R.string.enter_product_country))) },
 
-                        onDropDownItemSelected = {item ->
+                    onDropDownItemSelected = { item ->
                         item.name
                     },
                     dropdownItem = { test ->
@@ -406,159 +405,159 @@ fun AddProduct(modifier: Modifier = Modifier) {
                     )
                 )
 
-            OutlinedTextField(
-                value = saltPer100g,
-                singleLine = true,
-                shape = shapes.large,
-                modifier = Modifier
-                    .padding(start = nutrimentPadding)
-                    .weight(1f),
-                colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                onValueChange = { newValue ->
-                    saltPer100g = newValue
-                },
-                label = { Text(stringResource(R.string.enter_product_nutriment_salt)) },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Number
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {}
+                OutlinedTextField(
+                    value = saltPer100g,
+                    singleLine = true,
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .padding(start = nutrimentPadding)
+                        .weight(1f),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
+                    onValueChange = { newValue ->
+                        saltPer100g = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_salt)) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {}
+                    )
                 )
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            OutlinedTextField(
-                value = proteinsPer100g,
-                singleLine = true,
-                shape = shapes.large,
+            }
+            Row(
                 modifier = Modifier
-                    .padding(start = nutrimentPadding)
-                    .weight(1f),
-                colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                onValueChange = { newValue ->
-                    proteinsPer100g = newValue
-                },
-                label = { Text(stringResource(R.string.enter_product_nutriment_proteins)) },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Number
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {}
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                OutlinedTextField(
+                    value = proteinsPer100g,
+                    singleLine = true,
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .padding(start = nutrimentPadding)
+                        .weight(1f),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
+                    onValueChange = { newValue ->
+                        proteinsPer100g = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_proteins)) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {}
+                    )
                 )
-            )
 
-        OutlinedTextField(
-            value = sugarPer100g,
-            singleLine = true,
-            shape = shapes.large,
-            modifier = Modifier
-                .padding(start = nutrimentPadding)
-                .weight(1f),
-            colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-            onValueChange = { newValue ->
-                sugarPer100g = newValue
-            },
-            label = { Text(stringResource(R.string.enter_product_nutriment_sugar)) },
-            isError = false,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {}
-            )
-        )
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        OutlinedTextField(
-            value = sodiumPer100g,
-            singleLine = true,
-            shape = shapes.large,
-            modifier = Modifier
-                .padding(start = nutrimentPadding)
-                .weight(1f),
-            colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-            onValueChange = { newValue ->
-                sodiumPer100g = newValue
-            },
-            label = { Text(stringResource(R.string.enter_product_nutriment_sodium)) },
-            isError = false,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {}
-            )
-        )
-    }
+                OutlinedTextField(
+                    value = sugarPer100g,
+                    singleLine = true,
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .padding(start = nutrimentPadding)
+                        .weight(1f),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
+                    onValueChange = { newValue ->
+                        sugarPer100g = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_sugar)) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {}
+                    )
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                OutlinedTextField(
+                    value = sodiumPer100g,
+                    singleLine = true,
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .padding(start = nutrimentPadding)
+                        .weight(1f),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
+                    onValueChange = { newValue ->
+                        sodiumPer100g = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_sodium)) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {}
+                    )
+                )
+            }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            Demo_DropDownMenu2("Nutri score", NutriScore.entries.map { it.name })
-        }
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Demo_DropDownMenu2("Nutri score", NutriScore.entries.map { it.name })
+                }
 
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            Demo_DropDownMenu2("Nova Group", novaGroup)
-        }
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Demo_DropDownMenu2("Nova Group", novaGroup)
+                }
 
-    }
+            }
 
 
-    ingredients.forEachIndexed { index, ingredient ->
-        IngredientRow2(
-            ingredient = ingredient,
-            onIngredientChange = { newIngredient ->
-                ingredients = ingredients.toMutableList().also {
-                    it[index] = newIngredient
+            ingredients.forEachIndexed { index, ingredient ->
+                IngredientRow2(
+                    ingredient = ingredient,
+                    onIngredientChange = { newIngredient ->
+                        ingredients = ingredients.toMutableList().also {
+                            it[index] = newIngredient
+                        }
+                    }
+                ) {
+                    ingredients = ingredients.toMutableList().also {
+                        it.removeAt(index)
+                    }
                 }
             }
-        ) {
-            ingredients = ingredients.toMutableList().also {
-                it.removeAt(index)
-            }
+
+            AddIngredientRow2(
+                onAddIngredient = {
+                    ingredients = ingredients.toMutableList().also {
+                        it.add(ProductIngredient())
+                    }
+                }
+            )
+
+
+            ElevatedButtonExample(
+                onClick = {
+                }
+            )
         }
     }
-
-    AddIngredientRow2(
-        onAddIngredient = {
-            ingredients = ingredients.toMutableList().also {
-                it.add(ProductIngredient())
-            }
-        }
-    )
-
-
-    ElevatedButtonExample(
-        onClick = {
-        }
-    )
-}
-}
 }
 
 
@@ -571,14 +570,6 @@ fun DropDownItem(test: Brand) {
     ) {
         Spacer(modifier = Modifier.width(12.dp))
         Text(test.name)
-    }
-}
-
-class Brand(
-    val name: String
-) {
-    override fun toString(): String {
-        return "$name"
     }
 }
 
@@ -628,7 +619,7 @@ fun Demo_DropDownMenu2(
 
 @Composable
 fun ElevatedButtonExample(onClick: () -> Unit) {
-    ElevatedButton(onClick = { onClick() }) {
+    ElevatedButton({onClick()}){
         Text("Dodaj")
     }
 }
@@ -869,7 +860,8 @@ fun <T> SearchableExpandedDropDownMenu(
                         var isChecked by remember { mutableStateOf(selectedItem == selectedOption) }
 
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .clickable {
                                     isChecked = !isChecked
                                     selectedOption = if (isChecked) selectedItem else null
