@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -61,6 +62,8 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Login.route) { LoginScreen(navController) }
                 composable(Screen.ProductList.route) { ProductsScreen() }
                 composable(Screen.RecipeList.route) { RecipesScreen() }
+                composable(Screen.AddProduct.route) { AddProductScreen() }
+                composable(Screen.AddRecipe.route) { AddRecipeScreen() }
             }
         }
     }

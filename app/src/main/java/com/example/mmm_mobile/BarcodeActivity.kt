@@ -161,6 +161,6 @@ fun Greeting234(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview343() {
     MmmmobileTheme {
-        Greeting("Android!@#")
+        Greeting234("Android!@#")
     }
 }

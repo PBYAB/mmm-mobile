@@ -1,11 +1,6 @@
 package com.example.mmm_mobile
 
-import android.content.Intent
-import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -16,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
@@ -33,7 +27,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -46,12 +39,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -77,47 +68,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
 
-class AddProductActivity : ComponentActivity() {
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MmmmobileTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AddProduct()
-                }
-            }
-        }
-    }
-}
-
-data class ProductIngredient(
-    var name: String = "",
-)
-
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddProduct(modifier: Modifier = Modifier) {
+fun AddProductScreen() {
+
     val novaGroupOptions = listOf("1", "2", "3", "4", "5")
-    var expanded: Boolean by remember { mutableStateOf(false) }
-    var selectedOptionText: String by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var novaGroup by remember { mutableStateOf(novaGroupOptions) }
-    var categories by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("") }
     var nutriment by remember { mutableStateOf(Nutriment()) }
     var fiberPer100g by remember { mutableStateOf(nutriment.fiberPer100g) }
     var saltPer100g by remember { mutableStateOf(nutriment.saltPer100g) }
@@ -140,7 +103,7 @@ fun AddProduct(modifier: Modifier = Modifier) {
     )
 
     Card(
-        modifier = modifier.padding(10.dp),
+        modifier = Modifier.padding(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
         val mediumPadding = 5.dp
@@ -559,6 +522,11 @@ fun AddProduct(modifier: Modifier = Modifier) {
         }
     }
 }
+
+
+data class ProductIngredient(
+    var name: String = "",
+)
 
 
 @Composable
