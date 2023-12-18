@@ -17,4 +17,6 @@
     <string name="password">Password</string>
     <string name="search_icon_info">Search</string>
     <string name="favourite_recipes_icon_info">Favourites Recipes</string>
+    <string name="barcode_scanner_icon_info">Barcode Scanner</string>
+    <string name="search_label">Find product or recipe</string>
 </resources>

@@ -37,7 +37,7 @@ abstract class RecipeDataBase : RoomDatabase() {
                     super.onCreate(db)
                     INSTANCE?.let { database ->
                         GlobalScope.launch {
-                            populateDatabase(database.favouriteRecipeDao())
+                            populateDatabase(database.favouriteRecipeDao(), database.recipeIngredientDao())
                         }
                     }
                     Log.d("RecipeDataBase", "onCreate: ")
@@ -60,7 +60,7 @@ abstract class RecipeDataBase : RoomDatabase() {
 
 
 
-        suspend fun populateDatabase(favouriteRecipeDao: FavouriteRecipeDao) {
+        suspend fun populateDatabase(favouriteRecipeDao: FavouriteRecipeDao, recipeIngredientDao: RecipeIngredientDao) {
             val recipes = listOf(
                 FavouriteRecipe(0, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0),
                 FavouriteRecipe(0, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0),
@@ -72,19 +72,23 @@ abstract class RecipeDataBase : RoomDatabase() {
 
                 )
 
-
-            RecipeIngredient(0, "Kapusta", 500.0, IngredientUnit.G, 1)
-            RecipeIngredient(0, "Ciasto", 1000.0, IngredientUnit.G, 1)
-            RecipeIngredient(0, "Mięso", 500.0, IngredientUnit.ML, 2)
-            RecipeIngredient(0, "Ser", 500.0, IngredientUnit.ML, 3)
-            RecipeIngredient(0, "Truskawki", 500.0, IngredientUnit.ML, 4)
-            RecipeIngredient(0, "Jagody", 500.0, IngredientUnit.ML, 5)
-            RecipeIngredient(0, "Borówki", 500.0, IngredientUnit.ML, 6)
-            RecipeIngredient(0, "Maliny", 500.0, IngredientUnit.ML, 7)
-
+            val ingredients = listOf(
+                RecipeIngredient(0, "Kapusta", 500.0, IngredientUnit.G, 1),
+                RecipeIngredient(0, "Ciasto", 1000.0, IngredientUnit.G, 1),
+                RecipeIngredient(0, "Mięso", 500.0, IngredientUnit.ML, 2),
+                RecipeIngredient(0, "Ser", 500.0, IngredientUnit.ML, 3),
+                RecipeIngredient(0, "Truskawki", 500.0, IngredientUnit.ML, 4),
+                RecipeIngredient(0, "Jagody", 500.0, IngredientUnit.ML, 5),
+                RecipeIngredient(0, "Borówki", 500.0, IngredientUnit.ML, 6),
+                RecipeIngredient(0, "Maliny", 500.0, IngredientUnit.ML, 7),
+            )
 
             recipes.forEach {
                 favouriteRecipeDao.insertFavouriteRecipe(it)
+            }
+
+            ingredients.forEach {
+                recipeIngredientDao.insertAll(it)
             }
         }
 

@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current

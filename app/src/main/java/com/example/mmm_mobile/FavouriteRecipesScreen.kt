@@ -17,7 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,13 +32,12 @@ import com.example.mmm_mobile.viewmodel.RecipeViewModel
 
 @Composable
 fun FavouriteRecipesScreen(navController: NavController) {
-
     val recipeViewModel: RecipeViewModel = viewModel()
-    val favouriteRecipesWithIngredients = recipeViewModel.findAllFavouriteRecipes().collectAsState(initial = emptyList())
+    val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipes().observeAsState(initial = emptyList())
 
-
-    FavouriteRecipeList(recipes = favouriteRecipesWithIngredients.value, navController = navController)
+    FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, navController = navController)
 }
+
 
 @Composable
 fun FavouriteRecipeList(recipes: List<FavouriteRecipe>, navController: NavController) {

@@ -1,11 +1,9 @@
 import android.app.Application
-import android.util.Log
 import com.example.mmm_mobile.dao.RecipeIngredientDao
 import com.example.mmm_mobile.db.RecipeDataBase
 import com.example.mmm_mobile.entity.RecipeIngredient
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class RecipeIngredientRepository(
@@ -21,29 +19,11 @@ class RecipeIngredientRepository(
         recipeIngredientDao = recipeDataBase.recipeIngredientDao()
     }
 
-    fun findAllRecipeIngredients(): Flow<List<RecipeIngredient>> {
-        return recipeIngredientDao.getAll()
-    }
-
-    suspend fun insert(recipeIngredient: RecipeIngredient) {
-        withContext(defaultDispatcher) {
-            recipeIngredientDao.insertAll(recipeIngredient)
-            Log.d("RecipeIngredientRepository", "insert: $recipeIngredient")
+    suspend fun findRecipeIngredientsByRecipeId(recipeId: Long): List<RecipeIngredient>? {
+        return withContext(defaultDispatcher) {
+            recipeIngredientDao.getIngredientsByRecipeId(recipeId)
         }
     }
 
-    suspend fun update(recipeIngredient: RecipeIngredient) {
-        withContext(defaultDispatcher) {
-            recipeIngredientDao.updateRecipeIngredient(recipeIngredient)
-            Log.d("RecipeIngredientRepository", "update: $recipeIngredient")
-        }
-    }
-
-    suspend fun delete(recipeIngredient: RecipeIngredient) {
-        withContext(defaultDispatcher) {
-            recipeIngredientDao.deleteIngredientsByRecipeId(recipeIngredient.recipeId)
-            Log.d("RecipeIngredientRepository", "delete: $recipeIngredient")
-        }
-    }
 
 }
