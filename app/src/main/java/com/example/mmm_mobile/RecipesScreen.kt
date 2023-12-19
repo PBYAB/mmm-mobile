@@ -2,6 +2,7 @@ package com.example.mmm_mobile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,84 +22,48 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
 @Composable
-fun RecipesScreen() {
+fun RecipesScreen(navController: NavHostController) {
 
-    val products = listOf(
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS",
-        "Android",
-        "iOS",
-        "macOS",
-        "Windows",
-        "Linux",
-        "ChromeOS"
+    val recipes = listOf(
+        Recipe(1, "Android", 1, "https://picsum.photos/200/300"),
+        Recipe(2, "iOS", 2, "https://picsum.photos/200/300"),
+        Recipe(3, "macOS", 3, "https://picsum.photos/200/300"),
+        Recipe(4, "Windows", 4, "https://picsum.photos/200/300"),
+        Recipe(5, "Linux", 5, "https://picsum.photos/200/300"),
+        Recipe(6, "ChromeOS", 3, "https://picsum.photos/200/300"),
+        Recipe(7, "Android", 4, "https://picsum.photos/200/300"),
+        Recipe(8, "iOS", 5, "https://picsum.photos/200/300"),
+        Recipe(9, "macOS", 3, "https://picsum.photos/200/300"),
+        Recipe(10, "Windows", 2, "https://picsum.photos/200/300"),
     )
-    RecipeList(products = products)
+    RecipeList(recipes = recipes, navController = navController)
 }
 
     @Composable
-    fun RecipeList(products: List<String>) {
+    fun RecipeList(recipes: List<Recipe>, navController: NavController) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             Modifier.padding(8.dp)
         ) {
-            items(products) { product ->
-                RecipeListItem(recipe = product)
+            items(recipes) { recipe ->
+                RecipeListItem(recipe = recipe, navController = navController)
             }
         }
     }
 
     @Composable
-    fun RecipeListItem(recipe: String) {
+    fun RecipeListItem(recipe: Recipe, navController: NavController) {
         val context = LocalContext.current
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
-                .data(data = "https://picsum.photos/200/300")
+                .data(data = recipe.image)
                 .apply(block = fun ImageRequest.Builder.() {
                     placeholder(R.mipmap.ic_article_icon_foreground)
                     error(R.mipmap.ic_article_icon_foreground)
@@ -109,6 +74,9 @@ fun RecipesScreen() {
                 .fillMaxSize()
                 .padding(8.dp)
                 .background(MaterialTheme.colorScheme.background)
+                .clickable { // Dodajemy logikę kliknięcia
+                    navController.navigate("Recipe/${recipe.id}")
+                }
         ) {
             Image(
                 painter = painter,
@@ -119,13 +87,13 @@ fun RecipesScreen() {
             )
 
             Text(
-                text = recipe,
+                text = recipe.name,
                 modifier = Modifier.padding(8.dp)
             )
             Row(modifier = Modifier.padding(8.dp)) {
                 Icon(Icons.Filled.Person, context.getText(R.string.servings_count_info).toString())
                 Text(
-                    text = "4"
+                    text = recipe.servings.toString()
                 )
             }
         }
@@ -135,6 +103,6 @@ fun RecipesScreen() {
     @Composable
     fun RecipeListPreview() {
         MmmmobileTheme {
-            RecipesScreen()
+            RecipesScreen(navController = NavHostController(LocalContext.current))
         }
     }

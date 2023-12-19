@@ -2,8 +2,10 @@ package com.example.mmm_mobile
 
 enum class Screen(val route: String) {
     Login("Login"),
-    ProductList("Product List"),
-    RecipeList("Recipe List"),
+    ProductList("Products"),
+    RecipeList("Recipes"),
+    Search("Search"),
+    FavouriteRecipes("Favourite"),
     AddProduct("Add Product"),
     AddRecipe("Add Recipe")
 }

@@ -32,7 +32,6 @@ import org.openapitools.client.apis.Class1AuthenticationApi
 import org.openapitools.client.models.AuthenticationRequest
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current

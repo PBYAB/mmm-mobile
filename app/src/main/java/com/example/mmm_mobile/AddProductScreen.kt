@@ -72,7 +72,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class
+)
 @Composable
 fun AddProductScreen() {
 
@@ -479,7 +481,7 @@ fun AddProductScreen() {
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
-                    Demo_DropDownMenu2("Nutri score", NutriScore.entries.map { it.name })
+                    Demo_DropDownMenu2("Nutri score", NutriScore.values().map { it.name })
                 }
 
                 Box(
