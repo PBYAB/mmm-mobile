@@ -23,6 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.openapitools.client.apis.ArticleApi
+import org.openapitools.client.apis.Class1AuthenticationApi
+import org.openapitools.client.models.AuthenticationRequest
 
 
 @Composable
@@ -66,9 +73,15 @@ fun LoginScreen(navController: NavController) {
 
             )
             Button(onClick = {
-                // Handle login
-                // Navigate to ProductListActivity after login
-                navController.navigate(Screen.ProductList.route)
+                CoroutineScope(Dispatchers.IO).launch {
+                    val apiInstance = Class1AuthenticationApi("http://57.128.194.195")
+                    val loginRequest = AuthenticationRequest("mruwka@ddd.pl", "mruwka2115")
+                    val result = apiInstance.authenticate(loginRequest)
+                    println(result)
+                    withContext(Dispatchers.Main) {
+                        navController.navigate(Screen.ProductList.route)
+                    }
+                }
             },
                 modifier = Modifier.padding(top = 16.dp),
                 colors = ButtonDefaults.textButtonColors(

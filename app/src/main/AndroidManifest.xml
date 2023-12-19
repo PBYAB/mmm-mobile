@@ -9,10 +9,9 @@
         android:required="false" />
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -31,16 +30,6 @@
             android:name=".EditProductActivity"
             android:exported="false"
             android:label="@string/title_activity_edit_product"
-            android:theme="@style/Theme.Mmmmobile" />
-        <activity
-            android:name=".AddProductActivity"
-            android:exported="false"
-            android:label="@string/title_activity_add_ingredient"
-            android:theme="@style/Theme.Mmmmobile" />
-        <activity
-            android:name=".AddRecipeActivity"
-            android:exported="false"
-            android:label="@string/title_activity_recipe"
             android:theme="@style/Theme.Mmmmobile" />
         <activity
             android:name=".EditRecipeActivity"
