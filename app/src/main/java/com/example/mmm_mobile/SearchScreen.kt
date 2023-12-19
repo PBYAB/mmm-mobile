@@ -20,7 +20,6 @@ fun SearchScreen() {
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Search for products and recipes")
         OutlinedTextField(
             value = query.value,
             onValueChange = { query.value = it },

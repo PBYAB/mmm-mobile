@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
-            topBar = { if (currentRoute != Screen.Login.route) TopBar(navController) },
+            topBar = { TopBar(navController) },
             bottomBar = { BottomNavBar(navController) }
         ) { padding ->
             NavHost(
@@ -86,15 +86,18 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun BottomNavBar(navController: NavController) {
-        val items = listOf(Screen.ProductList, Screen.RecipeList, Screen.Search, Screen.FavouriteRecipes)
+        val items = listOf(Screen.ProductList, Screen.RecipeList, Screen.FavouriteRecipes)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
         // Don't show BottomNavigation if the current screen is Login
-        if (currentDestination?.route != Screen.Login.route) {
-            BottomNavigation(
+        when (currentDestination?.route) {
+            Screen.Login.route -> {}
+            Screen.Search.route -> {}
+
+            else -> BottomNavigation(
                 backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSurface,
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
                 items.forEach { screen ->
                     BottomNavigationItem(
@@ -123,21 +126,35 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopBar(navController: NavController){
-        TopAppBar(
-            title = { Text(text = getText(R.string.app_name).toString(), style = MaterialTheme.typography.headlineMedium) },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            actions = {
-                IconButton(onClick = { /* Handle more icon click */ }) {
-                    Icon(painter = painterResource(id = R.mipmap.barcode_scanner_icon), contentDescription = getText(R.string.barcode_scanner_icon_info).toString())
-                }
-                IconButton(onClick = { navController.navigate(Screen.Search.route) }) {
-                    Icon(Icons.Filled.Search, contentDescription = "Search")
-                }
-            }
-        )
+
+        when (navController.currentBackStackEntry?.destination?.route) {
+            Screen.Login.route -> {}
+            Screen.Search.route -> {}
+
+            else -> TopAppBar(
+                    title = {
+                        Text(
+                            text = getText(R.string.app_name).toString(),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    actions = {
+                        IconButton(onClick = { /* Handle more icon click */ }) {
+                            Icon(
+                                painter = painterResource(id = R.mipmap.barcode_scanner_icon),
+                                contentDescription = getText(R.string.barcode_scanner_icon_info).toString()
+                            )
+                        }
+                        IconButton(onClick = { navController.navigate(Screen.Search.route) }) {
+                            Icon(Icons.Filled.Search, contentDescription = "Search")
+                        }
+                    }
+                )
+        }
     }
 
     @Preview(showBackground = true, showSystemUi = true)
