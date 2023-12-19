@@ -27,12 +27,12 @@
             android:label="@string/title_activity_barcode"
             android:theme="@style/Theme.Mmmmobile" />
         <activity
-            android:name=".EditProductActivity"
+            android:name=".screens.EditProductActivity"
             android:exported="false"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/Theme.Mmmmobile" />
         <activity
-            android:name=".EditRecipeActivity"
+            android:name=".screens.EditRecipeActivity"
             android:exported="false"
             android:label="@string/title_activity_recipe_edit"
             android:theme="@style/Theme.Mmmmobile" />

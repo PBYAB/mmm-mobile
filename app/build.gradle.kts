@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.accompanist:accompanist-pager:0.20.2")
+
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
@@ -72,7 +74,7 @@ dependencies {
 
 
 
-    val cameraxVersion = "1.4.0-alpha02"
+    val cameraxVersion = "1.4.0-alpha03"
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
@@ -106,10 +108,10 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     implementation("com.squareup.moshi:moshi-adapters:1.14.0")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
 }

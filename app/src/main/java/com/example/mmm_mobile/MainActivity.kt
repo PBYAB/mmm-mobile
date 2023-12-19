@@ -36,6 +36,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mmm_mobile.screens.AddProductScreen
+import com.example.mmm_mobile.screens.AddRecipeScreen
+import com.example.mmm_mobile.screens.FavouriteRecipesScreen
+import com.example.mmm_mobile.screens.LoginScreen
+import com.example.mmm_mobile.screens.ProductDetailScreen
+import com.example.mmm_mobile.screens.ProductsScreen
+import com.example.mmm_mobile.screens.RecipeDetailScreen
+import com.example.mmm_mobile.screens.RecipesScreen
+import com.example.mmm_mobile.screens.Screen
+import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
 
