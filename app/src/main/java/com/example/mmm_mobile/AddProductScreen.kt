@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
-
 package com.example.mmm_mobile
 
 import android.util.Log
@@ -483,7 +481,7 @@ fun AddProductScreen() {
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
-                    Demo_DropDownMenu2("Nutri score", NutriScore.entries.map { it.name })
+                    Demo_DropDownMenu2("Nutri score", NutriScore.values().map { it.name })
                 }
 
                 Box(

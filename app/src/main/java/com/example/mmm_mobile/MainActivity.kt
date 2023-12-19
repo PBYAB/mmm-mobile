@@ -135,7 +135,6 @@ class MainActivity : ComponentActivity() {
     fun FAB(navController: NavController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
-        val nextDestination = ""
         // Don't show FAB if the current screen is Login
         when (currentDestination?.route) {
             Screen.Login.route -> {}
