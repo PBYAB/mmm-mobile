@@ -12,12 +12,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,6 +72,7 @@ fun ProductsScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
+                .clickable(onClick = {})
                 .background(MaterialTheme.colorScheme.background)
                 .clickable { // Dodajemy logikę kliknięcia
                     navController.navigate("Product/${product.id}")
@@ -142,6 +149,21 @@ fun ProductsScreen(navController: NavHostController) {
     }
 
     @Composable
+    fun SmallExample(onClick: () -> Unit) {
+        SmallFloatingActionButton(
+            modifier = Modifier
+                .clip(CircleShape)
+                .padding(30.dp),
+            onClick = { onClick() },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Icon(Icons.Filled.Add, "Small floating action button.")
+        }
+    }
+
+
+    @Composable
     fun ProductList(products: List<Product>, navController: NavController) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -151,7 +173,10 @@ fun ProductsScreen(navController: NavHostController) {
                 ProductListItem(product = product, navController = navController)
             }
         }
-    }
+        SmallExample {
+            }
+        }
+
 
     @Preview(showBackground = true, showSystemUi = true)
     @Composable
