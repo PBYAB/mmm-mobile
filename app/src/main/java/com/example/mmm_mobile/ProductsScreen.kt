@@ -148,19 +148,19 @@ fun ProductsScreen(navController: NavHostController) {
         }
     }
 
-    @Composable
-    fun SmallExample(onClick: () -> Unit) {
-        SmallFloatingActionButton(
-            modifier = Modifier
-                .clip(CircleShape)
-                .padding(30.dp),
-            onClick = { onClick() },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Icon(Icons.Filled.Add, "Small floating action button.")
-        }
-    }
+//    @Composable
+//    fun SmallExample(onClick: () -> Unit) {
+//        SmallFloatingActionButton(
+//            modifier = Modifier
+//                .clip(CircleShape)
+//                .padding(30.dp),
+//            onClick = { onClick() },
+//            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+//            contentColor = MaterialTheme.colorScheme.secondary
+//        ) {
+//            Icon(Icons.Filled.Add, "Small floating action button.")
+//        }
+//    }
 
 
     @Composable
@@ -173,8 +173,8 @@ fun ProductsScreen(navController: NavHostController) {
                 ProductListItem(product = product, navController = navController)
             }
         }
-        SmallExample {
-            }
+//        SmallExample {
+//            }
         }
 
 

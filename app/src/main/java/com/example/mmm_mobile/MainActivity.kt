@@ -11,11 +11,13 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,9 +29,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -57,6 +59,7 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             topBar = { TopBar(navController) },
+            floatingActionButton = { FAB(navController) },
             bottomBar = { BottomNavBar(navController) }
         ) { padding ->
             NavHost(
@@ -65,8 +68,8 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(padding)
             ) {
                 composable(Screen.Login.route) { LoginScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen() }
-                composable(Screen.RecipeList.route) { RecipesScreen() }
+                composable(Screen.ProductList.route) { ProductsScreen(navController) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
                 composable(Screen.AddProduct.route) { AddProductScreen() }
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
                 composable(Screen.ProductList.route) { ProductsScreen(navController) }
@@ -128,6 +131,38 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun FAB(navController: NavController) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        val nextDestination = ""
+        // Don't show FAB if the current screen is Login
+        when (currentDestination?.route) {
+            Screen.Login.route -> {}
+            Screen.Search.route -> {}
+
+            Screen.ProductList.route -> FloatingActionButton(
+                onClick = { navController.navigate(Screen.AddProduct.route) },
+                modifier = Modifier.padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
+            }
+
+            Screen.RecipeList.route -> FloatingActionButton(
+                onClick = { navController.navigate(Screen.AddRecipe.route) },
+                modifier = Modifier.padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
+            }
+
+            else -> {}
+        }
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopBar(navController: NavController){
@@ -169,6 +204,7 @@ class MainActivity : ComponentActivity() {
             Scaffold(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 topBar = { TopBar(rememberNavController()) },
+                floatingActionButton = { FAB(navController = rememberNavController()) },
                 bottomBar = { BottomNavBar(rememberNavController()) }
             ) { padding ->
                 Column(modifier = Modifier.padding(padding)) {

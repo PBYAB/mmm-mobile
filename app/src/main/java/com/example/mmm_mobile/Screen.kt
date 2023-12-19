@@ -6,8 +6,6 @@ enum class Screen(val route: String) {
     RecipeList("Recipes"),
     Search("Search"),
     FavouriteRecipes("Favourite"),
-    ProductList("Product List"),
-    RecipeList("Recipe List"),
     AddProduct("Add Product"),
     AddRecipe("Add Recipe")
 }

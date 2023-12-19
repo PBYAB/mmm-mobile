@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mmm_mobile.entity.IngredientUnit
 
 
 @Composable
@@ -256,9 +258,7 @@ fun Demo_DropDownMenu() {
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
-)
+
 @Composable
 fun IngredientRow(
     ingredient: Ingredient,

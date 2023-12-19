@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.example.mmm_mobile
 
 import android.util.Log
@@ -72,7 +74,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class
+)
 @Composable
 fun AddProductScreen() {
 
