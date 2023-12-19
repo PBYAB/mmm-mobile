@@ -72,8 +72,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
-    ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class
+@OptIn(ExperimentalMaterial3Api::class
 )
 @Composable
 fun AddProductScreen() {
@@ -166,12 +165,7 @@ fun AddProductScreen() {
                     onDone = { }
                 )
             )
-//            Button(onClick = {
-//                val intent = Intent(this, BarcodeActivity::class.java)
-//                startActivity(intent)
-//            }) {
-//
-//            }
+
 
             OutlinedTextField(
                 value = quantity,
@@ -670,7 +664,7 @@ fun AddIngredientRow2(onAddIngredient: () -> Unit) {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn( ExperimentalMaterial3Api::class)
 @Composable
 fun <T> SearchableExpandedDropDownMenu(
     modifier: Modifier = Modifier,
@@ -871,13 +865,4 @@ fun <T> SearchableExpandedDropDownMenu(
 
 
 private val DropdownMenuVerticalPadding = 5.dp
-//
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun AddProductPreview() {
-//    MmmmobileTheme {
-//        AddProduct(
-//            modifier = Modifier.fillMaxSize(),
-//        )
-//    }
-//}
+

@@ -102,6 +102,8 @@ class MainActivity : ComponentActivity() {
         when (currentDestination?.route) {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
+            Screen.AddProduct.route -> {}
+            Screen.AddRecipe.route -> {}
 
             else -> BottomNavigation(
                 backgroundColor = MaterialTheme.colorScheme.primaryContainer,
@@ -140,25 +142,22 @@ class MainActivity : ComponentActivity() {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
 
-            Screen.ProductList.route -> FloatingActionButton(
-                onClick = { navController.navigate(Screen.AddProduct.route) },
-                modifier = Modifier.padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
-            }
-
-            Screen.RecipeList.route -> FloatingActionButton(
-                onClick = { navController.navigate(Screen.AddRecipe.route) },
-                modifier = Modifier.padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
-            }
+            Screen.ProductList.route -> CreateFAB(navController, Screen.AddProduct.route)
+            Screen.RecipeList.route -> CreateFAB(navController, Screen.AddRecipe.route)
 
             else -> {}
+        }
+    }
+
+    @Composable
+    fun CreateFAB(navController: NavController, route: String) {
+        FloatingActionButton(
+            onClick = { navController.navigate(route) },
+            modifier = Modifier.padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
         }
     }
 
@@ -169,6 +168,8 @@ class MainActivity : ComponentActivity() {
         when (navController.currentBackStackEntry?.destination?.route) {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
+            Screen.AddProduct.route -> {}
+            Screen.AddRecipe.route -> {}
 
             else -> TopAppBar(
                     title = {
