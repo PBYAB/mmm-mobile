@@ -14,6 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +41,20 @@ fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val tokenManager = TokenManager.getInstance(context)
+    if (tokenManager.accessToken != null) {
+        val api = Class1AuthenticationApi()
+        LaunchedEffect(Unit) {
+            try {
+                withContext(Dispatchers.IO) {
+                    api.refreshToken()
+                }
+                navController.navigate(Screen.ProductList.route)
+            } catch (_: Exception) {
+                tokenManager.clear()
+            }
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -89,14 +105,19 @@ fun LoginScreen(navController: NavController) {
 //                                password.value
                             )
                             val result = apiInstance.authenticate(loginRequest)
-                            ApiClient.accessToken = result.accessToken
-                            println(ApiClient.accessToken)
+                            val tokenManager = TokenManager.getInstance(context)
+                            tokenManager.accessToken = result.accessToken
+                            println(ApiClient.accessToken) // TODO: remove
                             withContext(Dispatchers.Main) {
                                 navController.navigate(Screen.ProductList.route)
                             }
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Login failed. Try again", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context,
+                                    "Login failed. Try again",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
