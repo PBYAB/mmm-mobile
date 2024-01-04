@@ -42,19 +42,12 @@ fun LoginScreen(navController: NavController) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val tokenManager = TokenManager.getInstance(context)
+    println("LoginScreen: ${tokenManager.accessToken}")
     if (tokenManager.accessToken != null) {
-        val api = Class1AuthenticationApi()
-        LaunchedEffect(Unit) {
-            try {
-                withContext(Dispatchers.IO) {
-                    api.refreshToken()
-                }
-                navController.navigate(Screen.ProductList.route)
-            } catch (_: Exception) {
-                tokenManager.clear()
-            }
-        }
+        ApiClient.accessToken = tokenManager.accessToken
+        navController.navigate(Screen.ProductList.route)
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -105,7 +98,6 @@ fun LoginScreen(navController: NavController) {
 //                                password.value
                             )
                             val result = apiInstance.authenticate(loginRequest)
-                            val tokenManager = TokenManager.getInstance(context)
                             tokenManager.accessToken = result.accessToken
                             println(ApiClient.accessToken) // TODO: remove
                             withContext(Dispatchers.Main) {

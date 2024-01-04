@@ -51,8 +51,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Authenticate a user
-     * 
-     * @param authenticationRequest 
+     *
+     * @param authenticationRequest
      * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -82,8 +82,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Authenticate a user
-     * 
-     * @param authenticationRequest 
+     *
+     * @param authenticationRequest
      * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -101,7 +101,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
     /**
      * To obtain the request config of the operation authenticate
      *
-     * @param authenticationRequest 
+     * @param authenticationRequest
      * @return RequestConfig
      */
     fun authenticateRequestConfig(authenticationRequest: AuthenticationRequest) : RequestConfig<AuthenticationRequest> {
@@ -109,7 +109,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        
+
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/authenticate",
@@ -122,20 +122,21 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Refresh a token
-     * 
-     * @return void
+     *
+     * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
+    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun refreshToken() : Unit = withContext(Dispatchers.IO) {
+    suspend fun refreshToken() : AuthenticationResponse = withContext(Dispatchers.IO) {
         val localVarResponse = refreshTokenWithHttpInfo()
 
         return@withContext when (localVarResponse.responseType) {
-            ResponseType.Success -> Unit
+            ResponseType.Success -> (localVarResponse as Success<*>).data as AuthenticationResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -151,16 +152,17 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Refresh a token
-     * 
-     * @return ApiResponse<Unit?>
+     *
+     * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
+    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun refreshTokenWithHttpInfo() : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
+    suspend fun refreshTokenWithHttpInfo() : ApiResponse<AuthenticationResponse?> = withContext(Dispatchers.IO) {
         val localVariableConfig = refreshTokenRequestConfig()
 
-        return@withContext request<Unit, Unit>(
+        return@withContext request<Unit, AuthenticationResponse>(
             localVariableConfig
         )
     }
@@ -174,7 +176,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        
+
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/refresh-token",
@@ -187,8 +189,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Register a new user
-     * 
-     * @param registerRequest 
+     *
+     * @param registerRequest
      * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -218,8 +220,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Register a new user
-     * 
-     * @param registerRequest 
+     *
+     * @param registerRequest
      * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -237,7 +239,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
     /**
      * To obtain the request config of the operation register
      *
-     * @param registerRequest 
+     * @param registerRequest
      * @return RequestConfig
      */
     fun registerRequestConfig(registerRequest: RegisterRequest) : RequestConfig<RegisterRequest> {
@@ -245,7 +247,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        
+
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/register",
