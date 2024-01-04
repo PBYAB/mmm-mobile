@@ -1,6 +1,7 @@
 package com.example.mmm_mobile.screens
 
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.Class1AuthenticationApi
+import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.AuthenticationRequest
 
 
@@ -42,7 +44,10 @@ fun LoginScreen(navController: NavController) {
                 .align(Alignment.Center)
                 .padding(16.dp)
         ) {
-            Text(text = context.getText(R.string.login).toString(), style = MaterialTheme.typography.headlineLarge)
+            Text(
+                text = context.getText(R.string.login).toString(),
+                style = MaterialTheme.typography.headlineLarge
+            )
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
@@ -70,18 +75,31 @@ fun LoginScreen(navController: NavController) {
                     disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                 ),
 
-            )
-            Button(onClick = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val apiInstance = Class1AuthenticationApi("http://57.128.194.195")
-                    val loginRequest = AuthenticationRequest("mruwka@ddd.pl", "mruwka2115")
-                    val result = apiInstance.authenticate(loginRequest)
-                    println(result)
-                    withContext(Dispatchers.Main) {
-                        navController.navigate(Screen.ProductList.route)
+                )
+            Button(
+                onClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val apiInstance = Class1AuthenticationApi()
+                            val loginRequest = AuthenticationRequest(
+                                "mruwka@ddd.pl",
+                                "mruwka2115"
+//                                email.value,
+//                                password.value
+                            )
+                            val result = apiInstance.authenticate(loginRequest)
+                            ApiClient.accessToken = result.accessToken
+                            println(ApiClient.accessToken)
+                            withContext(Dispatchers.Main) {
+                                navController.navigate(Screen.ProductList.route)
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Login failed. Try again", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     }
-                }
-            },
+                },
                 modifier = Modifier.padding(top = 16.dp),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface,
@@ -93,6 +111,7 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
+
 @Preview(
     showBackground = true,
     showSystemUi = true,

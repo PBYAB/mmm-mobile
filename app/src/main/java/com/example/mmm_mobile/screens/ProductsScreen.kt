@@ -30,6 +30,11 @@ import coil.request.ImageRequest
 import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.openapitools.client.apis.ProductApi
+import org.openapitools.client.models.Pageable
 
 @Composable
 fun ProductsScreen(navController: NavController) {
@@ -151,6 +156,11 @@ fun ProductsScreen(navController: NavController) {
             columns = GridCells.Fixed(2),
             Modifier.padding(8.dp)
         ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val productClient = ProductApi()
+                val product = productClient.getProducts(Pageable(0, 10))
+                println(product)
+            }
             items(products) { product ->
                 ProductListItem(product = product, navController = navController)
             }
