@@ -25,6 +25,8 @@ import org.openapitools.client.models.RegisterRequest
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -60,10 +62,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun authenticate(authenticationRequest: AuthenticationRequest) : AuthenticationResponse {
+    suspend fun authenticate(authenticationRequest: AuthenticationRequest) : AuthenticationResponse = withContext(Dispatchers.IO) {
         val localVarResponse = authenticateWithHttpInfo(authenticationRequest = authenticationRequest)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as AuthenticationResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -88,10 +90,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun authenticateWithHttpInfo(authenticationRequest: AuthenticationRequest) : ApiResponse<AuthenticationResponse?> {
+    suspend fun authenticateWithHttpInfo(authenticationRequest: AuthenticationRequest) : ApiResponse<AuthenticationResponse?> = withContext(Dispatchers.IO) {
         val localVariableConfig = authenticateRequestConfig(authenticationRequest = authenticationRequest)
 
-        return request<AuthenticationRequest, AuthenticationResponse>(
+        return@withContext request<AuthenticationRequest, AuthenticationResponse>(
             localVariableConfig
         )
     }
@@ -107,8 +109,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/authenticate",
@@ -130,10 +131,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      * @throws ServerException If the API returns a server error response
      */
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun refreshToken() : Unit {
+    suspend fun refreshToken() : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = refreshTokenWithHttpInfo()
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -156,10 +157,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Throws(IllegalStateException::class, IOException::class)
-    fun refreshTokenWithHttpInfo() : ApiResponse<Unit?> {
+    suspend fun refreshTokenWithHttpInfo() : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = refreshTokenRequestConfig()
 
-        return request<Unit, Unit>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -197,10 +198,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun register(registerRequest: RegisterRequest) : AuthenticationResponse {
+    suspend fun register(registerRequest: RegisterRequest) : AuthenticationResponse = withContext(Dispatchers.IO) {
         val localVarResponse = registerWithHttpInfo(registerRequest = registerRequest)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as AuthenticationResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -225,10 +226,10 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun registerWithHttpInfo(registerRequest: RegisterRequest) : ApiResponse<AuthenticationResponse?> {
+    suspend fun registerWithHttpInfo(registerRequest: RegisterRequest) : ApiResponse<AuthenticationResponse?> = withContext(Dispatchers.IO) {
         val localVariableConfig = registerRequestConfig(registerRequest = registerRequest)
 
-        return request<RegisterRequest, AuthenticationResponse>(
+        return@withContext request<RegisterRequest, AuthenticationResponse>(
             localVariableConfig
         )
     }
@@ -244,8 +245,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/register",

@@ -20,12 +20,14 @@ import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateProductRequest
+import org.openapitools.client.models.PageProductToListDTO
 import org.openapitools.client.models.Pageable
-import org.openapitools.client.models.Product
 import org.openapitools.client.models.ProductDTO
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -52,20 +54,19 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Create a new product
      * 
      * @param createProductRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createProduct(createProductRequest: CreateProductRequest) : kotlin.Any {
+    suspend fun createProduct(createProductRequest: CreateProductRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = createProductWithHttpInfo(createProductRequest = createProductRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -83,16 +84,15 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Create a new product
      * 
      * @param createProductRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createProductWithHttpInfo(createProductRequest: CreateProductRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun createProductWithHttpInfo(createProductRequest: CreateProductRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createProductRequestConfig(createProductRequest = createProductRequest)
 
-        return request<CreateProductRequest, kotlin.Any>(
+        return@withContext request<CreateProductRequest, Unit>(
             localVariableConfig
         )
     }
@@ -123,20 +123,19 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Delete a product
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteProduct(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteProduct(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteProductWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -154,16 +153,15 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Delete a product
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteProductWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteProductWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteProductRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -193,7 +191,7 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a product by ID
      * 
      * @param id 
-     * @return Product
+     * @return ProductDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -202,11 +200,11 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProduct(id: kotlin.Long) : Product {
+    suspend fun getProduct(id: kotlin.Long) : ProductDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getProductWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Product
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as ProductDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -224,16 +222,16 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a product by ID
      * 
      * @param id 
-     * @return ApiResponse<Product?>
+     * @return ApiResponse<ProductDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getProductWithHttpInfo(id: kotlin.Long) : ApiResponse<Product?> {
+    suspend fun getProductWithHttpInfo(id: kotlin.Long) : ApiResponse<ProductDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getProductRequestConfig(id = id)
 
-        return request<Unit, Product>(
+        return@withContext request<Unit, ProductDTO>(
             localVariableConfig
         )
     }
@@ -272,10 +270,10 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProductByBarcode(barcode: kotlin.String) : ProductDTO {
+    suspend fun getProductByBarcode(barcode: kotlin.String) : ProductDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getProductByBarcodeWithHttpInfo(barcode = barcode)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as ProductDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -300,10 +298,10 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getProductByBarcodeWithHttpInfo(barcode: kotlin.String) : ApiResponse<ProductDTO?> {
+    suspend fun getProductByBarcodeWithHttpInfo(barcode: kotlin.String) : ApiResponse<ProductDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getProductByBarcodeRequestConfig(barcode = barcode)
 
-        return request<Unit, ProductDTO>(
+        return@withContext request<Unit, ProductDTO>(
             localVariableConfig
         )
     }
@@ -340,7 +338,7 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @param category  (optional)
      * @param allergens  (optional)
      * @param country  (optional)
-     * @return Product
+     * @return PageProductToListDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -349,11 +347,11 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProducts(pageable: Pageable, name: kotlin.String? = null, quantity: kotlin.String? = null, nutriScore: kotlin.collections.List<kotlin.Int>? = null, novaGroups: kotlin.collections.List<kotlin.Int>? = null, category: kotlin.collections.List<kotlin.Long>? = null, allergens: kotlin.collections.List<kotlin.Long>? = null, country: kotlin.collections.List<kotlin.Long>? = null) : Product {
+    suspend fun getProducts(pageable: Pageable, name: kotlin.String? = null, quantity: kotlin.String? = null, nutriScore: kotlin.collections.List<kotlin.Int>? = null, novaGroups: kotlin.collections.List<kotlin.Int>? = null, category: kotlin.collections.List<kotlin.Long>? = null, allergens: kotlin.collections.List<kotlin.Long>? = null, country: kotlin.collections.List<kotlin.Long>? = null) : PageProductToListDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getProductsWithHttpInfo(pageable = pageable, name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Product
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageProductToListDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -378,16 +376,16 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @param category  (optional)
      * @param allergens  (optional)
      * @param country  (optional)
-     * @return ApiResponse<Product?>
+     * @return ApiResponse<PageProductToListDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getProductsWithHttpInfo(pageable: Pageable, name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?) : ApiResponse<Product?> {
+    suspend fun getProductsWithHttpInfo(pageable: Pageable, name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?) : ApiResponse<PageProductToListDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getProductsRequestConfig(pageable = pageable, name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country)
 
-        return request<Unit, Product>(
+        return@withContext request<Unit, PageProductToListDTO>(
             localVariableConfig
         )
     }
@@ -449,20 +447,19 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * 
      * @param id 
      * @param createProductRequest 
-     * @return Product
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateProduct(id: kotlin.Long, createProductRequest: CreateProductRequest) : Product {
+    suspend fun updateProduct(id: kotlin.Long, createProductRequest: CreateProductRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateProductWithHttpInfo(id = id, createProductRequest = createProductRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Product
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -481,16 +478,15 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * 
      * @param id 
      * @param createProductRequest 
-     * @return ApiResponse<Product?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateProductWithHttpInfo(id: kotlin.Long, createProductRequest: CreateProductRequest) : ApiResponse<Product?> {
+    suspend fun updateProductWithHttpInfo(id: kotlin.Long, createProductRequest: CreateProductRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateProductRequestConfig(id = id, createProductRequest = createProductRequest)
 
-        return request<CreateProductRequest, Product>(
+        return@withContext request<CreateProductRequest, Unit>(
             localVariableConfig
         )
     }

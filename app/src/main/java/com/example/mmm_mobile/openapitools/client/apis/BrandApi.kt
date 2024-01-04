@@ -19,13 +19,15 @@ import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
-import org.openapitools.client.models.Brand
+import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CreateBrandRequest
-import org.openapitools.client.models.Page
+import org.openapitools.client.models.PageBrandDTO
 import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -52,20 +54,19 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Create a new brand
      * 
      * @param createBrandRequest 
-     * @return Brand
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createBrand(createBrandRequest: CreateBrandRequest) : Brand {
+    suspend fun createBrand(createBrandRequest: CreateBrandRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = createBrandWithHttpInfo(createBrandRequest = createBrandRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Brand
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -83,16 +84,15 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Create a new brand
      * 
      * @param createBrandRequest 
-     * @return ApiResponse<Brand?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createBrandWithHttpInfo(createBrandRequest: CreateBrandRequest) : ApiResponse<Brand?> {
+    suspend fun createBrandWithHttpInfo(createBrandRequest: CreateBrandRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createBrandRequestConfig(createBrandRequest = createBrandRequest)
 
-        return request<CreateBrandRequest, Brand>(
+        return@withContext request<CreateBrandRequest, Unit>(
             localVariableConfig
         )
     }
@@ -108,8 +108,7 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/brands",
@@ -124,20 +123,19 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Delete brand by ID
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteBrandById(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteBrandById(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteBrandByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -155,16 +153,15 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Delete brand by ID
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteBrandByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteBrandByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteBrandByIdRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -194,7 +191,7 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Get all brands
      * 
      * @param pageable 
-     * @return Page
+     * @return PageBrandDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -203,11 +200,11 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getAllBrands(pageable: Pageable) : Page {
+    suspend fun getAllBrands(pageable: Pageable) : PageBrandDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getAllBrandsWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Page
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageBrandDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -225,16 +222,16 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Get all brands
      * 
      * @param pageable 
-     * @return ApiResponse<Page?>
+     * @return ApiResponse<PageBrandDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getAllBrandsWithHttpInfo(pageable: Pageable) : ApiResponse<Page?> {
+    suspend fun getAllBrandsWithHttpInfo(pageable: Pageable) : ApiResponse<PageBrandDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getAllBrandsRequestConfig(pageable = pageable)
 
-        return request<Unit, Page>(
+        return@withContext request<Unit, PageBrandDTO>(
             localVariableConfig
         )
     }
@@ -252,8 +249,7 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
                 put("pageable", listOf(pageable.toString()))
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/brands",
@@ -268,7 +264,7 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Get brand by ID
      * 
      * @param id 
-     * @return Brand
+     * @return BrandDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -277,11 +273,11 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getBrandById(id: kotlin.Long) : Brand {
+    suspend fun getBrandById(id: kotlin.Long) : BrandDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getBrandByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Brand
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as BrandDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -299,16 +295,16 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * Get brand by ID
      * 
      * @param id 
-     * @return ApiResponse<Brand?>
+     * @return ApiResponse<BrandDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getBrandByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Brand?> {
+    suspend fun getBrandByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<BrandDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getBrandByIdRequestConfig(id = id)
 
-        return request<Unit, Brand>(
+        return@withContext request<Unit, BrandDTO>(
             localVariableConfig
         )
     }
@@ -323,8 +319,7 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/brands/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
@@ -340,20 +335,19 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * 
      * @param id 
      * @param createBrandRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateBrandById(id: kotlin.Long, createBrandRequest: CreateBrandRequest) : kotlin.Any {
+    suspend fun updateBrandById(id: kotlin.Long, createBrandRequest: CreateBrandRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateBrandByIdWithHttpInfo(id = id, createBrandRequest = createBrandRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -372,16 +366,15 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      * 
      * @param id 
      * @param createBrandRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateBrandByIdWithHttpInfo(id: kotlin.Long, createBrandRequest: CreateBrandRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun updateBrandByIdWithHttpInfo(id: kotlin.Long, createBrandRequest: CreateBrandRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateBrandByIdRequestConfig(id = id, createBrandRequest = createBrandRequest)
 
-        return request<CreateBrandRequest, kotlin.Any>(
+        return@withContext request<CreateBrandRequest, Unit>(
             localVariableConfig
         )
     }

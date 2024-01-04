@@ -21,11 +21,13 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.ArticleCategoryDTO
 import org.openapitools.client.models.CreateArticleCategoryRequest
-import org.openapitools.client.models.Page
+import org.openapitools.client.models.PageArticleCategoryDTO
 import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -52,20 +54,19 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      * Create a new category
      * 
      * @param createArticleCategoryRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createCategory(createArticleCategoryRequest: CreateArticleCategoryRequest) : kotlin.Any {
+    suspend fun createCategory(createArticleCategoryRequest: CreateArticleCategoryRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = createCategoryWithHttpInfo(createArticleCategoryRequest = createArticleCategoryRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -83,16 +84,15 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      * Create a new category
      * 
      * @param createArticleCategoryRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createCategoryWithHttpInfo(createArticleCategoryRequest: CreateArticleCategoryRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun createCategoryWithHttpInfo(createArticleCategoryRequest: CreateArticleCategoryRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createCategoryRequestConfig(createArticleCategoryRequest = createArticleCategoryRequest)
 
-        return request<CreateArticleCategoryRequest, kotlin.Any>(
+        return@withContext request<CreateArticleCategoryRequest, Unit>(
             localVariableConfig
         )
     }
@@ -120,6 +120,74 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
     }
 
     /**
+     * Delete category
+     * 
+     * @param id 
+     * @return void
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    suspend fun deleteCategory(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
+        val localVarResponse = deleteCategoryWithHttpInfo(id = id)
+
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * Delete category
+     * 
+     * @param id 
+     * @return ApiResponse<Unit?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Throws(IllegalStateException::class, IOException::class)
+    suspend fun deleteCategoryWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = deleteCategoryRequestConfig(id = id)
+
+        return@withContext request<Unit, Unit>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation deleteCategory
+     *
+     * @param id 
+     * @return RequestConfig
+     */
+    fun deleteCategoryRequestConfig(id: kotlin.Long) : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        
+        return RequestConfig(
+            method = RequestMethod.DELETE,
+            path = "/api/v1/knowledgeBase/categories/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+            body = localVariableBody
+        )
+    }
+
+    /**
      * Find a category by ID
      * 
      * @param id 
@@ -132,10 +200,10 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun findCategoryById(id: kotlin.Long) : ArticleCategoryDTO {
+    suspend fun findCategoryById(id: kotlin.Long) : ArticleCategoryDTO = withContext(Dispatchers.IO) {
         val localVarResponse = findCategoryByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as ArticleCategoryDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -160,10 +228,10 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun findCategoryByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<ArticleCategoryDTO?> {
+    suspend fun findCategoryByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<ArticleCategoryDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = findCategoryByIdRequestConfig(id = id)
 
-        return request<Unit, ArticleCategoryDTO>(
+        return@withContext request<Unit, ArticleCategoryDTO>(
             localVariableConfig
         )
     }
@@ -178,8 +246,7 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/knowledgeBase/categories/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
@@ -194,7 +261,7 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      * List all categories with pagination
      * 
      * @param pageable 
-     * @return Page
+     * @return PageArticleCategoryDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -203,11 +270,11 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCategories(pageable: Pageable) : Page {
+    suspend fun listCategories(pageable: Pageable) : PageArticleCategoryDTO = withContext(Dispatchers.IO) {
         val localVarResponse = listCategoriesWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Page
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageArticleCategoryDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -225,16 +292,16 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
      * List all categories with pagination
      * 
      * @param pageable 
-     * @return ApiResponse<Page?>
+     * @return ApiResponse<PageArticleCategoryDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun listCategoriesWithHttpInfo(pageable: Pageable) : ApiResponse<Page?> {
+    suspend fun listCategoriesWithHttpInfo(pageable: Pageable) : ApiResponse<PageArticleCategoryDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = listCategoriesRequestConfig(pageable = pageable)
 
-        return request<Unit, Page>(
+        return@withContext request<Unit, PageArticleCategoryDTO>(
             localVariableConfig
         )
     }
@@ -252,11 +319,82 @@ class ArticleCategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHt
                 put("pageable", listOf(pageable.toString()))
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/knowledgeBase/categories",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * Update category
+     * 
+     * @param id 
+     * @param createArticleCategoryRequest 
+     * @return void
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    suspend fun updateCategory(id: kotlin.Long, createArticleCategoryRequest: CreateArticleCategoryRequest) : Unit = withContext(Dispatchers.IO) {
+        val localVarResponse = updateCategoryWithHttpInfo(id = id, createArticleCategoryRequest = createArticleCategoryRequest)
+
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * Update category
+     * 
+     * @param id 
+     * @param createArticleCategoryRequest 
+     * @return ApiResponse<Unit?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Throws(IllegalStateException::class, IOException::class)
+    suspend fun updateCategoryWithHttpInfo(id: kotlin.Long, createArticleCategoryRequest: CreateArticleCategoryRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = updateCategoryRequestConfig(id = id, createArticleCategoryRequest = createArticleCategoryRequest)
+
+        return@withContext request<CreateArticleCategoryRequest, Unit>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation updateCategory
+     *
+     * @param id 
+     * @param createArticleCategoryRequest 
+     * @return RequestConfig
+     */
+    fun updateCategoryRequestConfig(id: kotlin.Long, createArticleCategoryRequest: CreateArticleCategoryRequest) : RequestConfig<CreateArticleCategoryRequest> {
+        val localVariableBody = createArticleCategoryRequest
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        
+        return RequestConfig(
+            method = RequestMethod.PUT,
+            path = "/api/v1/knowledgeBase/categories/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,

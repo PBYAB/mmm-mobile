@@ -22,18 +22,34 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
+ * @param barcode 
  * @param id 
  * @param name 
+ * @param novaGroup 
+ * @param nutriScore 
+ * @param quantity 
  */
 
 
-data class Allergen (
+data class ProductToListDTO (
+
+    @Json(name = "barcode")
+    val barcode: kotlin.String? = null,
 
     @Json(name = "id")
     val id: kotlin.Long? = null,
 
     @Json(name = "name")
-    val name: kotlin.String? = null
+    val name: kotlin.String? = null,
+
+    @Json(name = "novaGroup")
+    val novaGroup: kotlin.Int? = null,
+
+    @Json(name = "nutriScore")
+    val nutriScore: kotlin.Int? = null,
+
+    @Json(name = "quantity")
+    val quantity: kotlin.String? = null
 
 )
 

@@ -16,6 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.PageableObject
+import org.openapitools.client.models.ProductIngredientDTO
 import org.openapitools.client.models.SortObject
 
 import com.squareup.moshi.Json
@@ -38,10 +39,10 @@ import com.squareup.moshi.JsonClass
  */
 
 
-data class Page (
+data class PageProductIngredientDTO (
 
     @Json(name = "content")
-    val content: kotlin.collections.List<kotlin.Any>? = null,
+    val content: kotlin.collections.List<ProductIngredientDTO>? = null,
 
     @Json(name = "empty")
     val empty: kotlin.Boolean? = null,

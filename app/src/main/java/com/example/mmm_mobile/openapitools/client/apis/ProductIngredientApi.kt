@@ -20,11 +20,15 @@ import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateProductIngredientRequest
+import org.openapitools.client.models.PageProductIngredientDTO
 import org.openapitools.client.models.Pageable
 import org.openapitools.client.models.ProductIngredient
+import org.openapitools.client.models.ProductIngredientDTO
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -60,10 +64,10 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createProductIngredient(createProductIngredientRequest: CreateProductIngredientRequest) : ProductIngredient {
+    suspend fun createProductIngredient(createProductIngredientRequest: CreateProductIngredientRequest) : ProductIngredient = withContext(Dispatchers.IO) {
         val localVarResponse = createProductIngredientWithHttpInfo(createProductIngredientRequest = createProductIngredientRequest)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as ProductIngredient
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -88,10 +92,10 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createProductIngredientWithHttpInfo(createProductIngredientRequest: CreateProductIngredientRequest) : ApiResponse<ProductIngredient?> {
+    suspend fun createProductIngredientWithHttpInfo(createProductIngredientRequest: CreateProductIngredientRequest) : ApiResponse<ProductIngredient?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createProductIngredientRequestConfig(createProductIngredientRequest = createProductIngredientRequest)
 
-        return request<CreateProductIngredientRequest, ProductIngredient>(
+        return@withContext request<CreateProductIngredientRequest, ProductIngredient>(
             localVariableConfig
         )
     }
@@ -119,23 +123,22 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
     }
 
     /**
-     * Delete an existing category
+     * Delete a product ingredient
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteProductIngredient(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteProductIngredient(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteProductIngredientWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -150,19 +153,18 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
     }
 
     /**
-     * Delete an existing category
+     * Delete a product ingredient
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteProductIngredientWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteProductIngredientWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteProductIngredientRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -192,7 +194,7 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      * Get a product ingredient by ID
      * 
      * @param id 
-     * @return ProductIngredient
+     * @return ProductIngredientDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -201,11 +203,11 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProductIngredient(id: kotlin.Long) : ProductIngredient {
+    suspend fun getProductIngredient(id: kotlin.Long) : ProductIngredientDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getProductIngredientWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as ProductIngredient
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as ProductIngredientDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -223,16 +225,16 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      * Get a product ingredient by ID
      * 
      * @param id 
-     * @return ApiResponse<ProductIngredient?>
+     * @return ApiResponse<ProductIngredientDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getProductIngredientWithHttpInfo(id: kotlin.Long) : ApiResponse<ProductIngredient?> {
+    suspend fun getProductIngredientWithHttpInfo(id: kotlin.Long) : ApiResponse<ProductIngredientDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getProductIngredientRequestConfig(id = id)
 
-        return request<Unit, ProductIngredient>(
+        return@withContext request<Unit, ProductIngredientDTO>(
             localVariableConfig
         )
     }
@@ -262,7 +264,7 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      * Get a list of all product ingredients
      * 
      * @param pageable 
-     * @return ProductIngredient
+     * @return PageProductIngredientDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -271,11 +273,11 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProductIngredients(pageable: Pageable) : ProductIngredient {
+    suspend fun getProductIngredients(pageable: Pageable) : PageProductIngredientDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getProductIngredientsWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as ProductIngredient
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageProductIngredientDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -293,16 +295,16 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
      * Get a list of all product ingredients
      * 
      * @param pageable 
-     * @return ApiResponse<ProductIngredient?>
+     * @return ApiResponse<PageProductIngredientDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getProductIngredientsWithHttpInfo(pageable: Pageable) : ApiResponse<ProductIngredient?> {
+    suspend fun getProductIngredientsWithHttpInfo(pageable: Pageable) : ApiResponse<PageProductIngredientDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getProductIngredientsRequestConfig(pageable = pageable)
 
-        return request<Unit, ProductIngredient>(
+        return@withContext request<Unit, PageProductIngredientDTO>(
             localVariableConfig
         )
     }
@@ -332,24 +334,23 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
     }
 
     /**
-     * Update an existing country
+     * Update product ingredient
      * 
      * @param id 
      * @param createProductIngredientRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateProductIngredient(id: kotlin.Long, createProductIngredientRequest: CreateProductIngredientRequest) : kotlin.Any {
+    suspend fun updateProductIngredient(id: kotlin.Long, createProductIngredientRequest: CreateProductIngredientRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateProductIngredientWithHttpInfo(id = id, createProductIngredientRequest = createProductIngredientRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -364,20 +365,19 @@ class ProductIngredientApi(basePath: kotlin.String = defaultBasePath, client: Ok
     }
 
     /**
-     * Update an existing country
+     * Update product ingredient
      * 
      * @param id 
      * @param createProductIngredientRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateProductIngredientWithHttpInfo(id: kotlin.Long, createProductIngredientRequest: CreateProductIngredientRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun updateProductIngredientWithHttpInfo(id: kotlin.Long, createProductIngredientRequest: CreateProductIngredientRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateProductIngredientRequestConfig(id = id, createProductIngredientRequest = createProductIngredientRequest)
 
-        return request<CreateProductIngredientRequest, kotlin.Any>(
+        return@withContext request<CreateProductIngredientRequest, Unit>(
             localVariableConfig
         )
     }

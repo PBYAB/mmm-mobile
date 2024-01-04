@@ -20,11 +20,14 @@ import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateRecipeRequest
+import org.openapitools.client.models.PageRecipeListItem
 import org.openapitools.client.models.Pageable
-import org.openapitools.client.models.Recipe
+import org.openapitools.client.models.RecipeDTO
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -51,20 +54,19 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Create a new recipe
      * 
      * @param createRecipeRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createRecipe(createRecipeRequest: CreateRecipeRequest) : kotlin.Any {
+    suspend fun createRecipe(createRecipeRequest: CreateRecipeRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = createRecipeWithHttpInfo(createRecipeRequest = createRecipeRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -82,16 +84,15 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Create a new recipe
      * 
      * @param createRecipeRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createRecipeWithHttpInfo(createRecipeRequest: CreateRecipeRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun createRecipeWithHttpInfo(createRecipeRequest: CreateRecipeRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createRecipeRequestConfig(createRecipeRequest = createRecipeRequest)
 
-        return request<CreateRecipeRequest, kotlin.Any>(
+        return@withContext request<CreateRecipeRequest, Unit>(
             localVariableConfig
         )
     }
@@ -122,20 +123,19 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Delete recipe by ID
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteById(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteById(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -153,16 +153,15 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Delete recipe by ID
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteByIdRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -192,7 +191,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Get recipe by ID
      * 
      * @param id 
-     * @return Recipe
+     * @return RecipeDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -201,11 +200,11 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getById(id: kotlin.Long) : Recipe {
+    suspend fun getById(id: kotlin.Long) : RecipeDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Recipe
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as RecipeDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -223,16 +222,16 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * Get recipe by ID
      * 
      * @param id 
-     * @return ApiResponse<Recipe?>
+     * @return ApiResponse<RecipeDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Recipe?> {
+    suspend fun getByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<RecipeDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getByIdRequestConfig(id = id)
 
-        return request<Unit, Recipe>(
+        return@withContext request<Unit, RecipeDTO>(
             localVariableConfig
         )
     }
@@ -247,8 +246,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/recipes/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
@@ -267,7 +265,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
      * @param maxKcalPerServing  (optional)
-     * @return Recipe
+     * @return PageRecipeListItem
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -276,11 +274,11 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getRecipes(pageable: Pageable, name: kotlin.String? = null, servings: kotlin.collections.List<kotlin.Int>? = null, minKcalPerServing: kotlin.Double? = null, maxKcalPerServing: kotlin.Double? = null) : Recipe {
+    suspend fun getRecipes(pageable: Pageable, name: kotlin.String? = null, servings: kotlin.collections.List<kotlin.Int>? = null, minKcalPerServing: kotlin.Double? = null, maxKcalPerServing: kotlin.Double? = null) : PageRecipeListItem = withContext(Dispatchers.IO) {
         val localVarResponse = getRecipesWithHttpInfo(pageable = pageable, name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Recipe
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageRecipeListItem
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -302,16 +300,16 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
      * @param maxKcalPerServing  (optional)
-     * @return ApiResponse<Recipe?>
+     * @return ApiResponse<PageRecipeListItem?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getRecipesWithHttpInfo(pageable: Pageable, name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?) : ApiResponse<Recipe?> {
+    suspend fun getRecipesWithHttpInfo(pageable: Pageable, name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?) : ApiResponse<PageRecipeListItem?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getRecipesRequestConfig(pageable = pageable, name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing)
 
-        return request<Unit, Recipe>(
+        return@withContext request<Unit, PageRecipeListItem>(
             localVariableConfig
         )
     }
@@ -361,20 +359,19 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * 
      * @param id 
      * @param createRecipeRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateRecipeById(id: kotlin.Long, createRecipeRequest: CreateRecipeRequest) : kotlin.Any {
+    suspend fun updateRecipeById(id: kotlin.Long, createRecipeRequest: CreateRecipeRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateRecipeByIdWithHttpInfo(id = id, createRecipeRequest = createRecipeRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -393,16 +390,15 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      * 
      * @param id 
      * @param createRecipeRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateRecipeByIdWithHttpInfo(id: kotlin.Long, createRecipeRequest: CreateRecipeRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun updateRecipeByIdWithHttpInfo(id: kotlin.Long, createRecipeRequest: CreateRecipeRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateRecipeByIdRequestConfig(id = id, createRecipeRequest = createRecipeRequest)
 
-        return request<CreateRecipeRequest, kotlin.Any>(
+        return@withContext request<CreateRecipeRequest, Unit>(
             localVariableConfig
         )
     }

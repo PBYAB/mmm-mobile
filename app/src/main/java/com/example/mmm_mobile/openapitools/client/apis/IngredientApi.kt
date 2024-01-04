@@ -21,11 +21,13 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateIngredientRequest
 import org.openapitools.client.models.Ingredient
-import org.openapitools.client.models.Page
+import org.openapitools.client.models.PageIngredientListItem
 import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -61,10 +63,10 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createIngredient(createIngredientRequest: CreateIngredientRequest) : Ingredient {
+    suspend fun createIngredient(createIngredientRequest: CreateIngredientRequest) : Ingredient = withContext(Dispatchers.IO) {
         val localVarResponse = createIngredientWithHttpInfo(createIngredientRequest = createIngredientRequest)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as Ingredient
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -89,10 +91,10 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createIngredientWithHttpInfo(createIngredientRequest: CreateIngredientRequest) : ApiResponse<Ingredient?> {
+    suspend fun createIngredientWithHttpInfo(createIngredientRequest: CreateIngredientRequest) : ApiResponse<Ingredient?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createIngredientRequestConfig(createIngredientRequest = createIngredientRequest)
 
-        return request<CreateIngredientRequest, Ingredient>(
+        return@withContext request<CreateIngredientRequest, Ingredient>(
             localVariableConfig
         )
     }
@@ -123,7 +125,7 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      * List all ingredients
      * 
      * @param pageable 
-     * @return Page
+     * @return PageIngredientListItem
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -132,11 +134,11 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun findAll(pageable: Pageable) : Page {
+    suspend fun findAll(pageable: Pageable) : PageIngredientListItem = withContext(Dispatchers.IO) {
         val localVarResponse = findAllWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Page
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageIngredientListItem
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -154,16 +156,16 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      * List all ingredients
      * 
      * @param pageable 
-     * @return ApiResponse<Page?>
+     * @return ApiResponse<PageIngredientListItem?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun findAllWithHttpInfo(pageable: Pageable) : ApiResponse<Page?> {
+    suspend fun findAllWithHttpInfo(pageable: Pageable) : ApiResponse<PageIngredientListItem?> = withContext(Dispatchers.IO) {
         val localVariableConfig = findAllRequestConfig(pageable = pageable)
 
-        return request<Unit, Page>(
+        return@withContext request<Unit, PageIngredientListItem>(
             localVariableConfig
         )
     }

@@ -23,17 +23,25 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param id 
+ * @param kcalPerServing 
  * @param name 
+ * @param servings 
  */
 
 
-data class Brand (
+data class RecipeListItem (
 
     @Json(name = "id")
     val id: kotlin.Long? = null,
 
+    @Json(name = "kcalPerServing")
+    val kcalPerServing: kotlin.Double? = null,
+
     @Json(name = "name")
-    val name: kotlin.String? = null
+    val name: kotlin.String? = null,
+
+    @Json(name = "servings")
+    val servings: kotlin.Int? = null
 
 )
 

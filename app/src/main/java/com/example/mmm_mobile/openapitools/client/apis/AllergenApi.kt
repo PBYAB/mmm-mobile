@@ -19,13 +19,15 @@ import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
-import org.openapitools.client.models.Allergen
+import org.openapitools.client.models.AllergenDTO
 import org.openapitools.client.models.CreateAllergenRequest
-import org.openapitools.client.models.Page
+import org.openapitools.client.models.PageAllergenDTO
 import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -52,20 +54,19 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Create a new allergen
      * 
      * @param createAllergenRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createAllergen(createAllergenRequest: CreateAllergenRequest) : kotlin.Any {
+    suspend fun createAllergen(createAllergenRequest: CreateAllergenRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = createAllergenWithHttpInfo(createAllergenRequest = createAllergenRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -83,16 +84,15 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Create a new allergen
      * 
      * @param createAllergenRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createAllergenWithHttpInfo(createAllergenRequest: CreateAllergenRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun createAllergenWithHttpInfo(createAllergenRequest: CreateAllergenRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createAllergenRequestConfig(createAllergenRequest = createAllergenRequest)
 
-        return request<CreateAllergenRequest, kotlin.Any>(
+        return@withContext request<CreateAllergenRequest, Unit>(
             localVariableConfig
         )
     }
@@ -123,20 +123,19 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Delete allergen by ID
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteAllergenById(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteAllergenById(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteAllergenByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -154,16 +153,15 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Delete allergen by ID
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteAllergenByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteAllergenByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteAllergenByIdRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -193,7 +191,7 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Find a allergen by ID
      * 
      * @param id 
-     * @return Allergen
+     * @return AllergenDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -202,11 +200,11 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun findAllergenById(id: kotlin.Long) : Allergen {
+    suspend fun findAllergenById(id: kotlin.Long) : AllergenDTO = withContext(Dispatchers.IO) {
         val localVarResponse = findAllergenByIdWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Allergen
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as AllergenDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -224,16 +222,16 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * Find a allergen by ID
      * 
      * @param id 
-     * @return ApiResponse<Allergen?>
+     * @return ApiResponse<AllergenDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun findAllergenByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<Allergen?> {
+    suspend fun findAllergenByIdWithHttpInfo(id: kotlin.Long) : ApiResponse<AllergenDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = findAllergenByIdRequestConfig(id = id)
 
-        return request<Unit, Allergen>(
+        return@withContext request<Unit, AllergenDTO>(
             localVariableConfig
         )
     }
@@ -248,8 +246,7 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/allergens/{id}".replace("{"+"id"+"}", encodeURIComponent(id.toString())),
@@ -264,7 +261,7 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * List all allergens with pagination
      * 
      * @param pageable 
-     * @return Page
+     * @return PageAllergenDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -273,11 +270,11 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listAllergens(pageable: Pageable) : Page {
+    suspend fun listAllergens(pageable: Pageable) : PageAllergenDTO = withContext(Dispatchers.IO) {
         val localVarResponse = listAllergensWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Page
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageAllergenDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -295,16 +292,16 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * List all allergens with pagination
      * 
      * @param pageable 
-     * @return ApiResponse<Page?>
+     * @return ApiResponse<PageAllergenDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun listAllergensWithHttpInfo(pageable: Pageable) : ApiResponse<Page?> {
+    suspend fun listAllergensWithHttpInfo(pageable: Pageable) : ApiResponse<PageAllergenDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = listAllergensRequestConfig(pageable = pageable)
 
-        return request<Unit, Page>(
+        return@withContext request<Unit, PageAllergenDTO>(
             localVariableConfig
         )
     }
@@ -322,8 +319,7 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
                 put("pageable", listOf(pageable.toString()))
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        localVariableHeaders["Accept"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/allergens",
@@ -339,20 +335,19 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * 
      * @param id 
      * @param createAllergenRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateAllergenById(id: kotlin.Long, createAllergenRequest: CreateAllergenRequest) : kotlin.Any {
+    suspend fun updateAllergenById(id: kotlin.Long, createAllergenRequest: CreateAllergenRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateAllergenByIdWithHttpInfo(id = id, createAllergenRequest = createAllergenRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -371,16 +366,15 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      * 
      * @param id 
      * @param createAllergenRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateAllergenByIdWithHttpInfo(id: kotlin.Long, createAllergenRequest: CreateAllergenRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun updateAllergenByIdWithHttpInfo(id: kotlin.Long, createAllergenRequest: CreateAllergenRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateAllergenByIdRequestConfig(id = id, createAllergenRequest = createAllergenRequest)
 
-        return request<CreateAllergenRequest, kotlin.Any>(
+        return@withContext request<CreateAllergenRequest, Unit>(
             localVariableConfig
         )
     }

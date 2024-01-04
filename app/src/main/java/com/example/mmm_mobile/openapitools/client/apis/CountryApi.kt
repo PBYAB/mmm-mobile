@@ -20,11 +20,15 @@ import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.Country
+import org.openapitools.client.models.CountryDTO
 import org.openapitools.client.models.CreateCountryRequest
+import org.openapitools.client.models.PageCountryDTO
 import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiResponse
 import org.openapitools.client.infrastructure.ClientException
@@ -60,10 +64,10 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createCountry(createCountryRequest: CreateCountryRequest) : Country {
+    suspend fun createCountry(createCountryRequest: CreateCountryRequest) : Country = withContext(Dispatchers.IO) {
         val localVarResponse = createCountryWithHttpInfo(createCountryRequest = createCountryRequest)
 
-        return when (localVarResponse.responseType) {
+        return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as Country
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
@@ -88,10 +92,10 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun createCountryWithHttpInfo(createCountryRequest: CreateCountryRequest) : ApiResponse<Country?> {
+    suspend fun createCountryWithHttpInfo(createCountryRequest: CreateCountryRequest) : ApiResponse<Country?> = withContext(Dispatchers.IO) {
         val localVariableConfig = createCountryRequestConfig(createCountryRequest = createCountryRequest)
 
-        return request<CreateCountryRequest, Country>(
+        return@withContext request<CreateCountryRequest, Country>(
             localVariableConfig
         )
     }
@@ -122,20 +126,19 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Delete an existing country
      * 
      * @param id 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun deleteCountry(id: kotlin.Long) : kotlin.Any {
+    suspend fun deleteCountry(id: kotlin.Long) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = deleteCountryWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -153,16 +156,15 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Delete an existing country
      * 
      * @param id 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun deleteCountryWithHttpInfo(id: kotlin.Long) : ApiResponse<kotlin.Any?> {
+    suspend fun deleteCountryWithHttpInfo(id: kotlin.Long) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = deleteCountryRequestConfig(id = id)
 
-        return request<Unit, kotlin.Any>(
+        return@withContext request<Unit, Unit>(
             localVariableConfig
         )
     }
@@ -192,7 +194,7 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a list of all countries
      * 
      * @param pageable 
-     * @return Country
+     * @return PageCountryDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -201,11 +203,11 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getCountries(pageable: Pageable) : Country {
+    suspend fun getCountries(pageable: Pageable) : PageCountryDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getCountriesWithHttpInfo(pageable = pageable)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Country
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as PageCountryDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -223,16 +225,16 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a list of all countries
      * 
      * @param pageable 
-     * @return ApiResponse<Country?>
+     * @return ApiResponse<PageCountryDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getCountriesWithHttpInfo(pageable: Pageable) : ApiResponse<Country?> {
+    suspend fun getCountriesWithHttpInfo(pageable: Pageable) : ApiResponse<PageCountryDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getCountriesRequestConfig(pageable = pageable)
 
-        return request<Unit, Country>(
+        return@withContext request<Unit, PageCountryDTO>(
             localVariableConfig
         )
     }
@@ -265,7 +267,7 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a country by ID
      * 
      * @param id 
-     * @return Country
+     * @return CountryDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -274,11 +276,11 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getCountry(id: kotlin.Long) : Country {
+    suspend fun getCountry(id: kotlin.Long) : CountryDTO = withContext(Dispatchers.IO) {
         val localVarResponse = getCountryWithHttpInfo(id = id)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as Country
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as CountryDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -296,16 +298,16 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * Get a country by ID
      * 
      * @param id 
-     * @return ApiResponse<Country?>
+     * @return ApiResponse<CountryDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getCountryWithHttpInfo(id: kotlin.Long) : ApiResponse<Country?> {
+    suspend fun getCountryWithHttpInfo(id: kotlin.Long) : ApiResponse<CountryDTO?> = withContext(Dispatchers.IO) {
         val localVariableConfig = getCountryRequestConfig(id = id)
 
-        return request<Unit, Country>(
+        return@withContext request<Unit, CountryDTO>(
             localVariableConfig
         )
     }
@@ -336,20 +338,19 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * 
      * @param id 
      * @param createCountryRequest 
-     * @return kotlin.Any
+     * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun updateCountry(id: kotlin.Long, createCountryRequest: CreateCountryRequest) : kotlin.Any {
+    suspend fun updateCountry(id: kotlin.Long, createCountryRequest: CreateCountryRequest) : Unit = withContext(Dispatchers.IO) {
         val localVarResponse = updateCountryWithHttpInfo(id = id, createCountryRequest = createCountryRequest)
 
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.Any
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -368,16 +369,15 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * 
      * @param id 
      * @param createCountryRequest 
-     * @return ApiResponse<kotlin.Any?>
+     * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
-    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun updateCountryWithHttpInfo(id: kotlin.Long, createCountryRequest: CreateCountryRequest) : ApiResponse<kotlin.Any?> {
+    suspend fun updateCountryWithHttpInfo(id: kotlin.Long, createCountryRequest: CreateCountryRequest) : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
         val localVariableConfig = updateCountryRequestConfig(id = id, createCountryRequest = createCountryRequest)
 
-        return request<CreateCountryRequest, kotlin.Any>(
+        return@withContext request<CreateCountryRequest, Unit>(
             localVariableConfig
         )
     }
