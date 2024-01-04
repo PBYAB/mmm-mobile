@@ -44,6 +44,7 @@ import com.example.mmm_mobile.screens.ProductDetailScreen
 import com.example.mmm_mobile.screens.ProductsScreen
 import com.example.mmm_mobile.screens.RecipeDetailScreen
 import com.example.mmm_mobile.screens.RecipesScreen
+import com.example.mmm_mobile.screens.RegistrationScreen
 import com.example.mmm_mobile.screens.Screen
 import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(padding)
             ) {
                 composable(Screen.Login.route) { LoginScreen(navController) }
+                composable(Screen.Registration.route) { RegistrationScreen(navController) }
                 composable(Screen.ProductList.route) { ProductsScreen(navController) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController) }
                 composable(Screen.AddProduct.route) { AddProductScreen() }

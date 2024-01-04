@@ -4,6 +4,7 @@ package com.example.mmm_mobile.screens
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
@@ -107,6 +108,19 @@ fun LoginScreen(navController: NavController) {
                 )
             ) {
                 Text("Log in")
+            }
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+            Button(
+                onClick = {
+                    navController.navigate(Screen.Registration.route)
+                },
+                modifier = Modifier.padding(top = 16.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Text("Go to Registration")
             }
         }
     }

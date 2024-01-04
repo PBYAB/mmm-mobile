@@ -63,4 +63,8 @@
     <string name="favourite_recipes_icon_info">Favourites Recipes</string>
     <string name="barcode_scanner_icon_info">Barcode Scanner</string>
     <string name="search_label">Find product or recipe</string>
+    <string name="register">Registration</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="lastName">Last name</string>
+    <string name="firstName">First name</string>
 </resources>
