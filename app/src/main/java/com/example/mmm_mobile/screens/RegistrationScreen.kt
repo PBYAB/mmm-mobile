@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -130,6 +131,7 @@ fun RegistrationScreen(navController: NavController) {
                                 )
                                 val result = apiInstance.register(registerRequest)
                                 ApiClient.accessToken = result.accessToken
+                                TokenManager.getInstance(context).accessToken = result.accessToken
                                 println(ApiClient.accessToken)
                                 withContext(Dispatchers.Main) {
                                     navController.navigate(Screen.ProductList.route)
