@@ -22,7 +22,6 @@ import okhttp3.HttpUrl
 import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CreateBrandRequest
 import org.openapitools.client.models.PageBrandDTO
-import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
@@ -190,7 +189,10 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
     /**
      * Get all brands
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageBrandDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -200,8 +202,8 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getAllBrands(pageable: Pageable) : PageBrandDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = getAllBrandsWithHttpInfo(pageable = pageable)
+    suspend fun getAllBrands(page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageBrandDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getAllBrandsWithHttpInfo(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageBrandDTO
@@ -221,15 +223,18 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
     /**
      * Get all brands
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageBrandDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getAllBrandsWithHttpInfo(pageable: Pageable) : ApiResponse<PageBrandDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getAllBrandsRequestConfig(pageable = pageable)
+    suspend fun getAllBrandsWithHttpInfo(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageBrandDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getAllBrandsRequestConfig(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageBrandDTO>(
             localVariableConfig
@@ -239,14 +244,28 @@ class BrandApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient =
     /**
      * To obtain the request config of the operation getAllBrands
      *
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getAllBrandsRequestConfig(pageable: Pageable) : RequestConfig<Unit> {
+    fun getAllBrandsRequestConfig(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

@@ -23,7 +23,6 @@ import org.openapitools.client.models.Country
 import org.openapitools.client.models.CountryDTO
 import org.openapitools.client.models.CreateCountryRequest
 import org.openapitools.client.models.PageCountryDTO
-import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
@@ -193,7 +192,10 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get a list of all countries
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageCountryDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -203,8 +205,8 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getCountries(pageable: Pageable) : PageCountryDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = getCountriesWithHttpInfo(pageable = pageable)
+    suspend fun getCountries(page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageCountryDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getCountriesWithHttpInfo(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageCountryDTO
@@ -224,15 +226,18 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get a list of all countries
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageCountryDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getCountriesWithHttpInfo(pageable: Pageable) : ApiResponse<PageCountryDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getCountriesRequestConfig(pageable = pageable)
+    suspend fun getCountriesWithHttpInfo(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageCountryDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getCountriesRequestConfig(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageCountryDTO>(
             localVariableConfig
@@ -242,14 +247,28 @@ class CountryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation getCountries
      *
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getCountriesRequestConfig(pageable: Pageable) : RequestConfig<Unit> {
+    fun getCountriesRequestConfig(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

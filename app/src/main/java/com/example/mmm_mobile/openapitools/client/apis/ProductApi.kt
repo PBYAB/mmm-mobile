@@ -21,7 +21,6 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateProductRequest
 import org.openapitools.client.models.PageProductToListDTO
-import org.openapitools.client.models.Pageable
 import org.openapitools.client.models.ProductDTO
 
 import com.squareup.moshi.Json
@@ -330,7 +329,6 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get all products
      * 
-     * @param pageable 
      * @param name  (optional)
      * @param quantity  (optional)
      * @param nutriScore  (optional)
@@ -338,6 +336,10 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @param category  (optional)
      * @param allergens  (optional)
      * @param country  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageProductToListDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -347,8 +349,8 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getProducts(pageable: Pageable, name: kotlin.String? = null, quantity: kotlin.String? = null, nutriScore: kotlin.collections.List<kotlin.Int>? = null, novaGroups: kotlin.collections.List<kotlin.Int>? = null, category: kotlin.collections.List<kotlin.Long>? = null, allergens: kotlin.collections.List<kotlin.Long>? = null, country: kotlin.collections.List<kotlin.Long>? = null) : PageProductToListDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = getProductsWithHttpInfo(pageable = pageable, name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country)
+    suspend fun getProducts(name: kotlin.String? = null, quantity: kotlin.String? = null, nutriScore: kotlin.collections.List<kotlin.Int>? = null, novaGroups: kotlin.collections.List<kotlin.Int>? = null, category: kotlin.collections.List<kotlin.Long>? = null, allergens: kotlin.collections.List<kotlin.Long>? = null, country: kotlin.collections.List<kotlin.Long>? = null, page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageProductToListDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getProductsWithHttpInfo(name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageProductToListDTO
@@ -368,7 +370,6 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Get all products
      * 
-     * @param pageable 
      * @param name  (optional)
      * @param quantity  (optional)
      * @param nutriScore  (optional)
@@ -376,14 +377,18 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @param category  (optional)
      * @param allergens  (optional)
      * @param country  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageProductToListDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getProductsWithHttpInfo(pageable: Pageable, name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?) : ApiResponse<PageProductToListDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getProductsRequestConfig(pageable = pageable, name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country)
+    suspend fun getProductsWithHttpInfo(name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageProductToListDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getProductsRequestConfig(name = name, quantity = quantity, nutriScore = nutriScore, novaGroups = novaGroups, category = category, allergens = allergens, country = country, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageProductToListDTO>(
             localVariableConfig
@@ -393,7 +398,6 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation getProducts
      *
-     * @param pageable 
      * @param name  (optional)
      * @param quantity  (optional)
      * @param nutriScore  (optional)
@@ -401,9 +405,13 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @param category  (optional)
      * @param allergens  (optional)
      * @param country  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getProductsRequestConfig(pageable: Pageable, name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?) : RequestConfig<Unit> {
+    fun getProductsRequestConfig(name: kotlin.String?, quantity: kotlin.String?, nutriScore: kotlin.collections.List<kotlin.Int>?, novaGroups: kotlin.collections.List<kotlin.Int>?, category: kotlin.collections.List<kotlin.Long>?, allergens: kotlin.collections.List<kotlin.Long>?, country: kotlin.collections.List<kotlin.Long>?, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
@@ -428,7 +436,18 @@ class ProductApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
                 if (country != null) {
                     put("country", toMultiValue(country.toList(), "multi"))
                 }
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

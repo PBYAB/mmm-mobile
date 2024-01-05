@@ -22,7 +22,6 @@ import okhttp3.HttpUrl
 import org.openapitools.client.models.AllergenDTO
 import org.openapitools.client.models.CreateAllergenRequest
 import org.openapitools.client.models.PageAllergenDTO
-import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
@@ -260,7 +259,10 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * List all allergens with pagination
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageAllergenDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -270,8 +272,8 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun listAllergens(pageable: Pageable) : PageAllergenDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = listAllergensWithHttpInfo(pageable = pageable)
+    suspend fun listAllergens(page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageAllergenDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = listAllergensWithHttpInfo(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageAllergenDTO
@@ -291,15 +293,18 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * List all allergens with pagination
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageAllergenDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun listAllergensWithHttpInfo(pageable: Pageable) : ApiResponse<PageAllergenDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = listAllergensRequestConfig(pageable = pageable)
+    suspend fun listAllergensWithHttpInfo(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageAllergenDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = listAllergensRequestConfig(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageAllergenDTO>(
             localVariableConfig
@@ -309,14 +314,28 @@ class AllergenApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * To obtain the request config of the operation listAllergens
      *
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun listAllergensRequestConfig(pageable: Pageable) : RequestConfig<Unit> {
+    fun listAllergensRequestConfig(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

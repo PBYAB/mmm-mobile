@@ -22,7 +22,6 @@ import okhttp3.HttpUrl
 import org.openapitools.client.models.CreateIngredientRequest
 import org.openapitools.client.models.Ingredient
 import org.openapitools.client.models.PageIngredientListItem
-import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
@@ -124,7 +123,10 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
     /**
      * List all ingredients
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageIngredientListItem
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -134,8 +136,8 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun findAll(pageable: Pageable) : PageIngredientListItem = withContext(Dispatchers.IO) {
-        val localVarResponse = findAllWithHttpInfo(pageable = pageable)
+    suspend fun findAll(page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageIngredientListItem = withContext(Dispatchers.IO) {
+        val localVarResponse = findAllWithHttpInfo(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageIngredientListItem
@@ -155,15 +157,18 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
     /**
      * List all ingredients
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageIngredientListItem?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun findAllWithHttpInfo(pageable: Pageable) : ApiResponse<PageIngredientListItem?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = findAllRequestConfig(pageable = pageable)
+    suspend fun findAllWithHttpInfo(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageIngredientListItem?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = findAllRequestConfig(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageIngredientListItem>(
             localVariableConfig
@@ -173,14 +178,28 @@ class IngredientApi(basePath: kotlin.String = defaultBasePath, client: OkHttpCli
     /**
      * To obtain the request config of the operation findAll
      *
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun findAllRequestConfig(pageable: Pageable) : RequestConfig<Unit> {
+    fun findAllRequestConfig(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

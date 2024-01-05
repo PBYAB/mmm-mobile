@@ -51,8 +51,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Authenticate a user
-     *
-     * @param authenticationRequest
+     * 
+     * @param authenticationRequest 
      * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -82,8 +82,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Authenticate a user
-     *
-     * @param authenticationRequest
+     * 
+     * @param authenticationRequest 
      * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -101,7 +101,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
     /**
      * To obtain the request config of the operation authenticate
      *
-     * @param authenticationRequest
+     * @param authenticationRequest 
      * @return RequestConfig
      */
     fun authenticateRequestConfig(authenticationRequest: AuthenticationRequest) : RequestConfig<AuthenticationRequest> {
@@ -109,7 +109,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/authenticate",
@@ -122,7 +122,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Refresh a token
-     *
+     * 
      * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -152,7 +152,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Refresh a token
-     *
+     * 
      * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -176,7 +176,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/refresh-token",
@@ -189,8 +189,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Register a new user
-     *
-     * @param registerRequest
+     * 
+     * @param registerRequest 
      * @return AuthenticationResponse
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -220,8 +220,8 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
 
     /**
      * Register a new user
-     *
-     * @param registerRequest
+     * 
+     * @param registerRequest 
      * @return ApiResponse<AuthenticationResponse?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -239,7 +239,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
     /**
      * To obtain the request config of the operation register
      *
-     * @param registerRequest
+     * @param registerRequest 
      * @return RequestConfig
      */
     fun registerRequestConfig(registerRequest: RegisterRequest) : RequestConfig<RegisterRequest> {
@@ -247,7 +247,7 @@ class Class1AuthenticationApi(basePath: kotlin.String = defaultBasePath, client:
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-
+        
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/auth/register",

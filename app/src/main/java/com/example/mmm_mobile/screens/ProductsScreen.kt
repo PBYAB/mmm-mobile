@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.ProductApi
-import org.openapitools.client.models.Pageable
 
 @Composable
 fun ProductsScreen(navController: NavController) {
@@ -158,7 +157,7 @@ fun ProductsScreen(navController: NavController) {
         ) {
             CoroutineScope(Dispatchers.IO).launch {
                 val productClient = ProductApi()
-                val product = productClient.getProducts(Pageable(0, 10))
+                val product = productClient.getProducts()
                 println(product)
             }
             items(products) { product ->

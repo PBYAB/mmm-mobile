@@ -21,7 +21,6 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateRecipeReviewRequest
 import org.openapitools.client.models.PageRecipeReviewDTO
-import org.openapitools.client.models.Pageable
 import org.openapitools.client.models.RecipeReviewDTO
 
 import com.squareup.moshi.Json
@@ -270,7 +269,10 @@ class RecipeReviewApi(basePath: kotlin.String = defaultBasePath, client: OkHttpC
      * Get all reviews for recipe
      * 
      * @param id 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageRecipeReviewDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -280,8 +282,8 @@ class RecipeReviewApi(basePath: kotlin.String = defaultBasePath, client: OkHttpC
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getReviews(id: kotlin.Long, pageable: Pageable) : PageRecipeReviewDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = getReviewsWithHttpInfo(id = id, pageable = pageable)
+    suspend fun getReviews(id: kotlin.Long, page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageRecipeReviewDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getReviewsWithHttpInfo(id = id, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageRecipeReviewDTO
@@ -302,15 +304,18 @@ class RecipeReviewApi(basePath: kotlin.String = defaultBasePath, client: OkHttpC
      * Get all reviews for recipe
      * 
      * @param id 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageRecipeReviewDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getReviewsWithHttpInfo(id: kotlin.Long, pageable: Pageable) : ApiResponse<PageRecipeReviewDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getReviewsRequestConfig(id = id, pageable = pageable)
+    suspend fun getReviewsWithHttpInfo(id: kotlin.Long, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageRecipeReviewDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getReviewsRequestConfig(id = id, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageRecipeReviewDTO>(
             localVariableConfig
@@ -321,14 +326,28 @@ class RecipeReviewApi(basePath: kotlin.String = defaultBasePath, client: OkHttpC
      * To obtain the request config of the operation getReviews
      *
      * @param id 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getReviewsRequestConfig(id: kotlin.Long, pageable: Pageable) : RequestConfig<Unit> {
+    fun getReviewsRequestConfig(id: kotlin.Long, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         

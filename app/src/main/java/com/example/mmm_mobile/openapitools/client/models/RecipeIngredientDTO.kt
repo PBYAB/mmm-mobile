@@ -48,7 +48,7 @@ data class RecipeIngredientDTO (
     /**
      * 
      *
-     * Values: g,mL,tSP,tBSP,cUP,pIECE
+     * Values: g,mL,tSP,tBSP,cUP,pIECE,pINCH,pACKAGE,hANDFUL,jAR,cAN,bUNCH,sLICE,oTHER
      */
     @JsonClass(generateAdapter = false)
     enum class Unit(val value: kotlin.String) {
@@ -57,7 +57,15 @@ data class RecipeIngredientDTO (
         @Json(name = "TSP") tSP("TSP"),
         @Json(name = "TBSP") tBSP("TBSP"),
         @Json(name = "CUP") cUP("CUP"),
-        @Json(name = "PIECE") pIECE("PIECE");
+        @Json(name = "PIECE") pIECE("PIECE"),
+        @Json(name = "PINCH") pINCH("PINCH"),
+        @Json(name = "PACKAGE") pACKAGE("PACKAGE"),
+        @Json(name = "HANDFUL") hANDFUL("HANDFUL"),
+        @Json(name = "JAR") jAR("JAR"),
+        @Json(name = "CAN") cAN("CAN"),
+        @Json(name = "BUNCH") bUNCH("BUNCH"),
+        @Json(name = "SLICE") sLICE("SLICE"),
+        @Json(name = "OTHER") oTHER("OTHER");
     }
 }
 

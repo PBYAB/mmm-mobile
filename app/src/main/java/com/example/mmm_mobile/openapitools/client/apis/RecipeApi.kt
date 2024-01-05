@@ -21,7 +21,6 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.CreateRecipeRequest
 import org.openapitools.client.models.PageRecipeListItem
-import org.openapitools.client.models.Pageable
 import org.openapitools.client.models.RecipeDTO
 
 import com.squareup.moshi.Json
@@ -260,11 +259,14 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     /**
      * Get all recipes
      * 
-     * @param pageable 
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
      * @param maxKcalPerServing  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageRecipeListItem
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -274,8 +276,8 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getRecipes(pageable: Pageable, name: kotlin.String? = null, servings: kotlin.collections.List<kotlin.Int>? = null, minKcalPerServing: kotlin.Double? = null, maxKcalPerServing: kotlin.Double? = null) : PageRecipeListItem = withContext(Dispatchers.IO) {
-        val localVarResponse = getRecipesWithHttpInfo(pageable = pageable, name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing)
+    suspend fun getRecipes(name: kotlin.String? = null, servings: kotlin.collections.List<kotlin.Int>? = null, minKcalPerServing: kotlin.Double? = null, maxKcalPerServing: kotlin.Double? = null, page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageRecipeListItem = withContext(Dispatchers.IO) {
+        val localVarResponse = getRecipesWithHttpInfo(name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageRecipeListItem
@@ -295,19 +297,22 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     /**
      * Get all recipes
      * 
-     * @param pageable 
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
      * @param maxKcalPerServing  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageRecipeListItem?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getRecipesWithHttpInfo(pageable: Pageable, name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?) : ApiResponse<PageRecipeListItem?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getRecipesRequestConfig(pageable = pageable, name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing)
+    suspend fun getRecipesWithHttpInfo(name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageRecipeListItem?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getRecipesRequestConfig(name = name, servings = servings, minKcalPerServing = minKcalPerServing, maxKcalPerServing = maxKcalPerServing, page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageRecipeListItem>(
             localVariableConfig
@@ -317,14 +322,17 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     /**
      * To obtain the request config of the operation getRecipes
      *
-     * @param pageable 
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
      * @param maxKcalPerServing  (optional)
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getRecipesRequestConfig(pageable: Pageable, name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?) : RequestConfig<Unit> {
+    fun getRecipesRequestConfig(name: kotlin.String?, servings: kotlin.collections.List<kotlin.Int>?, minKcalPerServing: kotlin.Double?, maxKcalPerServing: kotlin.Double?, page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
@@ -340,13 +348,89 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
                 if (maxKcalPerServing != null) {
                     put("maxKcalPerServing", listOf(maxKcalPerServing.toString()))
                 }
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/recipes",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * Populate database with recipes
+     * 
+     * @return void
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    suspend fun populateDatabase() : Unit = withContext(Dispatchers.IO) {
+        val localVarResponse = populateDatabaseWithHttpInfo()
+
+        return@withContext when (localVarResponse.responseType) {
+            ResponseType.Success -> Unit
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * Populate database with recipes
+     * 
+     * @return ApiResponse<Unit?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Throws(IllegalStateException::class, IOException::class)
+    suspend fun populateDatabaseWithHttpInfo() : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = populateDatabaseRequestConfig()
+
+        return@withContext request<Unit, Unit>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation populateDatabase
+     *
+     * @return RequestConfig
+     */
+    fun populateDatabaseRequestConfig() : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/recipes/populate",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,

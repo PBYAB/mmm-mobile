@@ -24,10 +24,12 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param instructions 
+ * @param coverImageUrl 
  * @param ingredients 
  * @param kcalPerServing 
  * @param name 
  * @param servings 
+ * @param totalTime 
  */
 
 
@@ -35,6 +37,9 @@ data class CreateRecipeRequest (
 
     @Json(name = "instructions")
     val instructions: kotlin.String,
+
+    @Json(name = "coverImageUrl")
+    val coverImageUrl: kotlin.String? = null,
 
     @Json(name = "ingredients")
     val ingredients: kotlin.collections.List<RecipeIngredientForm>? = null,
@@ -46,7 +51,10 @@ data class CreateRecipeRequest (
     val name: kotlin.String? = null,
 
     @Json(name = "servings")
-    val servings: kotlin.Int? = null
+    val servings: kotlin.Int? = null,
+
+    @Json(name = "totalTime")
+    val totalTime: kotlin.Int? = null
 
 )
 

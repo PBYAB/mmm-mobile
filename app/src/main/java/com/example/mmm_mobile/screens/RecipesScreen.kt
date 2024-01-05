@@ -50,7 +50,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.ProductApi
 import org.openapitools.client.apis.RecipeApi
-import org.openapitools.client.models.Pageable
 
 
 class RecipePagingSource(
@@ -59,7 +58,7 @@ class RecipePagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Recipe> {
         val page = params.key ?: 0
         return try {
-            val apiRecipes = recipeApi.getRecipes(Pageable(page, 4))
+            val apiRecipes = recipeApi.getRecipes(page = page, size = 4)
             println(apiRecipes)
             val recipes = apiRecipes.content?.map {
                 Recipe(

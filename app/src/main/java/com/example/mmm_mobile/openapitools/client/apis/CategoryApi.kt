@@ -23,7 +23,6 @@ import org.openapitools.client.models.Category
 import org.openapitools.client.models.CategoryDTO
 import org.openapitools.client.models.CreateProductCategoryRequest
 import org.openapitools.client.models.PageCategoryDTO
-import org.openapitools.client.models.Pageable
 
 import com.squareup.moshi.Json
 
@@ -193,7 +192,10 @@ class CategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * Get a list of all categories
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return PageCategoryDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -203,8 +205,8 @@ class CategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun getCategories(pageable: Pageable) : PageCategoryDTO = withContext(Dispatchers.IO) {
-        val localVarResponse = getCategoriesWithHttpInfo(pageable = pageable)
+    suspend fun getCategories(page: kotlin.Int? = 0, size: kotlin.Int? = 10, sortBy: kotlin.String? = "id", sortDirection: kotlin.String? = "ASC") : PageCategoryDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getCategoriesWithHttpInfo(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as PageCategoryDTO
@@ -224,15 +226,18 @@ class CategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * Get a list of all categories
      * 
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return ApiResponse<PageCategoryDTO?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    suspend fun getCategoriesWithHttpInfo(pageable: Pageable) : ApiResponse<PageCategoryDTO?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = getCategoriesRequestConfig(pageable = pageable)
+    suspend fun getCategoriesWithHttpInfo(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : ApiResponse<PageCategoryDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getCategoriesRequestConfig(page = page, size = size, sortBy = sortBy, sortDirection = sortDirection)
 
         return@withContext request<Unit, PageCategoryDTO>(
             localVariableConfig
@@ -242,14 +247,28 @@ class CategoryApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClien
     /**
      * To obtain the request config of the operation getCategories
      *
-     * @param pageable 
+     * @param page  (optional, default to 0)
+     * @param size  (optional, default to 10)
+     * @param sortBy  (optional, default to "id")
+     * @param sortDirection  (optional, default to "ASC")
      * @return RequestConfig
      */
-    fun getCategoriesRequestConfig(pageable: Pageable) : RequestConfig<Unit> {
+    fun getCategoriesRequestConfig(page: kotlin.Int?, size: kotlin.Int?, sortBy: kotlin.String?, sortDirection: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("pageable", listOf(pageable.toString()))
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (size != null) {
+                    put("size", listOf(size.toString()))
+                }
+                if (sortBy != null) {
+                    put("sortBy", listOf(sortBy.toString()))
+                }
+                if (sortDirection != null) {
+                    put("sortDirection", listOf(sortDirection.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         
