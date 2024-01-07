@@ -1,4 +1,5 @@
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
@@ -26,6 +27,20 @@ class FavouriteRecipeRepository(
     suspend fun findRecipeById(recipeId: Long): FavouriteRecipe {
         return withContext(defaultDispatcher) {
             favouriteRecipeDao.getRecipeById(recipeId)
+        }
+    }
+
+    suspend fun insertFavouriteRecipe(favouriteRecipe: FavouriteRecipe) {
+        withContext(defaultDispatcher) {
+            favouriteRecipeDao.insertFavouriteRecipe(favouriteRecipe)
+            Log.d("FavouriteRecipeRepository", "insertFavouriteRecipe: $favouriteRecipe")
+        }
+    }
+
+    suspend fun deleteFavouriteRecipe(recipeId: Long) {
+        withContext(defaultDispatcher) {
+            favouriteRecipeDao.deleteFavouriteRecipe(recipeId)
+            Log.d("FavouriteRecipeRepository", "deleteFavouriteRecipe: $recipeId")
         }
     }
 

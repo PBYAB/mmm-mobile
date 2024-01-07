@@ -67,4 +67,6 @@
     <string name="confirm_password">Confirm password</string>
     <string name="lastName">Last name</string>
     <string name="firstName">First name</string>
+    <string name="time_info">Preparation Time</string>
+    <string name="try_again">Try Again</string>
 </resources>

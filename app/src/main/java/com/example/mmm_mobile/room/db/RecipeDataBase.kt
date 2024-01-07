@@ -14,10 +14,11 @@ import com.example.mmm_mobile.room.entity.RecipeIngredient
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 @Database(
     entities = [FavouriteRecipe::class, RecipeIngredient::class],
-    version = 1,
+    version = 4,
     exportSchema = true
 )
 abstract class RecipeDataBase : RoomDatabase() {
@@ -50,6 +51,10 @@ abstract class RecipeDataBase : RoomDatabase() {
                     RecipeDataBase::class.java,
                     "favourite_recipe_database"
                 )
+                    .setQueryCallback({ sql, bindArgs ->
+                        Log.d("Room", "Executing SQL: $sql")
+                        Log.d("Room", "With bindArgs: $bindArgs")
+                    }, Executors.newSingleThreadExecutor())
                     .addCallback(roomDatabaseCallback)
                     .fallbackToDestructiveMigration()
                     .build()
@@ -62,25 +67,25 @@ abstract class RecipeDataBase : RoomDatabase() {
 
         suspend fun populateDatabase(favouriteRecipeDao: FavouriteRecipeDao, recipeIngredientDao: RecipeIngredientDao) {
             val recipes = listOf(
-                FavouriteRecipe(0, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0),
-                FavouriteRecipe(0, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0),
-                FavouriteRecipe(0, "Pierogi z serem", 2, "https://picsum.photos/200/300", "Pierogi z serem", 200.0),
-                FavouriteRecipe(0, "Pierogi z truskawkami", 3, "https://picsum.photos/200/300", "Pierogi z truskawkami", 300.0),
-                FavouriteRecipe(0, "Pierogi z jagodami", 4, "https://picsum.photos/200/300", "Pierogi z jagodami", 400.0),
-                FavouriteRecipe(0, "Pierogi z borówkami", 5, "https://picsum.photos/200/300", "Pierogi z borówkami", 500.0),
-                FavouriteRecipe(0, "Pierogi z malinami", 6, "https://picsum.photos/200/300", "Pierogi z malinami", 600.0),
+                FavouriteRecipe(0, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0, 1),
+                FavouriteRecipe(0, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0,2),
+                FavouriteRecipe(0, "Pierogi z serem", 2, "https://picsum.photos/200/300", "Pierogi z serem", 200.0,3),
+                FavouriteRecipe(0, "Pierogi z truskawkami", 3, "https://picsum.photos/200/300", "Pierogi z truskawkami", 300.0,4),
+                FavouriteRecipe(0, "Pierogi z jagodami", 4, "https://picsum.photos/200/300", "Pierogi z jagodami", 400.0,5),
+                FavouriteRecipe(0, "Pierogi z borówkami", 5, "https://picsum.photos/200/300", "Pierogi z borówkami", 500.0,6),
+                FavouriteRecipe(0, "Pierogi z malinami", 6, "https://picsum.photos/200/300", "Pierogi z malinami", 600.0,7),
 
                 )
 
             val ingredients = listOf(
-                RecipeIngredient(0, "Kapusta", 500.0, IngredientUnit.G, 1),
-                RecipeIngredient(0, "Ciasto", 1000.0, IngredientUnit.G, 1),
-                RecipeIngredient(0, "Mięso", 500.0, IngredientUnit.ML, 2),
-                RecipeIngredient(0, "Ser", 500.0, IngredientUnit.ML, 3),
-                RecipeIngredient(0, "Truskawki", 500.0, IngredientUnit.ML, 4),
-                RecipeIngredient(0, "Jagody", 500.0, IngredientUnit.ML, 5),
-                RecipeIngredient(0, "Borówki", 500.0, IngredientUnit.ML, 6),
-                RecipeIngredient(0, "Maliny", 500.0, IngredientUnit.ML, 7),
+                RecipeIngredient(0,0, "Kapusta", 500.0, IngredientUnit.G, 1),
+                RecipeIngredient(0,0, "Ciasto", 1000.0, IngredientUnit.G, 1),
+                RecipeIngredient(0,0, "Mięso", 500.0, IngredientUnit.ML, 2),
+                RecipeIngredient(0,0, "Ser", 500.0, IngredientUnit.ML, 3),
+                RecipeIngredient(0,0, "Truskawki", 500.0, IngredientUnit.ML, 4),
+                RecipeIngredient(0,0, "Jagody", 500.0, IngredientUnit.ML, 5),
+                RecipeIngredient(0,0, "Borówki", 500.0, IngredientUnit.ML, 6),
+                RecipeIngredient(0,0, "Maliny", 500.0, IngredientUnit.ML, 7),
             )
 
             recipes.forEach {

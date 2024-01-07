@@ -56,6 +56,8 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+    implementation("androidx.paging:paging-runtime:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")
     kapt("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 

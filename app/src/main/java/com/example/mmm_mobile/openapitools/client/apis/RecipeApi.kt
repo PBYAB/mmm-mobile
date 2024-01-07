@@ -15,6 +15,7 @@
 
 package org.openapitools.client.apis
 
+import android.util.Log
 import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
@@ -258,7 +259,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Get all recipes
-     * 
+     *
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
@@ -296,7 +297,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Get all recipes
-     * 
+     *
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
@@ -375,7 +376,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Populate database with recipes
-     * 
+     *
      * @return void
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -404,7 +405,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Populate database with recipes
-     * 
+     *
      * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -427,7 +428,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        
+
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/recipes/populate",

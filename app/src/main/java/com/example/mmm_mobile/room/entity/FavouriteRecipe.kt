@@ -10,5 +10,6 @@ data class FavouriteRecipe(
     val servings: Int,
     val image: String,
     val instructions: String,
-    val kcalPerServings: Double
+    val kcalPerServings: Double,
+    val totalTime: Int
 )

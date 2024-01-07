@@ -8,5 +8,5 @@ enum class Screen(val route: String) {
     Search("Search"),
     FavouriteRecipes("Favourite"),
     AddProduct("Add Product"),
-    AddRecipe("Add Recipe")
+    AddRecipe("Add Recipe"),
 }

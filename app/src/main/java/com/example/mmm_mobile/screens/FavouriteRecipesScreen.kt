@@ -29,11 +29,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
-import com.example.mmm_mobile.room.viewmodel.RecipeViewModel
+import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 
 @Composable
 fun FavouriteRecipesScreen(navController: NavController) {
-    val recipeViewModel: RecipeViewModel = viewModel()
+    val recipeViewModel: FavouriteRecipeViewModel = viewModel()
     val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipes().observeAsState(initial = emptyList())
 
     FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, navController = navController)

@@ -14,7 +14,8 @@ import androidx.room.PrimaryKey
     )]
 )
 data class RecipeIngredient(
-    @PrimaryKey(autoGenerate = true) val ingredientId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    val ingredientId: Long,
     val name: String,
     val amount: Double,
     val unit: IngredientUnit,

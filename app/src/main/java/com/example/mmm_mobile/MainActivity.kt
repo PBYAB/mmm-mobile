@@ -64,8 +64,6 @@ class MainActivity : ComponentActivity() {
     fun MainActivityComposable() {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
 
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -86,20 +84,22 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
                 composable(Screen.ProductList.route) { ProductsScreen(navController) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController) }
-                composable(Screen.Search.route) { SearchScreen() }
+                composable(Screen.Search.route + "/products") { SearchScreen(navController) }
+                composable(Screen.Search.route + "/recipes") { SearchScreen(navController) }
                 composable("Product/{productId}") { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId")?.toLongOrNull()
                     ProductDetailScreen(productId) // Przekazujemy productId do ProductDetailScreen
                 }
                 composable("Recipe/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(recipeId) // Przekazujemy recipeId do RecipeDetailScreen
+                    RecipeDetailScreen(navController, recipeId) // Przekazujemy recipeId do RecipeDetailScreen
                 }
                 composable(Screen.FavouriteRecipes.route) { FavouriteRecipesScreen(navController) }
                 composable("Favorite/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(recipeId = recipeId) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
+                    RecipeDetailScreen(navController, recipeId = recipeId) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
                 }
+                composable(Screen.RecipeList.route + "/{query}") { RecipesScreen(navController) }
             }
         }
     }
@@ -116,6 +116,7 @@ class MainActivity : ComponentActivity() {
             Screen.Search.route -> {}
             Screen.AddProduct.route -> {}
             Screen.AddRecipe.route -> {}
+            Screen.Registration.route -> {}
 
             else -> BottomNavigation(
                 backgroundColor = MaterialTheme.colorScheme.primaryContainer,
@@ -124,15 +125,15 @@ class MainActivity : ComponentActivity() {
                 items.forEach { screen ->
                     BottomNavigationItem(
                         icon = {
-                            when (screen) {
+                            when(screen) {
                                 Screen.ProductList -> Icon(Icons.Filled.ShoppingCart, contentDescription = getText(R.string.products_screen_icon_info).toString())
-                                Screen.RecipeList ->  Icon(painter = painterResource(R.mipmap.restaurant_black_24dp), contentDescription = getText(R.string.recipes_screen_icon_info).toString())
-                                Screen.FavouriteRecipes -> Icon( Icons.Filled.Favorite, contentDescription = getText(R.string.favourite_recipes_icon_info).toString())
+                                Screen.RecipeList -> Icon(painter = painterResource(R.mipmap.restaurant_black_24dp), contentDescription = getText(R.string.recipes_screen_icon_info).toString())
+                                Screen.FavouriteRecipes -> Icon(Icons.Filled.Favorite, contentDescription = getText(R.string.favourite_recipes_icon_info).toString())
                                 else -> Icon(Icons.Filled.Home, contentDescription = getText(R.string.home_screen_icon_info).toString())
                             }
                         },
                         label = { Text(text = screen.route) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        selected = currentDestination?.hierarchy?.any { it.route?.startsWith(screen.route) ?: false } == true,
                         onClick = {
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.startDestinationId)
@@ -176,13 +177,15 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopBar(navController: NavController){
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-        when (navController.currentBackStackEntry?.destination?.route) {
+
+        when (currentRoute) {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
             Screen.AddProduct.route -> {}
             Screen.AddRecipe.route -> {}
-
+            Screen.Registration.route -> {}
             else -> TopAppBar(
                     title = {
                         Text(
@@ -201,7 +204,16 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = getText(R.string.barcode_scanner_icon_info).toString()
                             )
                         }
-                        IconButton(onClick = { navController.navigate(Screen.Search.route) }) {
+                        IconButton(onClick = {
+                            if (currentRoute != null) {
+                                when {
+                                    currentRoute.startsWith(Screen.ProductList.route) -> navController.navigate(Screen.Search.route + "/products")
+                                    currentRoute.startsWith(Screen.RecipeList.route) -> navController.navigate(Screen.Search.route + "/recipes")
+                                    else -> {}
+                                }
+                            }
+                        }
+                        ) {
                             Icon(Icons.Filled.Search, contentDescription = "Search")
                         }
                     }
