@@ -58,20 +58,20 @@ data class RecipeIngredient (
      */
     @JsonClass(generateAdapter = false)
     enum class Unit(val value: kotlin.String) {
-        @Json(name = "G") g("G"),
-        @Json(name = "ML") mL("ML"),
-        @Json(name = "TSP") tSP("TSP"),
-        @Json(name = "TBSP") tBSP("TBSP"),
-        @Json(name = "CUP") cUP("CUP"),
-        @Json(name = "PIECE") pIECE("PIECE"),
-        @Json(name = "PINCH") pINCH("PINCH"),
-        @Json(name = "PACKAGE") pACKAGE("PACKAGE"),
-        @Json(name = "HANDFUL") hANDFUL("HANDFUL"),
-        @Json(name = "JAR") jAR("JAR"),
-        @Json(name = "CAN") cAN("CAN"),
-        @Json(name = "BUNCH") bUNCH("BUNCH"),
-        @Json(name = "SLICE") sLICE("SLICE"),
-        @Json(name = "OTHER") oTHER("OTHER");
+        @Json(name = "G") G("G"),
+        @Json(name = "ML") ML("ML"),
+        @Json(name = "TSP") TSP("TSP"),
+        @Json(name = "TBSP") TBSP("TBSP"),
+        @Json(name = "CUP") CUP("CUP"),
+        @Json(name = "PIECE") PIECE("PIECE"),
+        @Json(name = "PINCH") PINCH("PINCH"),
+        @Json(name = "PACKAGE") PACKAGE("PACKAGE"),
+        @Json(name = "HANDFUL") HANDFUL("HANDFUL"),
+        @Json(name = "JAR") JAR("JAR"),
+        @Json(name = "CAN") CAN("CAN"),
+        @Json(name = "BUNCH") BUNCH("BUNCH"),
+        @Json(name = "SLICE") SLICE("SLICE"),
+        @Json(name = "OTHER") OTHER("OTHER");
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
@@ -35,126 +37,166 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.models.RecipeDTO
+import org.openapitools.client.models.RecipeIngredient
+import org.openapitools.client.models.RecipeIngredientDTO
 
 @Composable
 fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
-    val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
+    val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
+    val recipe by recipeLiveData.observeAsState()
 
-    val recipe by favouriteRecipeViewModel.findRecipeById(recipeId ?: 0).observeAsState(null)
-    val ingredients by favouriteRecipeViewModel.findRecipeIngredientsByRecipeId(recipeId ?: 0).observeAsState(null)
-
-    Log.d("RecipeDetailScreen", "Recipe: $recipe")
     if(recipe != null){
-        Log.d("RecipeDetailScreen", "Recipe not found in favourites")
-
-        val painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(data = recipe!!.image)
-                .apply(block = fun ImageRequest.Builder.() {
-                    placeholder(R.mipmap.ic_article_icon_foreground)
-                    error(R.mipmap.ic_article_icon_foreground)
-                }).build()
-        )
-
-
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item {
-                Button(onClick = {
-                    favouriteRecipeViewModel.deleteFavouriteRecipe(recipe!!.id)
-                }
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = null)
-                }
-            }
-
-            item {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            item { Text(text = recipe!!.name ?: "Loading...") }
-            item { Text(text = recipe!!.instructions ?: "Loading...") }
-            item { Text(text = recipe!!.servings.toString()) }
-            item { Text(text = recipe!!.totalTime.toString()) }
-
-
-            items(ingredients ?: emptyList()) { ingredient ->
-                Text(text = ingredient.name)
-                Text(text = ingredient.amount.toString())
-                Text(text = ingredient.unit.name)
-            }
+            item { Text(text = "" +recipeId + "|" + recipe?.id) }
+            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId) }
+            item { recipe?.mapToRecipeTDetails()?.let { RecipeDetails(recipeDetails = it) } }
         }
     }else{
+        val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+
         LaunchedEffect(recipeId) {
             recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
         }
 
-
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
 
-
-        val painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(data = recipe?.coverImageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    placeholder(R.mipmap.ic_article_icon_foreground)
-                    error(R.mipmap.ic_article_icon_foreground)
-                }).build()
-        )
-
-
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { Text(text = recipe?.id.toString() ?: "Loading...")}
-            item { Text(text = recipeId.toString() ?: "Loading...")}
-            item {
-                Button(onClick = {
-                    favouriteRecipeViewModel.insertFavouriteRecipe(
-                        RecipeDTO(
-                            id = recipe?.id ?: 0,
-                            name = recipe?.name ?: "",
-                            servings = recipe?.servings ?: 0,
-                            totalTime = recipe?.totalTime ?: 0,
-                            kcalPerServing = recipe?.kcalPerServing ?: 0.0,
-                            instructions = recipe?.instructions ?: "",
-                            coverImageUrl = recipe?.coverImageUrl ?: "",
-                            ingredients = recipe?.ingredients ?: emptyList()
-                        )
-                    )
-                }
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = null)
-                }
-            }
-
-            item {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            item { Text(text = recipe?.name ?: "Loading...") }
-            item { Text(text = recipe?.instructions ?: "Loading...") }
-            item { Text(text = recipe?.servings.toString()) }
-            item { Text(text = recipe?.totalTime.toString()) }
-            item { Text(text = recipe?.kcalPerServing.toString()) }
-
-            items(recipe?.ingredients.orEmpty()) { ingredient ->
-                ingredient.name?.let { Text(text = it) }
-                ingredient.amount?.let { Text(text = it.toString()) }
-                ingredient.unit?.let { Text(text = it.name) }
-            }
+            item { Text(text = "" +recipeId + " | " + recipe?.id) }
+            item { AddRecipeButton(favouriteRecipeViewModel, recipe) }
+            item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }
 }
 
+@Composable
+fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipeId: Long?) {
+    Button(onClick = {
+        favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
+    }) {
+        Icon(Icons.Filled.Delete, contentDescription = null)
+    }
+}
 
+@Composable
+fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?) {
+    Button(onClick = {
+        favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
+            RecipeDTO(
+                id = recipe?.id ?: 0,
+                name = recipe?.name ?: "",
+                servings = recipe?.servings ?: 0,
+                totalTime = recipe?.totalTime ?: 0,
+                kcalPerServing = recipe?.kcalPerServing ?: 0.0,
+                instructions = recipe?.instructions ?: "",
+                coverImageUrl = recipe?.coverImageUrl ?: "",
+                ingredients = recipe?.ingredients ?: emptyList()
+            )
+        )
+    }) {
+        Icon(Icons.Filled.Add, contentDescription = null)
+    }
+}
 
+@Composable
+fun RecipeDetails(recipeDetails: RecipeDetails){
+
+    when(recipeDetails.image){
+        is ByteArray -> DisplayImage(
+            imageBytes = recipeDetails.image,
+            modifier = Modifier.fillMaxWidth()
+        )
+        is String ->  DisplayImage(
+            imageUrl = recipeDetails.image,
+            modifier = Modifier.fillMaxWidth()
+        )
+        else ->  Text(text = "Loading...")
+    }
+    Text(text = recipeDetails.id.toString())
+    Text(text = recipeDetails.name)
+    Text(text = recipeDetails.instructions)
+    Text(text = recipeDetails.servings.toString())
+    Text(text = recipeDetails.totalTime.toString())
+    Text(text = recipeDetails.kcalPerServing.toString())
+
+    recipeDetails.ingredients.forEach(){
+        Text(text = it.name.toString())
+        Text(text = it.amount.toString())
+        Text(text = it.unit.toString())
+    }
+}
+@Composable
+fun DisplayImage(
+    imageBytes: ByteArray,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    contentScale: ContentScale = ContentScale.Crop,
+) {
+    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    val imageBitmap = bitmap.asImageBitmap()
+
+    Log.d("DisplayImage", "DisplayImage: ${imageBytes.size/1024}KB")
+
+    Image(
+        bitmap = imageBitmap,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = contentScale
+    )
+}
+
+@Composable
+fun DisplayImage(
+    imageUrl: String,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    contentScale: ContentScale = ContentScale.Crop,
+) {
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = imageUrl)
+            .apply(block = fun ImageRequest.Builder.() {
+                placeholder(R.mipmap.ic_article_icon_foreground)
+                error(R.mipmap.ic_article_icon_foreground)
+            }).build()
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = contentScale
+    )
+}
+
+fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
+    return RecipeDetails(
+        id = recipe.id ?: 0,
+        name = recipe.name ?: "",
+        servings = recipe.servings ?: 0,
+        totalTime = recipe.totalTime ?: 0,
+        kcalPerServing = recipe.kcalPerServing ?: 0.0,
+        instructions = recipe.instructions  ?: "",
+        image = recipe.coverImageUrl ?: "",
+        ingredients = recipe.ingredients?.map { ingredient ->
+            RecipeIngredientDTO(
+                name = ingredient.name ?: "",
+                amount = ingredient.amount ?: 0.0,
+                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit?.value?.uppercase() ?: "OTHER"),
+            )
+        } ?: emptyList()
+    )
+}
+class RecipeDetails(
+    val id: Long = 0,
+    val name: String = "",
+    val servings: Int = 0,
+    val totalTime: Int = 0,
+    val kcalPerServing: Double = 0.0,
+    val instructions: String = "",
+    val image : Any = "",
+    val ingredients: List<RecipeIngredientDTO> = emptyList()
+)
 
 
 class RecipeDetailsViewModel(private val recipeApi: RecipeApi = RecipeApi()) : ViewModel() {

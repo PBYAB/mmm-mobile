@@ -1,8 +1,7 @@
 import android.app.Application
-import android.util.Log
 import com.example.mmm_mobile.room.dao.RecipeIngredientDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
-import com.example.mmm_mobile.room.entity.RecipeIngredient
+import com.example.mmm_mobile.room.entity.Ingredient
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,31 +13,26 @@ class RecipeIngredientRepository(
 
     private val recipeIngredientDao: RecipeIngredientDao
 
-
     init {
         val recipeDataBase = RecipeDataBase.getDatabase(application)
         recipeIngredientDao = recipeDataBase.recipeIngredientDao()
     }
 
-    suspend fun findRecipeIngredientsByRecipeId(recipeId: Long): List<RecipeIngredient>? {
+    suspend fun getIngredientsForRecipe(recipeId: Long): List<Ingredient> {
         return withContext(defaultDispatcher) {
-            recipeIngredientDao.getIngredientsByRecipeId(recipeId)
+            recipeIngredientDao.getIngredientsForRecipe(recipeId)
         }
     }
 
-    suspend fun insertRecipeIngredient(recipeIngredient: RecipeIngredient) {
+    suspend fun insertRecipeIngredient(ingredient: Ingredient): Long {
+        return withContext(defaultDispatcher) {
+            recipeIngredientDao.insertRecipeIngredient(ingredient)
+        }
+    }
+
+    suspend fun deleteOrphanRecipeIngredients() {
         withContext(defaultDispatcher) {
-            recipeIngredientDao.insertAll(recipeIngredient)
-            Log.d("RecipeIngredientRepository", "insertRecipeIngredient: $recipeIngredient")
+            recipeIngredientDao.deleteOrphanRecipeIngredients()
         }
     }
-
-    suspend fun deleteRecipeIngredientByRecipeId(recipeId: Long) {
-        withContext(defaultDispatcher) {
-            recipeIngredientDao.deleteIngredientsByRecipeId(recipeId)
-            Log.d("RecipeIngredientRepository", "deleteRecipeIngredientByRecipeId: $recipeId")
-        }
-    }
-
-
 }

@@ -4,6 +4,39 @@ plugins {
     kotlin("kapt")
 }
 
+val composeVersion = "2023.08.00"
+val roomVersion = "2.6.1"
+val navigationVersion = "2.7.6"
+val glideVersion = "4.12.0"
+val accompanistVersion = "0.20.2"
+val runtimeLiveDataVersion = "1.5.4"
+val lifecycleExtensionsVersion = "2.2.0"
+val pagingRuntimeVersion = "3.2.1"
+val pagingComposeVersion = "3.2.1"
+val lifecycleCommonJava8Version = "2.6.2"
+val navigationComposeVersion = "2.7.6"
+val coilComposeVersion = "2.5.0"
+val composeUiVersion = "1.5.4"
+val composeMaterialVersion = "1.5.4"
+val retrofitVersion = "2.9.0"
+val converterGsonVersion = "2.9.0"
+val cameraCoreVersion = "1.3.1"
+val cameraxVersion = "1.4.0-alpha03"
+val accompanistPermissionsVersion = "0.33.2-alpha"
+val coreKtxVersion = "1.12.0"
+val barcodeScanningVersion = "17.2.0"
+val lifecycleRuntimeKtxVersion = "2.6.2"
+val activityComposeVersion = "1.8.2"
+val junitVersion = "4.13.2"
+val testExtJUnitVersion = "1.1.5"
+val espressoCoreVersion = "3.5.1"
+val kotlinStdlibJdk8Version = "1.9.10"
+val kotlinReflectVersion = "1.8.22"
+val moshiKotlinVersion = "1.14.0"
+val moshiAdaptersVersion = "1.14.0"
+val okhttpVersion = "4.12.0"
+val kotlintestRunnerJUnit5Version = "3.4.2"
+
 android {
     namespace = "com.example.mmm_mobile"
     compileSdk = 34
@@ -50,71 +83,100 @@ android {
     }
 }
 
+// Glide - Biblioteka do ładowania i wyświetlania obrazów
 dependencies {
-    implementation("com.google.accompanist:accompanist-pager:0.20.2")
+    implementation("com.github.bumptech.glide:glide:$glideVersion")
+    annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
+}
 
-    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+// Accompanist - Dodatkowe narzędzia dla Jetpack Compose
+dependencies {
+    implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
+}
 
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+// Room - Biblioteka do obsługi bazy danych
+dependencies {
+    implementation("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+}
 
-    implementation("androidx.paging:paging-runtime:3.2.1")
-    implementation("androidx.paging:paging-compose:3.2.1")
-    kapt("androidx.lifecycle:lifecycle-common-java8:2.6.2")
-
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    androidTestImplementation("androidx.room:room-testing:2.6.1")
-
-    implementation("androidx.navigation:navigation-compose:2.7.6")
-
-    implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("androidx.compose.ui:ui:1.5.4")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("androidx.camera:camera-core:1.3.1")
-
-
-
-    val cameraxVersion = "1.4.0-alpha03"
-    implementation("androidx.camera:camera-camera2:$cameraxVersion")
-    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
-    implementation("androidx.camera:camera-view:$cameraxVersion")
-    implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation ("com.google.mlkit:barcode-scanning:17.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.compose.ui:ui")
+// Jetpack Compose i powiązane biblioteki
+dependencies {
+    implementation("androidx.compose.runtime:runtime-livedata:$runtimeLiveDataVersion")
+    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
+    implementation("androidx.paging:paging-runtime-ktx:$pagingRuntimeVersion")
+    implementation("androidx.paging:paging-compose:$pagingComposeVersion")
+    kapt("androidx.lifecycle:lifecycle-common-java8:$lifecycleCommonJava8Version")
+    implementation("androidx.navigation:navigation-compose:$navigationComposeVersion")
+    implementation("io.coil-kt:coil-compose:$coilComposeVersion")
+    implementation("androidx.compose.ui:ui:$composeUiVersion")
+    implementation("androidx.compose.material:material:$composeMaterialVersion")
+    implementation("androidx.camera:camera-core:$cameraCoreVersion")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.navigation:navigation-runtime-ktx:2.7.6")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
-    implementation("com.squareup.moshi:moshi-adapters:1.14.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.4.2")
+}
+
+// CameraX - Biblioteka do obsługi aparatu
+dependencies {
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+}
+
+// Accompanist Permissions - Narzędzia do obsługi uprawnień
+dependencies {
+    implementation("com.google.accompanist:accompanist-permissions:$accompanistPermissionsVersion")
+}
+
+// Kotlin i Moshi - Obsługa języka Kotlin i konwersji JSON
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinStdlibJdk8Version")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
+    implementation("com.squareup.moshi:moshi-kotlin:$moshiKotlinVersion")
+    implementation("com.squareup.moshi:moshi-adapters:$moshiAdaptersVersion")
+}
+
+// Retrofit - Biblioteka do komunikacji sieciowej
+dependencies {
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$converterGsonVersion")
+    implementation("com.squareup.okhttp3:okhttp:$okhttpVersion")
+}
+
+// Google ML Kit - Biblioteka do przetwarzania obrazów
+dependencies {
+    implementation ("com.google.mlkit:barcode-scanning:$barcodeScanningVersion")
+}
+
+// Inne biblioteki ogólne
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtxVersion")
+    implementation("androidx.activity:activity-compose:$activityComposeVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinStdlibJdk8Version")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
+    testImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("androidx.test.ext:junit:$testExtJUnitVersion")
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espressoCoreVersion")
+    testImplementation("io.kotlintest:kotlintest-runner-junit5:$kotlintestRunnerJUnit5Version")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

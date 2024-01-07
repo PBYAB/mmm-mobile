@@ -9,17 +9,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.dao.RecipeIngredientDao
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
-import com.example.mmm_mobile.room.entity.IngredientUnit
-import com.example.mmm_mobile.room.entity.RecipeIngredient
+import com.example.mmm_mobile.room.entity.Ingredient
+import com.example.mmm_mobile.room.entity.RecipeIngredientCrossRef
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Database(
-    entities = [FavouriteRecipe::class, RecipeIngredient::class],
-    version = 4,
-    exportSchema = true
+    entities = [FavouriteRecipe::class, Ingredient::class, RecipeIngredientCrossRef::class],
+    version = 4
 )
 abstract class RecipeDataBase : RoomDatabase() {
 
@@ -66,35 +65,55 @@ abstract class RecipeDataBase : RoomDatabase() {
 
 
         suspend fun populateDatabase(favouriteRecipeDao: FavouriteRecipeDao, recipeIngredientDao: RecipeIngredientDao) {
-            val recipes = listOf(
-                FavouriteRecipe(0, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0, 1),
-                FavouriteRecipe(0, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0,2),
-                FavouriteRecipe(0, "Pierogi z serem", 2, "https://picsum.photos/200/300", "Pierogi z serem", 200.0,3),
-                FavouriteRecipe(0, "Pierogi z truskawkami", 3, "https://picsum.photos/200/300", "Pierogi z truskawkami", 300.0,4),
-                FavouriteRecipe(0, "Pierogi z jagodami", 4, "https://picsum.photos/200/300", "Pierogi z jagodami", 400.0,5),
-                FavouriteRecipe(0, "Pierogi z borówkami", 5, "https://picsum.photos/200/300", "Pierogi z borówkami", 500.0,6),
-                FavouriteRecipe(0, "Pierogi z malinami", 6, "https://picsum.photos/200/300", "Pierogi z malinami", 600.0,7),
-
-                )
-
-            val ingredients = listOf(
-                RecipeIngredient(0,0, "Kapusta", 500.0, IngredientUnit.G, 1),
-                RecipeIngredient(0,0, "Ciasto", 1000.0, IngredientUnit.G, 1),
-                RecipeIngredient(0,0, "Mięso", 500.0, IngredientUnit.ML, 2),
-                RecipeIngredient(0,0, "Ser", 500.0, IngredientUnit.ML, 3),
-                RecipeIngredient(0,0, "Truskawki", 500.0, IngredientUnit.ML, 4),
-                RecipeIngredient(0,0, "Jagody", 500.0, IngredientUnit.ML, 5),
-                RecipeIngredient(0,0, "Borówki", 500.0, IngredientUnit.ML, 6),
-                RecipeIngredient(0,0, "Maliny", 500.0, IngredientUnit.ML, 7),
-            )
-
-            recipes.forEach {
-                favouriteRecipeDao.insertFavouriteRecipe(it)
-            }
-
-            ingredients.forEach {
-                recipeIngredientDao.insertAll(it)
-            }
+//            val recipes = listOf(
+//                FavouriteRecipe(1, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0, 1),
+//                FavouriteRecipe(2, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0,2),
+//                FavouriteRecipe(3, "Pierogi z serem", 2, "https://picsum.photos/200/300", "Pierogi z serem", 200.0,3),
+//                FavouriteRecipe(4, "Pierogi z truskawkami", 3, "https://picsum.photos/200/300", "Pierogi z truskawkami", 300.0,4),
+//                FavouriteRecipe(5, "Pierogi z jagodami", 4, "https://picsum.photos/200/300", "Pierogi z jagodami", 400.0,5),
+//                FavouriteRecipe(6, "Pierogi z borówkami", 5, "https://picsum.photos/200/300", "Pierogi z borówkami", 500.0,6),
+//                FavouriteRecipe(7, "Pierogi z malinami", 6, "https://picsum.photos/200/300", "Pierogi z malinami", 600.0,7),
+//                )
+//
+//            recipes.forEach() {
+//                favouriteRecipeDao.insertFavouriteRecipe(it)
+//            }
+//
+//            val ingredients = listOf(
+//                RecipeIngredient(1, "Kapusta", 500.0, IngredientUnit.G),
+//                RecipeIngredient(2, "Ciasto", 1000.0, IngredientUnit.G),
+//                RecipeIngredient(3, "Mięso", 500.0, IngredientUnit.ML),
+//                RecipeIngredient(4, "Ser", 500.0, IngredientUnit.ML),
+//                RecipeIngredient(5, "Truskawki", 500.0, IngredientUnit.ML),
+//                RecipeIngredient(6, "Jagody", 500.0, IngredientUnit.ML),
+//                RecipeIngredient(7, "Borówki", 500.0, IngredientUnit.ML),
+//                RecipeIngredient(8, "Maliny", 500.0, IngredientUnit.ML),
+//            )
+//
+//            ingredients.forEach() {
+//                recipeIngredientDao.insertRecipeIngredient(it)
+//            }
+//
+//            val recipeIngredientCrossRefs = listOf(
+//                RecipeIngredientCrossRef(0,1, 1),
+//                RecipeIngredientCrossRef(0,1, 2),
+//                RecipeIngredientCrossRef(0,2, 3),
+//                RecipeIngredientCrossRef(0,2, 2),
+//                RecipeIngredientCrossRef(0,3, 4),
+//                RecipeIngredientCrossRef(0,3, 2),
+//                RecipeIngredientCrossRef(0,4, 5),
+//                RecipeIngredientCrossRef(0,4, 2),
+//                RecipeIngredientCrossRef(0,5, 6),
+//                RecipeIngredientCrossRef(0,5, 2),
+//                RecipeIngredientCrossRef(0,6, 7),
+//                RecipeIngredientCrossRef(0,6, 2),
+//                RecipeIngredientCrossRef(0,7, 8),
+//                RecipeIngredientCrossRef(0,7, 2),
+//            )
+//
+//            recipeIngredientCrossRefs.forEach() {
+//                favouriteRecipeDao.insertRecipeIngredientCrossRef(it)
+//            }
         }
 
     }

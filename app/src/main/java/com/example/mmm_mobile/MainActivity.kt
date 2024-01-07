@@ -2,6 +2,7 @@ package com.example.mmm_mobile
 
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -110,7 +111,6 @@ class MainActivity : ComponentActivity() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
-        // Don't show BottomNavigation if the current screen is Login
         when (currentDestination?.route) {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
@@ -177,8 +177,8 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopBar(navController: NavController){
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-
+        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+        Log.d("TopBar", "currentRoute: $currentRoute")
 
         when (currentRoute) {
             Screen.Login.route -> {}
