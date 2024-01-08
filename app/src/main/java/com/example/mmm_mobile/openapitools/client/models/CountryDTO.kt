@@ -30,7 +30,7 @@ import com.squareup.moshi.JsonClass
 data class CountryDTO (
 
     @Json(name = "name")
-    val name: kotlin.String,
+    val name: kotlin.String? = null,
 
     @Json(name = "id")
     val id: kotlin.Long? = null

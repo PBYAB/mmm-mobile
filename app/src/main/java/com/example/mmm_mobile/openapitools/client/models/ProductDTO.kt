@@ -51,7 +51,7 @@ data class ProductDTO (
     val allergens: kotlin.collections.Set<AllergenDTO>,
 
     @Json(name = "barcode")
-    val barcode: kotlin.String,
+    val barcode: kotlin.String = "",
 
     @Json(name = "brands")
     val brands: kotlin.collections.Set<BrandDTO>,
@@ -66,19 +66,19 @@ data class ProductDTO (
     val ingredientAnalysis: ProductIngredientAnalysisDTO,
 
     @Json(name = "name")
-    val name: kotlin.String,
+    val name: kotlin.String = "",
 
     @Json(name = "novaGroup")
-    val novaGroup: kotlin.Int,
+    val novaGroup: kotlin.Int? = null,
 
     @Json(name = "nutriScore")
-    val nutriScore: kotlin.Int,
+    val nutriScore: kotlin.Int? = null,
 
     @Json(name = "nutriment")
     val nutriment: NutrimentDTO,
 
     @Json(name = "quantity")
-    val quantity: kotlin.String,
+    val quantity: kotlin.String? = null,
 
     @Json(name = "id")
     val id: kotlin.Long? = null,

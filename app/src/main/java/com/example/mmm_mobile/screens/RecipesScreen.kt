@@ -54,12 +54,12 @@ class RecipeListViewModel : ViewModel() {
     private val recipesApi = RecipeApi()
     var state by mutableStateOf(ScreenState<Recipe>())
 
-    var name : String? by mutableStateOf(null)
-    var servings : List<Int>? by mutableStateOf(null)
-    var minKcalPerServing : Double? by mutableStateOf(null)
-    var maxKcalPerServing : Double? by mutableStateOf(null)
-    var sortBy by mutableStateOf("id")
-    var sortDirection by mutableStateOf("ASC")
+    private var name : String? by mutableStateOf(null)
+    private var servings : List<Int>? by mutableStateOf(null)
+    private var minKcalPerServing : Double? by mutableStateOf(null)
+    private var maxKcalPerServing : Double? by mutableStateOf(null)
+    private var sortBy by mutableStateOf("id")
+    private var sortDirection by mutableStateOf("ASC")
 
     private val paginator = DefaultPaginator(
         initialKey = state.page,
@@ -134,17 +134,19 @@ class RecipeListViewModel : ViewModel() {
 
 @Composable
 fun RecipesScreen(navController: NavController) {
-    RecipeList(navController = navController)
-}
-
-@Composable
-fun RecipeList(navController: NavController) {
     val backStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
     val query = backStackEntry?.arguments?.getString("query")
     Log.d("RecipeList", "query: $query")
 
     val viewModel = viewModel<RecipeListViewModel>()
     viewModel.filterRecipes(query, null, null, null, null, null)
+
+    RecipeList(navController = navController, viewModel = viewModel)
+}
+
+@Composable
+fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
+
     val state = viewModel.state
     val columnCount = 2
     val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }

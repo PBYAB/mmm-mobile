@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,19 +11,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -30,30 +42,118 @@ import coil.request.ImageRequest
 import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.example.mmm_mobile.utils.DefaultPaginator
+import com.example.mmm_mobile.utils.ScreenState
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.ProductApi
 
-@Composable
-fun ProductsScreen(navController: NavController) {
+class ProductsListViewModel : ViewModel() {
+
+    private val productApi = ProductApi()
+    var state by mutableStateOf(ScreenState<Product>())
 
 
-    val products = listOf(
-        Product(1, "Android","1111111100000", 1,1, "200G","https://picsum.photos/200/300"),
-        Product(2, "iOS","1111111100001", 2,2, "200G","https://picsum.photos/200/300"),
-        Product(3, "macOS","1111111100002", 3,3, "200G","https://picsum.photos/200/300"),
-        Product(4, "Windows","1111111100003", 4,4, "200G","https://picsum.photos/200/300"),
-        Product(5, "Linux","1111111100004", 5,1, "200G","https://picsum.photos/200/300"),
-        Product(6, "ChromeOS","1111111100005", 3,3, "200G","https://picsum.photos/200/300"),
-        Product(7, "Android","1111111100006", 4,4, "200G","https://picsum.photos/200/300"),
-        Product(8, "iOS","1111111100007", 5,1,  "200G","https://picsum.photos/200/300"),
-        Product(9, "macOS","1111111100008", 3,3, "200G","https://picsum.photos/200/300"),
-        Product(10, "Windows","1111111100009", 2,2, "200G","https://picsum.photos/200/300"),
+    private var name : String? by mutableStateOf(null)
+    private var quantity : String? by mutableStateOf(null)
+    private var nutriScore : List<Int>? by mutableStateOf(null)
+    private var novaGroups : List<Int>? by mutableStateOf(null)
+    private var category : List<Long>? by mutableStateOf(null)
+    private var allergens : List<Long>? by mutableStateOf(null)
+    private var country : List<Long>? by mutableStateOf(null)
+    private var sortBy by mutableStateOf("id")
+    private var sortDirection by mutableStateOf("ASC")
+
+    private val paginator = DefaultPaginator(
+        initialKey = state.page,
+        onLoadUpdated = {
+            state = state.copy(isLoading = it)
+        },
+        onRequest = { nextPage ->
+            try {
+                val content =
+                    productApi.getProducts(
+                        page = nextPage,
+                        size = 10,
+                        name = name,
+                        quantity = quantity,
+                        nutriScore = nutriScore,
+                        novaGroups = novaGroups,
+                        category = category,
+                        allergens = allergens,
+                        country = country,
+                        sortBy = sortBy,
+                        sortDirection = sortDirection
+                    ).content.orEmpty().map {
+                        Product(
+                            id = it.id!!,
+                            name = it.name.orEmpty(),
+                            quantity = it.quantity.orEmpty(),
+                            barcode = it.barcode.orEmpty(),
+                            image = "",
+                            nutriScore = it.nutriScore ?: 0,
+                            novaGroup = it.novaGroup ?: 0
+                        )
+                    }
+                Result.success(content)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        },
+        getNextKey = {
+            state.page + 1
+        },
+        onError = {
+            state = state.copy(error = it?.localizedMessage)
+        },
+        onSuccess = { items, newKey ->
+            state = state.copy(
+                items = state.items + items,
+                page = newKey,
+                endReached = items.isEmpty()
+            )
+        }
     )
 
+    init {
+        loadNextItems()
+    }
+
+    fun loadNextItems() {
+        viewModelScope.launch {
+            paginator.loadNextItems()
+        }
+    }
+
+    fun filterProducts(name: String?, quantity: String?, nutriScore: List<Int>?, novaGroups: List<Int>?, category: List<Long>?, allergens: List<Long>?, country: List<Long>?, sortBy: String?, sortDirection: String?) {
+        this.name = name
+        this.quantity = quantity
+        this.nutriScore = nutriScore
+        this.novaGroups = novaGroups
+        this.category = category
+        this.allergens = allergens
+        this.country = country
+        this.sortBy = sortBy ?: "id"
+        this.sortDirection = sortDirection ?: "ASC"
+
+        paginator.reset()
+        loadNextItems()
+    }
+
+}
+
+@Composable
+fun ProductsScreen(navController: NavController) {
+    val backStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    val query = backStackEntry?.arguments?.getString("query")
+    Log.d("ProductList", "query: $query")
+
+    val viewModel = viewModel<ProductsListViewModel>()
+    viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
+
+
+
     Box(modifier = Modifier) {
-        ProductList(products = products, navController = navController)
+        ProductList(navController = navController, viewModel = viewModel)
     }
 }
 
@@ -82,45 +182,32 @@ fun ProductsScreen(navController: NavController) {
                 painter = painter,
                 contentDescription = context.getText(R.string.product_image_info).toString(),
                 modifier = Modifier
+                    .size(200.dp, 150.dp)
                     .fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
             )
 
             Text(text = product.name,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp),
+                maxLines = 1,
+                minLines = 1,
             )
-            Row(modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()) {
 
-                Surface(shape = MaterialTheme.shapes.medium,
-                    shadowElevation = 1.dp,
-                    modifier = Modifier
-                        .padding(4.dp)
 
-                ) {
-                    Text(
-                        text = product.quantity,
-                        modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize
-                    )
-                }
-
-                Surface(shape = MaterialTheme.shapes.medium,
-                    shadowElevation = 1.dp,
-                    modifier = Modifier
-                        .padding(4.dp)
-                ) {
-
-                    Text(
-                        text = product.barcode,
-                        modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize
-                    )
-                }
+            Surface(shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = product.quantity,
+                    modifier = Modifier.padding(4.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    maxLines = 1,
+                )
             }
+
 
             Row(modifier = Modifier
                 .padding(4.dp)
@@ -150,18 +237,31 @@ fun ProductsScreen(navController: NavController) {
 
 
     @Composable
-    fun ProductList(products: List<Product>, navController: NavController) {
+    fun ProductList(navController: NavController, viewModel: ProductsListViewModel) {
+        val state = viewModel.state
+        val columnCount = 2
+        val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
+
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(columnCount),
             Modifier.padding(8.dp)
         ) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val productClient = ProductApi()
-                val product = productClient.getProducts()
-                println(product)
+            items(state.items.size) { i ->
+                val item = state.items[i]
+                if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
+                    viewModel.loadNextItems()
+                }
+                ProductListItem(product = item, navController = navController)
             }
-            items(products) { product ->
-                ProductListItem(product = product, navController = navController)
+            item(span = span) {
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }
@@ -178,13 +278,18 @@ fun ProductsScreen(navController: NavController) {
 
 
 fun getNutriScoreImage(nutriScore: Int): Int {
-    return when (nutriScore) {
-        1 -> R.drawable.nutri_score_a
-        2 -> R.drawable.nutri_score_b
-        3 -> R.drawable.nutri_score_c
-        4 -> R.drawable.nutri_score_d
-        5 -> R.drawable.nutri_score_e
-        else -> R.drawable.nutri_score_e
+    return if(-15 <= nutriScore && nutriScore <= -1) {
+        R.drawable.nutri_score_a
+    } else if(0 <= nutriScore && nutriScore <= 2) {
+        R.drawable.nutri_score_b
+    } else if(3 <= nutriScore && nutriScore <= 10) {
+        R.drawable.nutri_score_c
+    } else if(11 <= nutriScore && nutriScore <= 18) {
+        R.drawable.nutri_score_d
+    } else if(19 <= nutriScore && nutriScore <= 40) {
+        R.drawable.nutri_score_e
+    } else {
+        R.drawable.nutri_score_e
     }
 }
 

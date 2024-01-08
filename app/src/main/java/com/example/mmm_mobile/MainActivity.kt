@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                     RecipeDetailScreen(navController, recipeId = recipeId) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
                 }
                 composable(Screen.RecipeList.route + "/{query}") { RecipesScreen(navController) }
+                composable(Screen.ProductList.route + "/{query}") { ProductsScreen(navController) }
             }
         }
     }
