@@ -133,7 +133,7 @@ fun DisplayImage(
     contentScale: ContentScale = ContentScale.Crop,
 ) {
     val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    val imageBitmap = bitmap.asImageBitmap()
+    val imageBitmap = bitmap?.asImageBitmap() ?: return
 
     Log.d("DisplayImage", "DisplayImage: ${imageBytes.size/1024}KB")
 
