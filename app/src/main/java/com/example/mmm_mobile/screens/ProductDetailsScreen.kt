@@ -40,6 +40,9 @@ import org.openapitools.client.models.AllergenDTO
 import org.openapitools.client.models.NutrimentDTO
 import org.openapitools.client.models.ProductDTO
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
+import androidx.compose.ui.graphics.Color
+import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
 
 @Composable
@@ -115,7 +118,6 @@ fun ProductDetails(productDetails: ProductDTO) {
             )
         }
 
-
         Text(
             text = productDetails.name,
             style = MaterialTheme.typography.headlineSmall,
@@ -123,6 +125,8 @@ fun ProductDetails(productDetails: ProductDTO) {
                 .padding(4.dp)
                 .fillMaxWidth()
         )
+
+        DefaultDivider()
         Text(
             text = productDetails.barcode,
             style = MaterialTheme.typography.bodyMedium,
@@ -130,6 +134,8 @@ fun ProductDetails(productDetails: ProductDTO) {
                 .padding(4.dp)
                 .fillMaxWidth()
         )
+
+        DefaultDivider()
         Text(
             text = productDetails.quantity.toString(),
             style = MaterialTheme.typography.bodyMedium,
@@ -138,10 +144,13 @@ fun ProductDetails(productDetails: ProductDTO) {
                 .fillMaxWidth()
         )
 
-
+        DefaultDivider()
         AllergensList(allergens = productDetails.allergens ?: emptySet())
 
-        Text(text = productDetails.brands.toString())
+        DefaultDivider()
+        BrandsList(brands = productDetails.brands ?: emptySet())
+
+        DefaultDivider()
         Text(text = productDetails.categories.toString())
         Text(text = productDetails.countries.toString())
         Text(text = productDetails.ingredients.toString())
@@ -175,6 +184,11 @@ fun ProductDetails(productDetails: ProductDTO) {
 
 @Composable
 fun AllergensList(allergens: Set<AllergenDTO>) {
+    Text(
+        text = "Allergens",
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Black.copy(alpha = 0.5f)
+    )
     LazyRow {
         items(allergens.toList()) { allergen ->
             Surface(shape = MaterialTheme.shapes.medium,
@@ -202,6 +216,39 @@ fun AllergensList(allergens: Set<AllergenDTO>) {
 }
 
 
+@Composable
+fun BrandsList(brands: Set<BrandDTO>) {
+    Text(
+        text = "Brands",
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Black.copy(alpha = 0.5f)
+    )
+    LazyRow {
+        items(brands.toList()) { brand ->
+            Surface(shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                    Text(
+                        text = brand.name ?: "",
+                        modifier = Modifier.padding(4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                        maxLines = 1,
+                    )
+                }
+        }
+    }
+}
+
+@Composable
+fun DefaultDivider() {
+    Divider(
+        thickness = 3.dp,
+        color = MaterialTheme.colorScheme.primaryContainer,
+    )
+}
+
 fun getAllergenImage(name : String) : Int {
     return when {
         name.contains("egg", ignoreCase = true) -> R.drawable.allergen_egg_icon
@@ -211,6 +258,7 @@ fun getAllergenImage(name : String) : Int {
         name.contains("milk", ignoreCase = true) -> R.drawable.allergen_milk_icon
         name.contains("mustard", ignoreCase = true) -> R.drawable.allergen_mustard_icon
         name.contains("nuts", ignoreCase = true) -> R.drawable.allergen_nut_icon
+        name.contains("sesame", ignoreCase = true) -> R.drawable.allergen_sesame_icon
         name == "" -> R.drawable.allergen_free_icon
         else -> R.drawable.allergen_unknown_icon
     }
