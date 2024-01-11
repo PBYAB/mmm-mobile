@@ -134,12 +134,10 @@ class ProductsListViewModel : ViewModel() {
         this.country = country
         this.sortBy = sortBy ?: "id"
         this.sortDirection = sortDirection ?: "ASC"
-
-        paginator.reset()
-        loadNextItems()
     }
-
 }
+
+
 
 @Composable
 fun ProductsScreen(navController: NavController) {
@@ -278,18 +276,13 @@ fun ProductsScreen(navController: NavController) {
 
 
 fun getNutriScoreImage(nutriScore: Int): Int {
-    return if(-15 <= nutriScore && nutriScore <= -1) {
-        R.drawable.nutri_score_a
-    } else if(0 <= nutriScore && nutriScore <= 2) {
-        R.drawable.nutri_score_b
-    } else if(3 <= nutriScore && nutriScore <= 10) {
-        R.drawable.nutri_score_c
-    } else if(11 <= nutriScore && nutriScore <= 18) {
-        R.drawable.nutri_score_d
-    } else if(19 <= nutriScore && nutriScore <= 40) {
-        R.drawable.nutri_score_e
-    } else {
-        R.drawable.nutri_score_e
+    return when (nutriScore) {
+        in -15..-2 -> R.drawable.nutri_score_a
+        in 0..2 -> R.drawable.nutri_score_b
+        in 3..10 -> R.drawable.nutri_score_c
+        in 11..18 -> R.drawable.nutri_score_d
+        in 19..40 -> R.drawable.nutri_score_e
+        else -> R.drawable.nutri_score_e
     }
 }
 

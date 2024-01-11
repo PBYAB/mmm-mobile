@@ -117,6 +117,7 @@ class RecipeListViewModel : ViewModel() {
         }
     }
 
+
     fun filterRecipes(name: String?, servings: List<Int>?, minKcalPerServing: Double?, maxKcalPerServing: Double?, sortBy: String?, sortDirection: String?) {
         this.name = name
         this.servings = servings
@@ -129,7 +130,6 @@ class RecipeListViewModel : ViewModel() {
             this.sortDirection = sortDirection
         }
     }
-
 }
 
 @Composable
