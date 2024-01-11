@@ -9,4 +9,5 @@ enum class Screen(val route: String) {
     FavouriteRecipes("Favourite"),
     AddProduct("Add Product"),
     AddRecipe("Add Recipe"),
+    Barcode("Scane Barcode")
 }

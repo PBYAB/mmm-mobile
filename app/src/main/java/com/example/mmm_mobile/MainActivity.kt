@@ -39,6 +39,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mmm_mobile.screens.AddProductScreen
 import com.example.mmm_mobile.screens.AddRecipeScreen
+import com.example.mmm_mobile.screens.BarcodeScreen
 import com.example.mmm_mobile.screens.FavouriteRecipesScreen
 import com.example.mmm_mobile.screens.LoginScreen
 import com.example.mmm_mobile.screens.ProductDetailScreen
@@ -83,6 +84,7 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.RecipeList.route) { RecipesScreen(navController) }
                 composable(Screen.AddProduct.route) { AddProductScreen() }
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
+                composable(Screen.Barcode.route) { BarcodeScreen() }
                 composable(Screen.ProductList.route) { ProductsScreen(navController) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController) }
                 composable(Screen.Search.route + "/products") { SearchScreen(navController) }
@@ -118,6 +120,7 @@ class MainActivity : ComponentActivity() {
             Screen.AddProduct.route -> {}
             Screen.AddRecipe.route -> {}
             Screen.Registration.route -> {}
+            Screen.Barcode.route -> {}
 
             else -> BottomNavigation(
                 backgroundColor = MaterialTheme.colorScheme.primaryContainer,
@@ -199,7 +202,7 @@ class MainActivity : ComponentActivity() {
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
                     actions = {
-                        IconButton(onClick = { /* Handle more icon click */ }) {
+                        IconButton(onClick = { navController.navigate(Screen.Barcode.route) }) {
                             Icon(
                                 painter = painterResource(id = R.mipmap.barcode_scanner_icon),
                                 contentDescription = getText(R.string.barcode_scanner_icon_info).toString()
