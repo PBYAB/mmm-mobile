@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,13 +49,13 @@ fun RegistrationScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                text = context.getText(R.string.register).toString(),
+                text = context.getText(R.string.register).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )
             OutlinedTextField(
                 value = firstName.value,
                 onValueChange = { firstName.value = it },
-                label = { Text(context.getText(R.string.firstName).toString()) },
+                label = { Text(context.getText(R.string.firstName).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -66,7 +68,7 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = lastName.value,
                 onValueChange = { lastName.value = it },
-                label = { Text(context.getText(R.string.lastName).toString()) },
+                label = { Text(context.getText(R.string.lastName).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -79,7 +81,7 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text(context.getText(R.string.email).toString()) },
+                label = { Text(context.getText(R.string.email).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -92,7 +94,7 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(context.getText(R.string.password).toString()) },
+                label = { Text(context.getText(R.string.password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -106,7 +108,7 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = confirmPassword.value,
                 onValueChange = { confirmPassword.value = it },
-                label = { Text(context.getText(R.string.confirm_password).toString()) },
+                label = { Text(context.getText(R.string.confirm_password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -152,7 +154,7 @@ fun RegistrationScreen(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Register")
+                Text("Register", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
             }
         }
     }

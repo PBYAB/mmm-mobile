@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun ProductDetailScreen(productId: Long?) {
     val productDetailsViewModel: ProductDetailsViewModel = viewModel()

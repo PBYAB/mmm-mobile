@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -44,6 +45,7 @@ import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Recipe
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
 import kotlinx.coroutines.launch
@@ -206,6 +208,8 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
 
         Text(
             text = recipe.name,
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp),
             minLines = 2,
             maxLines = 2
@@ -214,12 +218,16 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
         Row(modifier = Modifier.padding(8.dp)) {
             Icon(Icons.Filled.Person, context.getText(R.string.servings_count_info).toString())
             Text(
-                text = recipe.servings.toString()
+                text = recipe.servings.toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(painter = painterResource(id = R.drawable.timer_fill0_wght400_grad0_opsz24) , contentDescription = context.getText(R.string.time_info).toString())
             Text(
-                text = recipe.time.toString() + " min"
+                text = recipe.time.toString() + " min",
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal
             )
         }
     }

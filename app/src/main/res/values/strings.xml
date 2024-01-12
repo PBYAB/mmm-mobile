@@ -45,7 +45,7 @@
     <string name="title_activity_edit_product">EditProductActivity</string>
     <string name="title_activity_barcode">BarcodeActivity</string>
     <string name="recipe_image_info">Recipe image</string>
-    <string name="servings_count_info">Servings</string>
+    <string name="servings_count_info">Porcje: </string>
     <string name="product_image_info">Product image</string>
     <string name="nutri_score_image_info">Nutri score</string>
     <string name="nova_group_image_info">Nova group</string>
@@ -69,4 +69,12 @@
     <string name="firstName">First name</string>
     <string name="time_info">Preparation Time</string>
     <string name="try_again">Try Again</string>
+    <string name="calories_per_serving">"Kalorie w porcji: "</string>
+    <string name="total_time">"Czas przygotowania: "</string>
+    <string name="instructions_title">"Przygotowanie: "</string>
+    <string name="servings_title">"Porcje: "</string>
+    <string name="ingredients_title">Składniki: </string>
+    <string name="minutes">" min"</string>
+    <string name="calories">" kcal"</string>
+    <string name="see_more">...Rozwiń</string>
 </resources>

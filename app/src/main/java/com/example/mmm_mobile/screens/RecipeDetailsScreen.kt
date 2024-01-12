@@ -1,15 +1,23 @@
 package com.example.mmm_mobile.screens
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,10 +25,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toLowerCase
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,6 +49,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
+import com.example.mmm_mobile.ui.theme.josefinSansFontFamily
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,8 +84,7 @@ fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { Text(text = "" +recipeId + " | " + recipe?.id) }
-            item { AddRecipeButton(favouriteRecipeViewModel, recipe) }
+            item { AddRecipeButton(favouriteRecipeViewModel, recipe)}
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }
@@ -80,7 +101,8 @@ fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recip
 
 @Composable
 fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?) {
-    Button(onClick = {
+    Button(
+        onClick = {
         favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
             RecipeDTO(
                 id = recipe?.id ?: 0,
@@ -98,34 +120,129 @@ fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: 
     }
 }
 
+@SuppressLint("RestrictedApi")
 @Composable
-fun RecipeDetails(recipeDetails: RecipeDetails){
+fun RecipeDetails(recipeDetails: RecipeDetails) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
 
-    when(recipeDetails.image){
+    when (recipeDetails.image) {
         is ByteArray -> DisplayImage(
             imageBytes = recipeDetails.image,
             modifier = Modifier.fillMaxWidth()
         )
-        is String ->  DisplayImage(
+        is String -> DisplayImage(
             imageUrl = recipeDetails.image,
             modifier = Modifier.fillMaxWidth()
         )
-        else ->  Text(text = "Loading...")
+        else -> Text(text = "Loading...")
     }
-    Text(text = recipeDetails.id.toString())
-    Text(text = recipeDetails.name)
-    Text(text = recipeDetails.instructions)
-    Text(text = recipeDetails.servings.toString())
-    Text(text = recipeDetails.totalTime.toString())
-    Text(text = recipeDetails.kcalPerServing.toString())
 
-    recipeDetails.ingredients.forEach(){
-        Text(text = it.name.toString())
-        Text(text = it.amount.toString())
-        Text(text = it.unit.toString())
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 30.sp, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Black)) {
+                append(recipeDetails.name)
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 22.sp,fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)) {
+                append(context.getText(R.string.instructions_title).toString())
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+    val instructionsText = buildAnnotatedString {
+        withStyle(style = SpanStyle(fontSize = 16.sp, color = Color.Black, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Normal)) {
+            val visibleText = if (expanded) recipeDetails.instructions else recipeDetails.instructions.take(100)
+            append(visibleText)
+            if (!expanded && recipeDetails.instructions.length > 100) {
+                append(" " + context.getText(R.string.see_more).toString())
+                addStringAnnotation("expand", "true", visibleText.length + 1, visibleText.length + 1 + context.getText(R.string.see_more).length)
+            }
+        }
+    }
+
+    ClickableText(
+        text = instructionsText,
+        modifier = Modifier.padding(10.dp),
+        onClick = { offset ->
+            val annotations = instructionsText.getStringAnnotations("expand", offset, offset)
+            if (annotations.isNotEmpty()) {
+                expanded = true
+            }
+        }
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 16.sp, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)) {
+                append(context.getText(R.string.servings_title).toString() + recipeDetails.servings.toString())
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 16.sp, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)) {
+                append(context.getText(R.string.total_time).toString() + recipeDetails.totalTime.toString() + context.getText(R.string.minutes).toString())
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 16.sp, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)) {
+                append(context.getText(R.string.calories_per_serving).toString() + recipeDetails.kcalPerServing.toString() + context.getText(R.string.calories).toString())
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontSize = 22.sp, fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)) {
+                append(context.getText(R.string.ingredients_title).toString())
+            }
+        },
+        modifier = Modifier.padding(10.dp)
+    )
+
+    recipeDetails.ingredients.forEach {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Text(
+                text = it.amount.toString() + " " + it.unit.toString().lowercase() + " " + it.name.toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
     }
 }
+
 @Composable
+
 fun DisplayImage(
     imageBytes: ByteArray,
     modifier: Modifier = Modifier,

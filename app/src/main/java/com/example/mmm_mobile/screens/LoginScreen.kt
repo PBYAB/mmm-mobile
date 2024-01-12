@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,13 +57,13 @@ fun LoginScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                text = context.getText(R.string.login).toString(),
+                text = context.getText(R.string.login).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text(context.getText(R.string.email).toString()) },
+                label = { Text(context.getText(R.string.email).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -74,7 +76,7 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(context.getText(R.string.password).toString()) },
+                label = { Text(context.getText(R.string.password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -120,7 +122,7 @@ fun LoginScreen(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Log in")
+                Text("Log in", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
             }
             Spacer(modifier = Modifier.padding(top = 16.dp))
             Button(
@@ -133,7 +135,7 @@ fun LoginScreen(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Go to Registration")
+                Text("Go to Registration", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
             }
         }
     }

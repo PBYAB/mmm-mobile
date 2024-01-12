@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -42,6 +43,7 @@ import coil.request.ImageRequest
 import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
 import kotlinx.coroutines.launch
@@ -185,7 +187,7 @@ fun ProductsScreen(navController: NavController) {
                 contentScale = ContentScale.FillWidth
             )
 
-            Text(text = product.name,
+            Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Medium,
                     modifier = Modifier.padding(8.dp),
                 maxLines = 1,
                 minLines = 1,
@@ -202,6 +204,7 @@ fun ProductsScreen(navController: NavController) {
                     modifier = Modifier.padding(4.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    fontFamily = poppinsFontFamily,
                     maxLines = 1,
                 )
             }
