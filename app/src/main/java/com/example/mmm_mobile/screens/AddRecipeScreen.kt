@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,13 +41,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.IngredientUnit
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.openapitools.client.apis.RecipeApi
+import org.openapitools.client.models.RecipeDTO
 
 
 @Composable
@@ -73,10 +86,14 @@ fun AddRecipeScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.add_recipe_title),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
                     style = typography.displayMedium
                 )
                 Text(
                     text = stringResource(R.string.instructions),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center,
                     style = typography.titleMedium,
                 )
@@ -89,7 +106,8 @@ fun AddRecipeScreen() {
                     onValueChange = {
                             newValue -> recipeName = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_recipe_name)) },
+                    label = { Text(stringResource(R.string.enter_recipe_name),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
@@ -109,7 +127,8 @@ fun AddRecipeScreen() {
                     onValueChange = {
                             newValue -> recipeInstructions = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_recipe_instructions)) },
+                    label = { Text(stringResource(R.string.enter_recipe_instructions),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
@@ -133,7 +152,8 @@ fun AddRecipeScreen() {
                         onValueChange = {
                                 newValue -> recipeCaloriesPerServing = newValue
                         },
-                        label = { Text(stringResource(R.string.enter_calories)) },
+                        label = { Text(stringResource(R.string.enter_calories),fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,) },
                         isError = false,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             imeAction = ImeAction.Done,
@@ -154,7 +174,8 @@ fun AddRecipeScreen() {
                         onValueChange = {
                                 newValue -> recipeServings = newValue
                         },
-                        label = { Text(stringResource(R.string.enter_servings)) },
+                        label = { Text(stringResource(R.string.enter_servings),fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,) },
                         isError = false,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             imeAction = ImeAction.Done,
@@ -200,6 +221,8 @@ fun AddRecipeScreen() {
                 ) {
                     Text(
                         text = stringResource(R.string.add_recipe_button),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 16.sp
                     )
                 }
@@ -246,7 +269,8 @@ fun Demo_DropDownMenu() {
             ) {
                 unitList.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item) },
+                        text = { Text(text = item, fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,) },
                         onClick = {
                             selectedText = item
                             expanded = false
@@ -281,7 +305,8 @@ fun IngredientRow(
             onValueChange = { newValue ->
                 onIngredientChange(ingredient.copy(name = newValue))
             },
-            label = { Text(stringResource(R.string.enter_ingredient_name)) },
+            label = { Text(stringResource(R.string.enter_ingredient_name),fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,) },
             isError = false,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done
@@ -303,7 +328,8 @@ fun IngredientRow(
             onValueChange = { newValue ->
                 onIngredientChange(ingredient.copy(quantity = newValue))
             },
-            label = { Text(stringResource(R.string.enter_ingredient_quantity)) },
+            label = { Text(stringResource(R.string.enter_ingredient_quantity),fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,) },
             isError = false,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
@@ -357,6 +383,7 @@ fun AddIngredientRow(onAddIngredient: () -> Unit) {
         }
     }
 }
+
 
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable

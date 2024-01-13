@@ -77,4 +77,14 @@
     <string name="minutes">" min"</string>
     <string name="calories">" kcal"</string>
     <string name="see_more">...Rozwiń</string>
+    <string name="product_ingredient_analisis">Analisis</string>
+    <string name="nutriment">Nutriments</string>
+    <string name="energyKcalPer100G">"Kcal: "</string>
+    <string name="fatPer100G">"Fat: "</string>
+    <string name="per100g">per 100g</string>
+    <string name="sugarsPer100G">"Sugars: "</string>
+    <string name="fiberPer100G">"Fiber: "</string>
+    <string name="sodiumPer100G">"Sodium: "</string>
+    <string name="saltPer100G">"Salt: "</string>
+    <string name="proteinsPer100G">"Proteins: "</string>
 </resources>

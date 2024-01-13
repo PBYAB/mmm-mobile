@@ -65,15 +65,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mmm_mobile.models.Brand
 import com.example.mmm_mobile.models.NutriScore
 import com.example.mmm_mobile.models.Nutriment
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.openapitools.client.apis.ProductApi
+import org.openapitools.client.models.ProductDTO
+import org.openapitools.client.models.RecipeDTO
 
 
 @OptIn(ExperimentalMaterial3Api::class
@@ -123,11 +136,15 @@ fun AddProductScreen() {
         ) {
             Text(
                 text = stringResource(R.string.add_product_title),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
                 style = typography.displayMedium
             )
             Text(
                 text = stringResource(R.string.product_instructions),
                 textAlign = TextAlign.Center,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
                 style = typography.titleMedium,
             )
             OutlinedTextField(
@@ -144,7 +161,9 @@ fun AddProductScreen() {
                 onValueChange = { newValue ->
                     name = newValue
                 },
-                label = { Text(stringResource(R.string.enter_product_name)) },
+                label = { Text(stringResource(R.string.enter_product_name),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,) },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -168,7 +187,8 @@ fun AddProductScreen() {
                 onValueChange = { newValue ->
                     barcode = newValue
                 },
-                label = { Text(stringResource(R.string.enter_barcode)) },
+                label = { Text(stringResource(R.string.enter_barcode),fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,) },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -193,7 +213,8 @@ fun AddProductScreen() {
                 onValueChange = { newValue ->
                     quantity = newValue
                 },
-                label = { Text(stringResource(R.string.enter_product_quantity)) },
+                label = { Text(stringResource(R.string.enter_product_quantity),fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,) },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done,
@@ -211,7 +232,8 @@ fun AddProductScreen() {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = (stringResource(R.string.enter_product_brand))) },
+                    placeholder = { Text(text = (stringResource(R.string.enter_product_brand)),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     onDropDownItemSelected = { item ->
                         item.name
                     },
@@ -228,12 +250,16 @@ fun AddProductScreen() {
             }
             Box(
                 modifier = Modifier
+                    .padding(10.dp)
                     .fillMaxWidth(),
             ) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = (stringResource(R.string.enter_product_allergen))) },
+                    placeholder = {
+                        Text(text = (stringResource(R.string.enter_product_allergen)),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     onDropDownItemSelected = { item ->
                         item.name
                     },
@@ -250,12 +276,17 @@ fun AddProductScreen() {
             }
             Box(
                 modifier = Modifier
+                    .padding(10.dp)
                     .fillMaxWidth(),
             ) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = (stringResource(R.string.enter_product_category))) },
+                    placeholder = {
+                        Text(text = (stringResource(R.string.enter_product_category)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        ) },
                     onDropDownItemSelected = { item ->
                         item.name
                     },
@@ -273,12 +304,17 @@ fun AddProductScreen() {
 
             Box(
                 modifier = Modifier
+                    .padding(10.dp)
                     .fillMaxWidth(),
             ) {
                 SearchableExpandedDropDownMenu(
                     listOfItems = brands,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = (stringResource(R.string.enter_product_country))) },
+                    placeholder = {
+                        Text(text = (stringResource(R.string.enter_product_country)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        ) },
 
                     onDropDownItemSelected = { item ->
                         item.name
@@ -299,6 +335,8 @@ fun AddProductScreen() {
                 modifier = Modifier
                     .padding(top = 10.dp),
                 text = stringResource(R.string.product_nutriment_information),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium,
             )
@@ -324,7 +362,9 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         caloriesPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_calorie)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_calorie),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -349,7 +389,10 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         fatPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_fat)) },
+                    label = {
+                        Text(stringResource(R.string.enter_product_nutriment_fat),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -381,7 +424,9 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         fiberPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_fiber)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_fiber),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -407,7 +452,9 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         saltPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_salt)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_salt),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -439,7 +486,9 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         proteinsPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_proteins)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_proteins),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -465,7 +514,9 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         sugarPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_sugar)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_sugar),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -497,7 +548,8 @@ fun AddProductScreen() {
                     onValueChange = { newValue ->
                         sodiumPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_sodium)) },
+                    label = { Text(stringResource(R.string.enter_product_nutriment_sodium),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium) },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -614,7 +666,9 @@ fun Demo_DropDownMenu2(
         ) {
             scoreList.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(text = item) },
+                    text = { Text(text = item,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium) },
                     onClick = {
                         selectedText = item
                         expanded = false
@@ -628,7 +682,8 @@ fun Demo_DropDownMenu2(
 @Composable
 fun ElevatedButtonExample(onClick: () -> Unit) {
     ElevatedButton({onClick()}){
-        Text("Dodaj")
+        Text("Dodaj", fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Medium,)
     }
 }
 
@@ -664,7 +719,8 @@ fun IngredientRow2(
             onValueChange = { newValue ->
                 onIngredientChange(ingredient.copy(name = newValue))
             },
-            label = { Text(stringResource(R.string.enter_ingredient_name)) },
+            label = { Text(stringResource(R.string.enter_ingredient_name), fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,) },
             isError = false,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done
@@ -719,7 +775,10 @@ fun <T> SearchableExpandedDropDownMenu(
     listOfItems: List<T>,
     enable: Boolean = true,
     readOnly: Boolean = true,
-    placeholder: @Composable (() -> Unit) = { Text(text = "Brand") },
+    placeholder: @Composable (() -> Unit) = { Text(text = "Brand",
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        ) },
     openedIcon: ImageVector = Icons.Outlined.KeyboardArrowUp,
     closedIcon: ImageVector = Icons.Outlined.KeyboardArrowDown,
     parentTextFieldCornerRadius: Dp = 12.dp,
@@ -853,7 +912,8 @@ fun <T> SearchableExpandedDropDownMenu(
                             Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
                         },
                         placeholder = {
-                            Text(text = "Search")
+                            Text(text = "Search", fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium)
                         },
                         interactionSource = remember { MutableInteractionSource() }
                             .also { interactionSource ->
@@ -893,7 +953,8 @@ fun <T> SearchableExpandedDropDownMenu(
                                 modifier = Modifier.weight(0.5f),
                                 text = {
                                     // Add your text content here
-                                    Text(selectedItem.toString())
+                                    Text(selectedItem.toString(), fontFamily = poppinsFontFamily,
+                                        fontWeight = FontWeight.Medium)
                                 },
                                 onClick = {
                                     keyboardController?.hide()
@@ -910,6 +971,24 @@ fun <T> SearchableExpandedDropDownMenu(
         }
     }
 }
+
+
+class AddProductViewModel(private val productApi: ProductApi = ProductApi()) : ViewModel() {
+    private val _product = MutableStateFlow<ProductDTO?>(null)
+    fun fetchProduct(id: Long) {
+        viewModelScope.launch {
+            try {
+                val product = withContext(Dispatchers.IO) {
+                    productApi.getProduct(id)
+                }
+                _product.emit(product)
+            } catch (e: Exception) {
+                Log.e("AddProductViewModel", "Error fetching product", e)
+            }
+        }
+    }
+}
+
 
 
 private val DropdownMenuVerticalPadding = 5.dp
