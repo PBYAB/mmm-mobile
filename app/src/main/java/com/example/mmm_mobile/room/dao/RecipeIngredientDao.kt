@@ -27,4 +27,7 @@ interface RecipeIngredientDao {
 
     @Query("SELECT * FROM recipe_ingredient WHERE id = :ingredientId")
     suspend fun getIngredientById(ingredientId: Long): Ingredient?
+
+    @Query("SELECT * FROM recipe_ingredient")
+    fun getIngredients(): List<Ingredient>
 }

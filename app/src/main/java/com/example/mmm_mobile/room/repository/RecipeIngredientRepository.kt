@@ -18,6 +18,8 @@ class RecipeIngredientRepository(
         recipeIngredientDao = recipeDataBase.recipeIngredientDao()
     }
 
+    fun findAllIngredients() = recipeIngredientDao.getIngredients()
+
     suspend fun getIngredientsForRecipe(recipeId: Long): List<Ingredient> {
         return withContext(defaultDispatcher) {
             recipeIngredientDao.getIngredientsForRecipe(recipeId)

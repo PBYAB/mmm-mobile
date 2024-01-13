@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,7 +63,7 @@ import org.openapitools.client.models.RecipeIngredient
 import org.openapitools.client.models.RecipeIngredientDTO
 
 @Composable
-fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
+fun RecipeDetailScreen(navController: NavController, recipeId: Long?, snackbarHostState: SnackbarHostState) {
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
     val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
     val recipe by recipeLiveData.observeAsState()
@@ -69,7 +71,7 @@ fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
     if(recipe != null){
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item { Text(text = "" +recipeId + "|" + recipe?.recipe?.id) }
-            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId) }
+            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }else{
@@ -82,38 +84,51 @@ fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { AddRecipeButton(favouriteRecipeViewModel, recipe)}
+            item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }
 }
 
 @Composable
-fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipeId: Long?) {
+fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipeId: Long?, snackbarHostState: SnackbarHostState) {
     Button(onClick = {
-        favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
+        favouriteRecipeViewModel.viewModelScope.launch {
+            favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
+            snackbarHostState.showSnackbar(
+                message = "Recipe deleted",
+                duration = SnackbarDuration.Short
+            )
+        }
     }) {
         Icon(Icons.Filled.Delete, contentDescription = null)
     }
 }
 
 @Composable
-fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?) {
+fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?, snackbarHostState: SnackbarHostState) {
     Button(
         onClick = {
-        favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
-            RecipeDTO(
-                id = recipe?.id ?: 0,
-                name = recipe?.name ?: "",
-                servings = recipe?.servings ?: 0,
-                totalTime = recipe?.totalTime ?: 0,
-                kcalPerServing = recipe?.kcalPerServing ?: 0.0,
-                instructions = recipe?.instructions ?: "",
-                coverImageUrl = recipe?.coverImageUrl ?: "",
-                ingredients = recipe?.ingredients ?: emptyList()
-            )
-        )
-    }) {
+            favouriteRecipeViewModel.viewModelScope.launch {
+                favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
+                    RecipeDTO(
+                        id = recipe?.id ?: 0,
+                        name = recipe?.name ?: "",
+                        servings = recipe?.servings ?: 0,
+                        totalTime = recipe?.totalTime ?: 0,
+                        kcalPerServing = recipe?.kcalPerServing ?: 0.0,
+                        instructions = recipe?.instructions ?: "",
+                        coverImageUrl = recipe?.coverImageUrl ?: "",
+                        ingredients = recipe?.ingredients ?: emptyList()
+                    )
+                )
+                snackbarHostState.showSnackbar(
+                    message = "Recipe ${recipe?.name} added to favourites",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    ) {
         Icon(Icons.Filled.Add, contentDescription = null)
     }
 }
