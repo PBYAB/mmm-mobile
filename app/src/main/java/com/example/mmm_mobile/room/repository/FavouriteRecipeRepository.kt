@@ -2,6 +2,7 @@ import android.app.Application
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
+import com.example.mmm_mobile.room.entity.Ingredient
 import com.example.mmm_mobile.room.entity.RecipeIngredientCrossRef
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -21,20 +22,28 @@ class FavouriteRecipeRepository(
 
     fun findAllFavouriteRecipes() = favouriteRecipeDao.getFavouriteRecipes()
 
+    fun findAllFavouriteRecipesWithoutIngredients() = favouriteRecipeDao.getFavouriteRecipesWithoutIngredients()
+
     suspend fun findRecipeById(recipeId: Long): FavouriteRecipe {
         return withContext(defaultDispatcher) {
             favouriteRecipeDao.getRecipeById(recipeId)
         }
     }
 
-    suspend fun insertFavouriteRecipe(recipe: FavouriteRecipe) : Long {
+    suspend fun insertFavouriteRecipe(recipe: FavouriteRecipe, ingredients: List<Ingredient>) : Long {
         return withContext(defaultDispatcher) {
-            favouriteRecipeDao.insertFavouriteRecipe(recipe)
+            val recipeId = favouriteRecipeDao.insertFavouriteRecipe(recipe)
+            ingredients.forEach { ingredient ->
+                val crossRef = RecipeIngredientCrossRef(recipeId = recipeId, ingredientId = ingredient.id)
+                favouriteRecipeDao.insertRecipeIngredientCrossRef(crossRef)
+            }
+            recipeId
         }
     }
 
     suspend fun deleteFavouriteRecipe(recipeId: Long) {
         withContext(defaultDispatcher) {
+            favouriteRecipeDao.deleteRecipeIngredientCrossRefs(recipeId)
             favouriteRecipeDao.deleteFavouriteRecipe(recipeId)
         }
     }

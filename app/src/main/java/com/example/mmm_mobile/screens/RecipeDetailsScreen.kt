@@ -4,18 +4,15 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -48,6 +45,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 import com.example.mmm_mobile.ui.theme.josefinSansFontFamily
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -70,9 +68,9 @@ fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
 
     if(recipe != null){
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { Text(text = "" +recipeId + "|" + recipe?.id) }
+            item { Text(text = "" +recipeId + "|" + recipe?.recipe?.id) }
             item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId) }
-            item { recipe?.mapToRecipeTDetails()?.let { RecipeDetails(recipeDetails = it) } }
+            item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }else{
         val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
@@ -304,6 +302,27 @@ fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
         } ?: emptyList()
     )
 }
+
+fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
+    return RecipeDetails(
+        id = recipe.recipe.id,
+        name = recipe.recipe.name,
+        servings = recipe.recipe.servings,
+        totalTime = recipe.recipe.totalTime,
+        kcalPerServing = recipe.recipe.kcalPerServing,
+        instructions = recipe.recipe.instructions,
+        image = recipe.recipe.image,
+        ingredients = recipe.ingredients.map { ingredient ->
+            RecipeIngredientDTO(
+                name = ingredient.name,
+                amount = ingredient.amount,
+                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit.name.uppercase()),
+            )
+        }
+    )
+}
+
+
 class RecipeDetails(
     val id: Long = 0,
     val name: String = "",
