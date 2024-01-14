@@ -4,12 +4,17 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,8 +48,17 @@ import org.openapitools.client.models.ProductDTO
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.example.mmm_mobile.models.Nutriment
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import org.openapitools.client.models.BrandDTO
+import org.openapitools.client.models.CategoryDTO
+import org.openapitools.client.models.Country
+import org.openapitools.client.models.CountryDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
+import org.openapitools.client.models.ProductIngredientDTO
+import java.util.Locale.Category
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -103,91 +117,257 @@ fun ProductDetails(productDetails: ProductDTO) {
             }).build()
     )
 
-    Column {
-        Box(modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth()
-            .background(color = androidx.compose.ui.graphics.Color.LightGray)
-        ){
-            Image(
-                painter = painter,
-                contentDescription = context.getText(R.string.recipe_image_info).toString(),
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        item {
+            Box(
                 modifier = Modifier
-                    .size(200.dp, 200.dp)
-                    .align(alignment = androidx.compose.ui.Alignment.Center)
-                    .fillMaxWidth(),
-                contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                    .padding(4.dp)
+                    .fillMaxWidth()
+                    .background(color = androidx.compose.ui.graphics.Color.LightGray)
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = context.getText(R.string.recipe_image_info).toString(),
+                    modifier = Modifier
+                        .size(200.dp, 200.dp)
+                        .align(alignment = androidx.compose.ui.Alignment.Center)
+                        .fillMaxWidth(),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                )
+            }
+        }
+        item {
+            Text(
+                text = productDetails.name,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
             )
         }
 
-        Text(
-            text = productDetails.name,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-        )
-
-        DefaultDivider()
-        Text(
-            text = productDetails.barcode,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-        )
-
-        DefaultDivider()
-        Text(
-            text = productDetails.quantity.toString(),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-        )
-
-        DefaultDivider()
-        AllergensList(allergens = productDetails.allergens ?: emptySet())
-
-        DefaultDivider()
-        BrandsList(brands = productDetails.brands ?: emptySet())
-
-        DefaultDivider()
-        Text(text = productDetails.categories.toString())
-        Text(text = productDetails.countries.toString())
-        Text(text = productDetails.ingredients.toString())
-        Text(text = productDetails.ingredientAnalysis.toString())
-        Text(text = productDetails.nutriment.toString())
-        Row(modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth()) {
-
-            val nutriScoreImage = getNutriScoreImage(productDetails.nutriScore ?: 5)
-            val novaGroupImage = getNovaGroupImage(productDetails.novaGroup ?: 4)
-
-            Image(painter = painterResource(id = nutriScoreImage),
-                contentDescription = context.getText(R.string.nutri_score_image_info).toString(),
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item {
+            Text(
+                text = productDetails.barcode,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(2.dp)
-                    .size(32.dp)
-                    .weight(1f)
+                    .padding(4.dp)
+                    .fillMaxWidth()
+            )
+        }
+
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item {
+            Text(
+                text = productDetails.quantity.toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
+            )
+        }
+
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item {
+            AllergensList(allergens = productDetails.allergens ?: emptySet())
+        }
+
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item {
+            BrandsList(brands = productDetails.brands ?: emptySet())
+        }
+
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+        item {
+            CategoryList(category = productDetails.categories)
+        }
+        item {
+            CountryList(country = productDetails.countries)
+        }
+        item {
+            productDetails.ingredients?.let { IngredientList(ingredient = it) }
+        }
+        item {
+            Text(
+                text = context.getText(R.string.product_ingredient_analisis).toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp,
+                color = Color.Black.copy(alpha = 0.5f),
+                modifier = Modifier.padding(10.dp)
+            )
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = productDetails.ingredientAnalysis.ingredientsDescription.toString(),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+        }
+        item {
+            Text(
+                text = context.getText(R.string.nutriment).toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp,
+                color = Color.Black.copy(alpha = 0.5f),
+                modifier = Modifier.padding(10.dp)
+            )
+            Text(
+                text = context.getText(R.string.per100g).toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(10.dp)
             )
 
-            Image(painter = painterResource(id =  novaGroupImage),
-                contentDescription = context.getText(R.string.nova_group_image_info).toString(),
-                modifier = Modifier
-                    .padding(2.dp)
-                    .size(32.dp)
-                    .weight(1f)
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                NutrimentTable(productDetails.nutriment)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth()
+                ) {
+
+                    val nutriScoreImage = getNutriScoreImage(productDetails.nutriScore ?: 5)
+                    val novaGroupImage = getNovaGroupImage(productDetails.novaGroup ?: 4)
+
+                    Image(
+                        painter = painterResource(id = nutriScoreImage),
+                        contentDescription = context.getText(R.string.nutri_score_image_info)
+                            .toString(),
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .size(40.dp)
+                            .weight(1f)
+                    )
+
+                    Image(
+                        painter = painterResource(id = novaGroupImage),
+                        contentDescription = context.getText(R.string.nova_group_image_info)
+                            .toString(),
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .size(40.dp)
+                            .weight(1f)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+        }
+    }
+}
+
+@Composable
+fun NutrimentTable(nutriment: NutrimentDTO) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+        // Definiowanie wag kolumn
+        val column1Weight = .3f
+        val column2Weight = .3f
+
+        Row(Modifier.background(Color.Gray)) {
+            TableCell(
+                text = "Nutriment Type" ,
+                weight = column1Weight
+            )
+            TableCell(
+                text = "Score",
+                weight = column2Weight
+            )
+        }
+
+        Row(Modifier.fillMaxWidth()) {
+            TableCell(
+                text = context.getText(R.string.energyKcalPer100G).toString(),
+                weight = column1Weight
+            )
+            TableCell(
+                text = nutriment.energyKcalPer100g.toString(),
+                weight = column2Weight
+            )
+        }
+
+        Row(Modifier.fillMaxWidth()) {
+            TableCell(
+                text = context.getText(R.string.fatPer100G).toString(),
+                weight = column1Weight
+            )
+            TableCell(
+                text = nutriment.fatPer100g.toString(),
+                weight = column2Weight
+            )
+        }
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(
+            text = context.getText(R.string.sugarsPer100G).toString(),
+            weight = column1Weight
+        )
+        TableCell(
+            text = nutriment.sugarsPer100g.toString(),
+            weight = column2Weight
+        )
+    }
+        Row(Modifier.fillMaxWidth()) {
+            TableCell(
+                text = context.getText(R.string.proteinsPer100G).toString(),
+                weight = column1Weight
+            )
+            TableCell(
+                text = nutriment.proteinsPer100g.toString(),
+                weight = column2Weight
+            )
+        }
+        Row(Modifier.fillMaxWidth()) {
+            TableCell(
+                text = context.getText(R.string.saltPer100G).toString(),
+                weight = column1Weight
+            )
+            TableCell(
+                text = nutriment.saltPer100g.toString(),
+                weight = column2Weight
             )
         }
     }
+
+
+@Composable
+fun RowScope.TableCell(
+    text: String,
+    weight: Float
+) {
+    Text(
+        text = text,
+        Modifier
+            .border(1.dp, Color.Black)
+            .weight(weight)
+            .padding(8.dp)
+    )
 }
 
 @Composable
 fun AllergensList(allergens: Set<AllergenDTO>) {
     Text(
         text = "Allergens",
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(10.dp),
         style = MaterialTheme.typography.bodySmall,
         color = Color.Black.copy(alpha = 0.5f)
     )
@@ -206,9 +386,107 @@ fun AllergensList(allergens: Set<AllergenDTO>) {
                     )
                     Text(
                         text = allergen.name ?: "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun CategoryList(category: Set<CategoryDTO>) {
+    Text(
+        text = "Categories",
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(10.dp),
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Black.copy(alpha = 0.5f)
+    )
+    LazyRow {
+        items(category.toList()) { category ->
+            Surface(shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Row {
+                    Text(
+                        text = category.name ?: "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(4.dp),
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CountryList(country: Set<CountryDTO>) {
+    Text(
+        text = "Countries",
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(10.dp),
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Black.copy(alpha = 0.5f)
+    )
+    LazyRow {
+        items(country.toList()) { country ->
+            Surface(shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Row {
+                    Text(
+                        text = country.name ?: "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(4.dp),
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun IngredientList(ingredient: Set<ProductIngredientDTO>) {
+    Text(
+        text = "Ingredients",
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(10.dp),
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Black.copy(alpha = 0.5f)
+    )
+    LazyRow {
+        items(ingredient.toList()) { ingredient ->
+            Surface(shape = MaterialTheme.shapes.medium,
+                shadowElevation = 1.dp,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Row {
+                    Text(
+                        text = ingredient.name ?: "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(4.dp),
                         maxLines = 1,
                     )
                 }
@@ -222,7 +500,10 @@ fun AllergensList(allergens: Set<AllergenDTO>) {
 fun BrandsList(brands: Set<BrandDTO>) {
     Text(
         text = "Brands",
-        style = MaterialTheme.typography.bodySmall,
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(10.dp),
         color = Color.Black.copy(alpha = 0.5f)
     )
     LazyRow {
@@ -233,9 +514,10 @@ fun BrandsList(brands: Set<BrandDTO>) {
             ) {
                     Text(
                         text = brand.name ?: "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(4.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
                         maxLines = 1,
                     )
                 }

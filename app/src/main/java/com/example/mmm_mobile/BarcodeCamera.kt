@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import android.content.ContentValues.TAG
+import android.widget.Toast
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -22,15 +23,26 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.openapitools.client.apis.ProductApi
+import org.openapitools.client.infrastructure.ClientException
 import java.util.concurrent.Executors
+
 @ExperimentalGetImage
-class BarcodeCamera {
+class BarcodeCamera(private val navController: NavController, private val context: Context) {
     private var camera: Camera? = null
+    private var isScanning = false
+    private var lastBarcode = ""
 
     @Composable
     fun CameraPreview(
@@ -98,7 +110,9 @@ class BarcodeCamera {
             // Types of barcodes
             val options = BarcodeScannerOptions.Builder()
                 .setBarcodeFormats(
-                    Barcode.FORMAT_CODE_128,
+                    Barcode.FORMAT_EAN_8,
+                    Barcode.FORMAT_EAN_13,
+                    Barcode.FORMAT_CODE_128
                 )
                 .enableAllPotentialBarcodes()
                 .build()
@@ -149,23 +163,54 @@ class BarcodeCamera {
                     imageProxy.imageInfo.rotationDegrees
                 )
 
-            barcodeScanner.process(inputImage)
-                .addOnSuccessListener { barcodeList ->
-                    val barcode = barcodeList.getOrNull(0)
-                    onSuccess(barcode)
-                }
-                .addOnFailureListener {
-                    // This failure will happen if the barcode scanning model
-                    // fails to download from Google Play Services
-                    Log.e(TAG, it.message.orEmpty())
-                }.addOnCompleteListener {
-                    // When the image is from CameraX analysis use case, must
-                    // call image.close() on received images when finished
-                    // using them. Otherwise, new images may not be received
-                    // or the camera may stall.
-                    imageProxy.image?.close()
-                    imageProxy.close()
-                }
+            if (!isScanning) {
+                isScanning = true
+
+                barcodeScanner.process(inputImage)
+                    .addOnSuccessListener { barcodeList ->
+                        val barcode = barcodeList.getOrNull(0)
+                        onSuccess(barcode)
+
+                        barcode?.let {
+                            GlobalScope.launch {
+                                val productApi = ProductApi()
+                                it.rawValue?.let { barcode ->
+                                    try {
+                                        if(lastBarcode != barcode) {
+                                            lastBarcode = barcode
+                                            val id = productApi.getProductByBarcode(barcode).id
+                                            withContext(Dispatchers.Main) {
+                                                id?.let {
+                                                    navController.navigate("Product/$id")
+                                                }
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, e.message.orEmpty())
+                                        withContext(Dispatchers.Main) {
+                                            if (e is ClientException && e.statusCode == 404) {
+                                                Toast.makeText(context, "Product not found", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .addOnFailureListener {
+                        // This failure will happen if the barcode scanning model
+                        // fails to download from Google Play Services
+                        Log.e(TAG, it.message.orEmpty())
+                    }.addOnCompleteListener {
+                        // When the image is from CameraX analysis use case, must
+                        // call image.close() on received images when finished
+                        // using them. Otherwise, new images may not be received
+                        // or the camera may stall.
+                        imageProxy.image?.close()
+                        imageProxy.close()
+                        isScanning = false
+                    }
+            }
         }
     }
 }
