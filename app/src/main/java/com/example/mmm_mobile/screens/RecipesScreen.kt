@@ -1,5 +1,8 @@
 package com.example.mmm_mobile.screens
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,9 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +55,8 @@ import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
+import com.example.mmm_mobile.utils.ShakeDetector
+import com.example.mmm_mobile.utils.ShakeEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -56,16 +64,16 @@ import org.openapitools.client.apis.RecipeApi
 
 class RecipeListViewModel : ViewModel() {
 
-    private val recipesApi = RecipeApi()
+    val recipesApi = RecipeApi()
     var state by mutableStateOf(ScreenState<Recipe>())
 
     private val _filterApplied = MutableStateFlow(false)
     val filterApplied: StateFlow<Boolean> = _filterApplied
 
-    private var name : String? by mutableStateOf(null)
-    private var servings : List<Int>? by mutableStateOf(null)
-    private var minKcalPerServing : Double? by mutableStateOf(null)
-    private var maxKcalPerServing : Double? by mutableStateOf(null)
+    private var name: String? by mutableStateOf(null)
+    private var servings: List<Int>? by mutableStateOf(null)
+    private var minKcalPerServing: Double? by mutableStateOf(null)
+    private var maxKcalPerServing: Double? by mutableStateOf(null)
     private var sortBy by mutableStateOf("id")
     private var sortDirection by mutableStateOf("ASC")
 
@@ -132,7 +140,14 @@ class RecipeListViewModel : ViewModel() {
     }
 
 
-    fun filterRecipes(name: String?, servings: List<Int>?, minKcalPerServing: Double?, maxKcalPerServing: Double?, sortBy: String?, sortDirection: String?) {
+    fun filterRecipes(
+        name: String?,
+        servings: List<Int>?,
+        minKcalPerServing: Double?,
+        maxKcalPerServing: Double?,
+        sortBy: String?,
+        sortDirection: String?
+    ) {
         this.name = name
         this.servings = servings
         this.minKcalPerServing = minKcalPerServing
@@ -154,7 +169,35 @@ fun RecipesScreen(navController: NavController, query: String?) {
     val viewModel = viewModel<RecipeListViewModel>()
     viewModel.filterRecipes(query, null, null, null, null, null)
 
+    val context = LocalContext.current
+    val shakeEventListener = onShakeEvent(viewModel, navController)
+    val shakeDetector = remember { ShakeDetector(shakeEventListener) }
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+    DisposableEffect(Unit) {
+        sensorManager.registerListener(
+            shakeDetector,
+            accelerometer,
+            SensorManager.SENSOR_DELAY_NORMAL
+        )
+        onDispose {
+            sensorManager.unregisterListener(shakeDetector)
+        }
+    }
+
+
     RecipeList(navController = navController, viewModel = viewModel)
+}
+
+@Composable
+fun onShakeEvent(viewModel: RecipeListViewModel, navController: NavController): ShakeEventListener {
+    return {
+        viewModel.viewModelScope.launch {
+            val recipeOfTheDay = viewModel.recipesApi.getUserRecipeOfTheDay()
+            navController.navigate("Recipe/${recipeOfTheDay.id}")
+        }
+    }
 }
 
 @Composable
@@ -234,7 +277,10 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
                 fontWeight = FontWeight.Normal
             )
             Spacer(modifier = Modifier.padding(8.dp))
-            Icon(painter = painterResource(id = R.drawable.timer_fill0_wght400_grad0_opsz24) , contentDescription = context.getText(R.string.time_info).toString())
+            Icon(
+                painter = painterResource(id = R.drawable.timer_fill0_wght400_grad0_opsz24),
+                contentDescription = context.getText(R.string.time_info).toString()
+            )
             Text(
                 text = recipe.time.toString() + " min",
                 fontFamily = poppinsFontFamily,

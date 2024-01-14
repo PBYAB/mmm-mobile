@@ -5,13 +5,6 @@ import androidx.room.Entity
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
-import com.example.mmm_mobile.screens.RecipeDetails
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.openapitools.client.models.Recipe
-import org.openapitools.client.models.RecipeIngredientDTO
 
 @Entity(tableName = "favourite_recipe")
 data class FavouriteRecipe(

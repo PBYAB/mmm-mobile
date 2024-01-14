@@ -441,42 +441,6 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     }
 
     /**
-     * Populate database with recipes
-     * 
-     * @return ApiResponse<Unit?>
-     * @throws IllegalStateException If the request is not correctly configured
-     * @throws IOException Rethrows the OkHttp execute method exception
-     */
-    @Throws(IllegalStateException::class, IOException::class)
-    suspend fun populateDatabaseWithHttpInfo() : ApiResponse<Unit?> = withContext(Dispatchers.IO) {
-        val localVariableConfig = populateDatabaseRequestConfig()
-
-        return@withContext request<Unit, Unit>(
-            localVariableConfig
-        )
-    }
-
-    /**
-     * To obtain the request config of the operation populateDatabase
-     *
-     * @return RequestConfig
-     */
-    fun populateDatabaseRequestConfig() : RequestConfig<Unit> {
-        val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        
-        return RequestConfig(
-            method = RequestMethod.GET,
-            path = "/api/v1/recipes/populate",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-            body = localVariableBody
-        )
-    }
-
-    /**
      * Update
      * 
      * @param id 
