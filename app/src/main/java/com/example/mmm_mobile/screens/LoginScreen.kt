@@ -14,7 +14,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -94,8 +93,8 @@ fun LoginScreen(navController: NavController) {
                         try {
                             val apiInstance = Class1AuthenticationApi()
                             val loginRequest = AuthenticationRequest(
-                                "mruwka@ddd.pl",
-                                "mruwka2115"
+                                "patrycja@ddd.pl",
+                                "pati2137"
 //                                email.value,
 //                                password.value
                             )

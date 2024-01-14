@@ -1,7 +1,6 @@
 package com.example.mmm_mobile.screens
 
 import android.Manifest
-import androidx.activity.ComponentActivity
 import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.example.mmm_mobile.BarcodeCamera
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -39,7 +39,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class) @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun BarcodeScreen() {
+fun BarcodeScreen(navController: NavController) {
     val cameraPermission = rememberPermissionState(
         Manifest.permission.CAMERA
     )
@@ -50,7 +50,7 @@ fun BarcodeScreen() {
     }
 
     val camera = remember {
-        BarcodeCamera()
+        BarcodeCamera(navController)
     }
 
     var lastScannedBarcode by remember {
