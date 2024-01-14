@@ -35,22 +35,22 @@ import com.squareup.moshi.JsonClass
 data class ArticleDTO (
 
     @Json(name = "category")
-    val category: ArticleCategoryDTO? = null,
+    val category: ArticleCategoryDTO,
 
     @Json(name = "content")
-    val content: kotlin.String? = null,
+    val content: kotlin.String,
 
     @Json(name = "createdAt")
-    val createdAt: java.time.OffsetDateTime? = null,
+    val createdAt: java.time.OffsetDateTime,
 
     @Json(name = "id")
-    val id: kotlin.Long? = null,
+    val id: kotlin.Long,
 
     @Json(name = "status")
-    val status: ArticleDTO.Status? = null,
+    val status: ArticleDTO.Status,
 
     @Json(name = "title")
-    val title: kotlin.String? = null
+    val title: kotlin.String
 
 ) {
 

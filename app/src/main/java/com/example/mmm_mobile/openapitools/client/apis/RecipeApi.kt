@@ -15,7 +15,6 @@
 
 package org.openapitools.client.apis
 
-import android.util.Log
 import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
@@ -259,7 +258,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Get all recipes
-     *
+     * 
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
@@ -297,7 +296,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
 
     /**
      * Get all recipes
-     *
+     * 
      * @param name  (optional)
      * @param servings  (optional)
      * @param minKcalPerServing  (optional)
@@ -375,21 +374,22 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     }
 
     /**
-     * Populate database with recipes
-     *
-     * @return void
+     * 
+     * 
+     * @return RecipeDTO
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
+    @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    suspend fun populateDatabase() : Unit = withContext(Dispatchers.IO) {
-        val localVarResponse = populateDatabaseWithHttpInfo()
+    suspend fun getUserRecipeOfTheDay() : RecipeDTO = withContext(Dispatchers.IO) {
+        val localVarResponse = getUserRecipeOfTheDayWithHttpInfo()
 
         return@withContext when (localVarResponse.responseType) {
-            ResponseType.Success -> Unit
+            ResponseType.Success -> (localVarResponse as Success<*>).data as RecipeDTO
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -404,8 +404,45 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
     }
 
     /**
-     * Populate database with recipes
+     * 
+     * 
+     * @return ApiResponse<RecipeDTO?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    suspend fun getUserRecipeOfTheDayWithHttpInfo() : ApiResponse<RecipeDTO?> = withContext(Dispatchers.IO) {
+        val localVariableConfig = getUserRecipeOfTheDayRequestConfig()
+
+        return@withContext request<Unit, RecipeDTO>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation getUserRecipeOfTheDay
      *
+     * @return RequestConfig
+     */
+    fun getUserRecipeOfTheDayRequestConfig() : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/recipes/user/recipe-of-the-day",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * Populate database with recipes
+     * 
      * @return ApiResponse<Unit?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -428,7 +465,7 @@ class RecipeApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient 
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/recipes/populate",

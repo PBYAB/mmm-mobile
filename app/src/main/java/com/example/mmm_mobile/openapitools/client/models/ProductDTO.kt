@@ -20,6 +20,7 @@ import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CategoryDTO
 import org.openapitools.client.models.CountryDTO
 import org.openapitools.client.models.NutrimentDTO
+import org.openapitools.client.models.ProductImageDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
 import org.openapitools.client.models.ProductIngredientDTO
 
@@ -29,44 +30,54 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param allergens 
  * @param barcode 
+ * @param id 
+ * @param allergens 
  * @param brands 
  * @param categories 
  * @param countries 
+ * @param images 
  * @param ingredientAnalysis 
+ * @param ingredients 
  * @param name 
  * @param novaGroup 
  * @param nutriScore 
  * @param nutriment 
  * @param quantity 
- * @param id 
- * @param ingredients 
  */
 
 
 data class ProductDTO (
 
-    @Json(name = "allergens")
-    val allergens: kotlin.collections.Set<AllergenDTO>,
-
     @Json(name = "barcode")
-    val barcode: kotlin.String = "",
+    val barcode: kotlin.String,
+
+    @Json(name = "id")
+    val id: kotlin.Long,
+
+    @Json(name = "allergens")
+    val allergens: kotlin.collections.Set<AllergenDTO>? = null,
 
     @Json(name = "brands")
-    val brands: kotlin.collections.Set<BrandDTO>,
+    val brands: kotlin.collections.Set<BrandDTO>? = null,
 
     @Json(name = "categories")
-    val categories: kotlin.collections.Set<CategoryDTO>,
+    val categories: kotlin.collections.Set<CategoryDTO>? = null,
 
     @Json(name = "countries")
-    val countries: kotlin.collections.Set<CountryDTO>,
+    val countries: kotlin.collections.Set<CountryDTO>? = null,
+
+    @Json(name = "images")
+    val images: kotlin.collections.Set<ProductImageDTO>? = null,
 
     @Json(name = "ingredientAnalysis")
-    val ingredientAnalysis: ProductIngredientAnalysisDTO,
+    val ingredientAnalysis: ProductIngredientAnalysisDTO? = null,
+
+    @Json(name = "ingredients")
+    val ingredients: kotlin.collections.Set<ProductIngredientDTO>? = null,
 
     @Json(name = "name")
-    val name: kotlin.String = "",
+    val name: kotlin.String? = null,
 
     @Json(name = "novaGroup")
     val novaGroup: kotlin.Int? = null,
@@ -75,16 +86,10 @@ data class ProductDTO (
     val nutriScore: kotlin.Int? = null,
 
     @Json(name = "nutriment")
-    val nutriment: NutrimentDTO,
+    val nutriment: NutrimentDTO? = null,
 
     @Json(name = "quantity")
-    val quantity: kotlin.String? = null,
-
-    @Json(name = "id")
-    val id: kotlin.Long? = null,
-
-    @Json(name = "ingredients")
-    val ingredients: kotlin.collections.Set<ProductIngredientDTO>? = null
+    val quantity: kotlin.String? = null
 
 )
 

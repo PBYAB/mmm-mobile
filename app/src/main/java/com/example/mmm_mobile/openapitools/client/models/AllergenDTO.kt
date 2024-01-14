@@ -22,18 +22,18 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param name 
  * @param id 
+ * @param name 
  */
 
 
 data class AllergenDTO (
 
-    @Json(name = "name")
-    val name: kotlin.String? = null,
-
     @Json(name = "id")
-    val id: kotlin.Long? = null
+    val id: kotlin.Long,
+
+    @Json(name = "name")
+    val name: kotlin.String
 
 )
 

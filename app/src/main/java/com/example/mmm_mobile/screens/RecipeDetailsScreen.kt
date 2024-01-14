@@ -310,9 +310,10 @@ fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
         image = recipe.coverImageUrl ?: "",
         ingredients = recipe.ingredients?.map { ingredient ->
             RecipeIngredientDTO(
-                name = ingredient.name ?: "",
+                id = ingredient.id,
+                name = ingredient.name,
                 amount = ingredient.amount ?: 0.0,
-                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit?.value?.uppercase() ?: "OTHER"),
+                unit = ingredient.unit?.value?.let { RecipeIngredientDTO.Unit.valueOf(it.uppercase()) },
             )
         } ?: emptyList()
     )
@@ -329,6 +330,7 @@ fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
         image = recipe.recipe.image,
         ingredients = recipe.ingredients.map { ingredient ->
             RecipeIngredientDTO(
+                id = ingredient.id,
                 name = ingredient.name,
                 amount = ingredient.amount,
                 unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit.name.uppercase()),

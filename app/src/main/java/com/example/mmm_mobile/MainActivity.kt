@@ -87,9 +87,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Registration.route) { RegistrationScreen(navController) }
                 composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
-                composable(Screen.AddProduct.route) { AddProductScreen() }
+                composable(Screen.AddProduct.route) { AddProductScreen(navController) }
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
-                composable(Screen.Barcode.route) { BarcodeScreen() }
+                composable(Screen.Barcode.route) { BarcodeScreen(navController) }
                 composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(Screen.Search.route + "/products") { SearchScreen(navController) }

@@ -22,6 +22,7 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
+ * @param id 
  * @param energyKcalPer100g 
  * @param fatPer100g 
  * @param fiberPer100g 
@@ -29,11 +30,13 @@ import com.squareup.moshi.JsonClass
  * @param saltPer100g 
  * @param sodiumPer100g 
  * @param sugarsPer100g 
- * @param id 
  */
 
 
 data class NutrimentDTO (
+
+    @Json(name = "id")
+    val id: kotlin.Long,
 
     @Json(name = "energyKcalPer100g")
     val energyKcalPer100g: kotlin.Double? = null,
@@ -54,10 +57,7 @@ data class NutrimentDTO (
     val sodiumPer100g: kotlin.Double? = null,
 
     @Json(name = "sugarsPer100g")
-    val sugarsPer100g: kotlin.Double? = null,
-
-    @Json(name = "id")
-    val id: kotlin.Long? = null
+    val sugarsPer100g: kotlin.Double? = null
 
 )
 

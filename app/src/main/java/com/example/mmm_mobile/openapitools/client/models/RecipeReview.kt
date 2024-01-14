@@ -16,6 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.Recipe
+import org.openapitools.client.models.User
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -27,7 +28,7 @@ import com.squareup.moshi.JsonClass
  * @param id 
  * @param rating 
  * @param recipe 
- * @param userId 
+ * @param user 
  */
 
 
@@ -45,8 +46,8 @@ data class RecipeReview (
     @Json(name = "recipe")
     val recipe: Recipe? = null,
 
-    @Json(name = "userId")
-    val userId: kotlin.Long? = null
+    @Json(name = "user")
+    val user: User? = null
 
 )
 

@@ -15,6 +15,7 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.ProductImageDTO
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -24,6 +25,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param barcode 
  * @param id 
+ * @param image 
  * @param name 
  * @param novaGroup 
  * @param nutriScore 
@@ -34,10 +36,13 @@ import com.squareup.moshi.JsonClass
 data class ProductToListDTO (
 
     @Json(name = "barcode")
-    val barcode: kotlin.String? = null,
+    val barcode: kotlin.String,
 
     @Json(name = "id")
-    val id: kotlin.Long? = null,
+    val id: kotlin.Long,
+
+    @Json(name = "image")
+    val image: ProductImageDTO? = null,
 
     @Json(name = "name")
     val name: kotlin.String? = null,

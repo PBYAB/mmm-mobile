@@ -16,6 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.RecipeIngredientDTO
+import org.openapitools.client.models.RecipeReviewDTO
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -23,12 +24,14 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param coverImageUrl 
  * @param id 
+ * @param name 
+ * @param averageRating 
+ * @param coverImageUrl 
  * @param ingredients 
  * @param instructions 
  * @param kcalPerServing 
- * @param name 
+ * @param reviews 
  * @param servings 
  * @param totalTime 
  */
@@ -36,11 +39,17 @@ import com.squareup.moshi.JsonClass
 
 data class RecipeDTO (
 
+    @Json(name = "id")
+    val id: kotlin.Long,
+
+    @Json(name = "name")
+    val name: kotlin.String,
+
+    @Json(name = "averageRating")
+    val averageRating: kotlin.Double? = null,
+
     @Json(name = "coverImageUrl")
     val coverImageUrl: kotlin.String? = null,
-
-    @Json(name = "id")
-    val id: kotlin.Long? = null,
 
     @Json(name = "ingredients")
     val ingredients: kotlin.collections.List<RecipeIngredientDTO>? = null,
@@ -51,8 +60,8 @@ data class RecipeDTO (
     @Json(name = "kcalPerServing")
     val kcalPerServing: kotlin.Double? = null,
 
-    @Json(name = "name")
-    val name: kotlin.String? = null,
+    @Json(name = "reviews")
+    val reviews: kotlin.collections.Set<RecipeReviewDTO>? = null,
 
     @Json(name = "servings")
     val servings: kotlin.Int? = null,

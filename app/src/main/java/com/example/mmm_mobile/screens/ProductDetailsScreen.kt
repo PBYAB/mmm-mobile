@@ -137,15 +137,17 @@ fun ProductDetails(productDetails: ProductDTO) {
             }
         }
         item {
-            Text(
-                text = productDetails.name,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-            )
+            productDetails.name?.let {
+                Text(
+                    text = it,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth()
+                )
+            }
         }
 
         item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -186,10 +188,10 @@ fun ProductDetails(productDetails: ProductDTO) {
 
         item { Spacer(modifier = Modifier.height(8.dp)) }
         item {
-            CategoryList(category = productDetails.categories)
+            productDetails.categories?.let { CategoryList(category = it) }
         }
         item {
-            CountryList(country = productDetails.countries)
+            productDetails.countries?.let { CountryList(country = it) }
         }
         item {
             productDetails.ingredients?.let { IngredientList(ingredient = it) }
@@ -209,7 +211,7 @@ fun ProductDetails(productDetails: ProductDTO) {
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(
-                    text = productDetails.ingredientAnalysis.ingredientsDescription.toString(),
+                    text = productDetails.ingredientAnalysis?.ingredientsDescription.toString(),
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 12.sp,
@@ -236,7 +238,7 @@ fun ProductDetails(productDetails: ProductDTO) {
 
             Column {
                 Spacer(modifier = Modifier.height(8.dp))
-                NutrimentTable(productDetails.nutriment)
+                productDetails.nutriment?.let { NutrimentTable(it) }
                 Spacer(modifier = Modifier.height(16.dp))
             }
 

@@ -22,23 +22,23 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param amount 
- * @param ingredientId 
+ * @param id 
  * @param name 
+ * @param amount 
  * @param unit 
  */
 
 
 data class RecipeIngredientDTO (
 
-    @Json(name = "amount")
-    val amount: kotlin.Double? = null,
-
-    @Json(name = "ingredientId")
-    val ingredientId: kotlin.Long? = null,
+    @Json(name = "id")
+    val id: kotlin.Long,
 
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
+
+    @Json(name = "amount")
+    val amount: kotlin.Double? = null,
 
     @Json(name = "unit")
     val unit: RecipeIngredientDTO.Unit? = null

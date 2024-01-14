@@ -22,15 +22,18 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
+ * @param id 
  * @param fromPalmOil 
  * @param ingredientsDescription 
  * @param vegan 
  * @param vegetarian 
- * @param id 
  */
 
 
 data class ProductIngredientAnalysisDTO (
+
+    @Json(name = "id")
+    val id: kotlin.Long,
 
     @Json(name = "fromPalmOil")
     val fromPalmOil: kotlin.Boolean? = null,
@@ -42,10 +45,7 @@ data class ProductIngredientAnalysisDTO (
     val vegan: kotlin.Boolean? = null,
 
     @Json(name = "vegetarian")
-    val vegetarian: kotlin.Boolean? = null,
-
-    @Json(name = "id")
-    val id: kotlin.Long? = null
+    val vegetarian: kotlin.Boolean? = null
 
 )
 

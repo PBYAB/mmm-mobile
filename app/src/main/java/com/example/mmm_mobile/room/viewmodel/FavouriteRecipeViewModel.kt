@@ -41,8 +41,8 @@ class FavouriteRecipeViewModel(
         viewModelScope.launch {
             val ingredients = recipe.ingredients?.map { ingredient ->
                 Ingredient(
-                    id = ingredient.ingredientId ?: 0,
-                    name = ingredient.name ?: "",
+                    id = ingredient.id,
+                    name = ingredient.name,
                     amount = ingredient.amount ?: 0.0,
                     unit = IngredientUnit.valueOf(ingredient.unit?.name ?: "")
                 )
@@ -58,8 +58,8 @@ class FavouriteRecipeViewModel(
 
             recipeId = favouriteRecipeRepository.insertFavouriteRecipe(
                 FavouriteRecipe(
-                    id = recipe.id ?: 0,
-                    name = recipe.name ?: "",
+                    id = recipe.id,
+                    name = recipe.name,
                     servings = recipe.servings ?: 0,
                     image = downloadImage(
                         getApplication(),
