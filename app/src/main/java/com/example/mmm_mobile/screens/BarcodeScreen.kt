@@ -50,7 +50,7 @@ fun BarcodeScreen(navController: NavController) {
     }
 
     val camera = remember {
-        BarcodeCamera(navController)
+        BarcodeCamera(navController, navController.context)
     }
 
     var lastScannedBarcode by remember {

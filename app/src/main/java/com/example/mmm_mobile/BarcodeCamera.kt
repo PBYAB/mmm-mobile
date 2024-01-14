@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import android.content.ContentValues.TAG
+import android.widget.Toast
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -34,10 +35,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.ProductApi
+import org.openapitools.client.infrastructure.ClientException
 import java.util.concurrent.Executors
 
 @ExperimentalGetImage
-class BarcodeCamera(private val navController: NavController) {
+class BarcodeCamera(private val navController: NavController, private val context: Context) {
     private var camera: Camera? = null
     private var isScanning = false
     private var lastBarcode = ""
@@ -174,23 +176,22 @@ class BarcodeCamera(private val navController: NavController) {
                                 val productApi = ProductApi()
                                 it.rawValue?.let { barcode ->
                                     try {
-                                        Log.d(TAG, "Barcode: $barcode")
-
-                                        if(lastBarcode == barcode) {
-                                            Log.d(TAG, "Barcode already scanned")
-                                        } else {
+                                        if(lastBarcode != barcode) {
                                             lastBarcode = barcode
                                             val id = productApi.getProductByBarcode(barcode).id
                                             withContext(Dispatchers.Main) {
                                                 id?.let {
-                                                    Log.d(TAG, "Product id: $id")
                                                     navController.navigate("Product/$id")
                                                 }
                                             }
                                         }
-
                                     } catch (e: Exception) {
                                         Log.e(TAG, e.message.orEmpty())
+                                        withContext(Dispatchers.Main) {
+                                            if (e is ClientException && e.statusCode == 404) {
+                                                Toast.makeText(context, "Product not found", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
                                     }
                                 }
                             }
