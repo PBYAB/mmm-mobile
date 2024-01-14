@@ -18,15 +18,18 @@ class RecipeIngredientRepository(
         recipeIngredientDao = recipeDataBase.recipeIngredientDao()
     }
 
+    fun findAllIngredients() = recipeIngredientDao.getIngredients()
+
     suspend fun getIngredientsForRecipe(recipeId: Long): List<Ingredient> {
         return withContext(defaultDispatcher) {
             recipeIngredientDao.getIngredientsForRecipe(recipeId)
         }
     }
 
-    suspend fun insertRecipeIngredient(ingredient: Ingredient): Long {
+    suspend fun insertIngredientIfNotExists(ingredient: Ingredient): Long {
         return withContext(defaultDispatcher) {
-            recipeIngredientDao.insertRecipeIngredient(ingredient)
+            val existingIngredient = recipeIngredientDao.getIngredientById(ingredient.id)
+            return@withContext existingIngredient?.id ?: recipeIngredientDao.insertRecipeIngredient(ingredient)
         }
     }
 

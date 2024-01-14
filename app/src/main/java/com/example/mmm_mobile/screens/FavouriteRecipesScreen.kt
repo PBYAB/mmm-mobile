@@ -39,7 +39,7 @@ import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 @Composable
 fun FavouriteRecipesScreen(navController: NavController) {
     val recipeViewModel: FavouriteRecipeViewModel = viewModel()
-    val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipes().observeAsState(initial = emptyList())
+    val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipesWithoutIngredients().observeAsState(initial = emptyList())
 
 
     FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, navController = navController)

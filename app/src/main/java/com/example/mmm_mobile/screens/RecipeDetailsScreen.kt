@@ -4,21 +4,20 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +47,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 import com.example.mmm_mobile.ui.theme.josefinSansFontFamily
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -63,16 +63,16 @@ import org.openapitools.client.models.RecipeIngredient
 import org.openapitools.client.models.RecipeIngredientDTO
 
 @Composable
-fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
+fun RecipeDetailScreen(navController: NavController, recipeId: Long?, snackbarHostState: SnackbarHostState) {
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
     val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
     val recipe by recipeLiveData.observeAsState()
 
     if(recipe != null){
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { Text(text = "" +recipeId + "|" + recipe?.id) }
-            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId) }
-            item { recipe?.mapToRecipeTDetails()?.let { RecipeDetails(recipeDetails = it) } }
+            item { Text(text = "" +recipeId + "|" + recipe?.recipe?.id) }
+            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId, snackbarHostState) }
+            item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }else{
         val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
@@ -84,38 +84,51 @@ fun RecipeDetailScreen(navController: NavController, recipeId: Long?) {
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { AddRecipeButton(favouriteRecipeViewModel, recipe)}
+            item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it) ) } }
         }
     }
 }
 
 @Composable
-fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipeId: Long?) {
+fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipeId: Long?, snackbarHostState: SnackbarHostState) {
     Button(onClick = {
-        favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
+        favouriteRecipeViewModel.viewModelScope.launch {
+            favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
+            snackbarHostState.showSnackbar(
+                message = "Recipe deleted from favourites",
+                duration = SnackbarDuration.Short
+            )
+        }
     }) {
         Icon(Icons.Filled.Delete, contentDescription = null)
     }
 }
 
 @Composable
-fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?) {
+fun AddRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recipe: RecipeDTO?, snackbarHostState: SnackbarHostState) {
     Button(
         onClick = {
-        favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
-            RecipeDTO(
-                id = recipe?.id ?: 0,
-                name = recipe?.name ?: "",
-                servings = recipe?.servings ?: 0,
-                totalTime = recipe?.totalTime ?: 0,
-                kcalPerServing = recipe?.kcalPerServing ?: 0.0,
-                instructions = recipe?.instructions ?: "",
-                coverImageUrl = recipe?.coverImageUrl ?: "",
-                ingredients = recipe?.ingredients ?: emptyList()
-            )
-        )
-    }) {
+            favouriteRecipeViewModel.viewModelScope.launch {
+                favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
+                    RecipeDTO(
+                        id = recipe?.id ?: 0,
+                        name = recipe?.name ?: "",
+                        servings = recipe?.servings ?: 0,
+                        totalTime = recipe?.totalTime ?: 0,
+                        kcalPerServing = recipe?.kcalPerServing ?: 0.0,
+                        instructions = recipe?.instructions ?: "",
+                        coverImageUrl = recipe?.coverImageUrl ?: "",
+                        ingredients = recipe?.ingredients ?: emptyList()
+                    )
+                )
+                snackbarHostState.showSnackbar(
+                    message = "Recipe ${recipe?.name} added to favourites",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    ) {
         Icon(Icons.Filled.Add, contentDescription = null)
     }
 }
@@ -304,6 +317,27 @@ fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
         } ?: emptyList()
     )
 }
+
+fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
+    return RecipeDetails(
+        id = recipe.recipe.id,
+        name = recipe.recipe.name,
+        servings = recipe.recipe.servings,
+        totalTime = recipe.recipe.totalTime,
+        kcalPerServing = recipe.recipe.kcalPerServing,
+        instructions = recipe.recipe.instructions,
+        image = recipe.recipe.image,
+        ingredients = recipe.ingredients.map { ingredient ->
+            RecipeIngredientDTO(
+                name = ingredient.name,
+                amount = ingredient.amount,
+                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit.name.uppercase()),
+            )
+        }
+    )
+}
+
+
 class RecipeDetails(
     val id: Long = 0,
     val name: String = "",

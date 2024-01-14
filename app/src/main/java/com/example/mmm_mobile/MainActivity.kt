@@ -22,11 +22,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,11 +69,13 @@ class MainActivity : ComponentActivity() {
     fun MainActivityComposable() {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val snackbarHostState = remember { SnackbarHostState() }
 
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             topBar = { TopBar(navController) },
             floatingActionButton = { FAB(navController) },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = { BottomNavBar(navController) }
         ) { padding ->
             NavHost(
@@ -80,13 +85,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable(Screen.Login.route) { LoginScreen(navController) }
                 composable(Screen.Registration.route) { RegistrationScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen(navController) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
-                composable(Screen.AddProduct.route) { AddProductScreen(navController) }
+                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
+                composable(Screen.AddProduct.route) { AddProductScreen() }
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
                 composable(Screen.Barcode.route) { BarcodeScreen() }
-                composable(Screen.ProductList.route) { ProductsScreen(navController) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
+                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(Screen.Search.route + "/products") { SearchScreen(navController) }
                 composable(Screen.Search.route + "/recipes") { SearchScreen(navController) }
                 composable("Product/{productId}") { backStackEntry ->
@@ -95,15 +100,22 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Recipe/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(navController, recipeId) // Przekazujemy recipeId do RecipeDetailScreen
+                    RecipeDetailScreen(navController, recipeId, snackbarHostState) // Przekazujemy recipeId do RecipeDetailScreen
                 }
                 composable(Screen.FavouriteRecipes.route) { FavouriteRecipesScreen(navController) }
                 composable("Favorite/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(navController, recipeId = recipeId) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
+                    RecipeDetailScreen(navController, recipeId = recipeId, snackbarHostState) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
                 }
-                composable(Screen.RecipeList.route + "/{query}") { RecipesScreen(navController) }
-                composable(Screen.ProductList.route + "/{query}") { ProductsScreen(navController) }
+                composable(Screen.RecipeList.route + "/{query}"){ backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    RecipesScreen(navController, query)
+
+                }
+                composable(Screen.ProductList.route + "/{query}") { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    ProductsScreen(navController, query)
+                }
             }
         }
     }

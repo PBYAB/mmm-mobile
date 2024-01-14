@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
 import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.room.entity.Ingredient
+import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,42 +34,59 @@ class FavouriteRecipeViewModel(
 
     fun findAllFavouriteRecipes() = favouriteRecipeRepository.findAllFavouriteRecipes()
 
+    fun findAllFavouriteRecipesWithoutIngredients() = favouriteRecipeRepository.findAllFavouriteRecipesWithoutIngredients()
 
     fun insertFavouriteRecipeWithIngredients(recipe: RecipeDTO) : Long {
         var recipeId: Long = 0
         viewModelScope.launch {
+            val ingredients = recipe.ingredients?.map { ingredient ->
+                Ingredient(
+                    id = ingredient.ingredientId ?: 0,
+                    name = ingredient.name ?: "",
+                    amount = ingredient.amount ?: 0.0,
+                    unit = IngredientUnit.valueOf(ingredient.unit?.name ?: "")
+                )
+            } ?: listOf()
+
+            val ingredientIds = ingredients.map { ingredient ->
+                recipeIngredientRepository.insertIngredientIfNotExists(ingredient)
+            }
+
+            val ingredientsWithIds = ingredients.zip(ingredientIds) { ingredient, id ->
+                ingredient.copy(id = id)
+            }
 
             recipeId = favouriteRecipeRepository.insertFavouriteRecipe(
-                    FavouriteRecipe(
-                        id = recipe.id ?: 0,
-                        name = recipe.name ?: "",
-                        servings = recipe.servings ?: 0,
-                        image = downloadImage(
-                            getApplication(),
-                            recipe.coverImageUrl ?: ""
-                            ) ?: byteArrayOf(),
-                        instructions = recipe.instructions ?: "",
-                        kcalPerServing = recipe.kcalPerServing ?: 0.0,
-                        totalTime = recipe.totalTime ?: 0,
-                        ingredients = recipe.ingredients?.map { ingredient ->
-                            Ingredient(
-                                name = ingredient.name ?: "",
-                                amount = ingredient.amount ?: 0.0,
-                                unit = IngredientUnit.valueOf(ingredient.unit?.value?.uppercase() ?: "OTHER"),
-                            ) } ?: emptyList()
-                    )
+                FavouriteRecipe(
+                    id = recipe.id ?: 0,
+                    name = recipe.name ?: "",
+                    servings = recipe.servings ?: 0,
+                    image = downloadImage(
+                        getApplication(),
+                        recipe.coverImageUrl ?: ""
+                    ) ?: byteArrayOf(),
+                    instructions = recipe.instructions ?: "",
+                    kcalPerServing = recipe.kcalPerServing ?: 0.0,
+                    totalTime = recipe.totalTime ?: 0
+                ),
+                ingredientsWithIds
             )
         }
         return recipeId
     }
 
-    fun getFavouriteRecipeWithIngredients(recipeId: Long): LiveData<FavouriteRecipe> {
-        val result = MutableLiveData<FavouriteRecipe>()
+    fun getFavouriteRecipeWithIngredients(recipeId: Long): LiveData<RecipeWithIngredients?> {
+        val recipeWithIngredients = MutableLiveData<RecipeWithIngredients?>()
         viewModelScope.launch {
             val recipe = favouriteRecipeRepository.findRecipeById(recipeId)
-           result.value = recipe
+            if (recipe != null) {
+                val ingredients = recipeIngredientRepository.getIngredientsForRecipe(recipeId)
+                recipeWithIngredients.postValue(RecipeWithIngredients(recipe, ingredients))
+            } else {
+                recipeWithIngredients.postValue(null)
+            }
         }
-        return result
+        return recipeWithIngredients
     }
 
     fun deleteFavouriteRecipeWithIngredients(recipeId: Long) {
