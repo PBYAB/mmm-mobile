@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -61,27 +61,12 @@ import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.openapitools.client.apis.AllergenApi
-import org.openapitools.client.apis.BrandApi
-import org.openapitools.client.apis.CategoryApi
-import org.openapitools.client.apis.CountryApi
 import org.openapitools.client.apis.IngredientApi
-import org.openapitools.client.apis.ProductApi
-import org.openapitools.client.apis.ProductIngredientApi
 import org.openapitools.client.apis.RecipeApi
-import org.openapitools.client.models.AllergenDTO
-import org.openapitools.client.models.BrandDTO
-import org.openapitools.client.models.CategoryDTO
-import org.openapitools.client.models.CountryDTO
-import org.openapitools.client.models.CreateProductRequest
 import org.openapitools.client.models.CreateRecipeRequest
 import org.openapitools.client.models.IngredientListItem
-import org.openapitools.client.models.ProductIngredientDTO
-import org.openapitools.client.models.RecipeDTO
-import org.openapitools.client.models.RecipeIngredientDTO
 import org.openapitools.client.models.RecipeIngredientForm
 
 
@@ -96,75 +81,100 @@ fun AddRecipeScreen() {
         var recipeCaloriesPerServing by remember { mutableStateOf("") }
         var ingredients by remember { mutableStateOf(listOf(Ingredient())) }
 
-        Card(
-            modifier = Modifier.padding(10.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+    Card(
+        modifier = Modifier.padding(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+    ) {
+        val mediumPadding = 8.dp
+        Column(
+            verticalArrangement = Arrangement.spacedBy(mediumPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(mediumPadding)
+                .fillMaxSize()
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
         ) {
-            val mediumPadding = 10.dp
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(mediumPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(mediumPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                item {
-                    Text(
-                        text = stringResource(R.string.add_recipe_title),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = typography.displayMedium
+                Text(
+                    text = stringResource(R.string.add_recipe_title),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = typography.displayMedium,
+                    modifier = Modifier
+                        .padding(mediumPadding)
+                )
+                Text(
+                    text = stringResource(R.string.instructions),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    style = typography.titleMedium,
+                    modifier = Modifier
+                        .padding(mediumPadding)
+                )
+                OutlinedTextField(
+                    value = recipeName,
+                    singleLine = true,
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(mediumPadding),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    onValueChange = {
+                            newValue -> recipeName = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_recipe_name),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { }
                     )
-                }
-                item {
-                    Text(
-                        text = stringResource(R.string.instructions),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center,
-                        style = typography.titleMedium,
+                )
+
+                OutlinedTextField(
+                    value = recipeInstructions,
+                    singleLine = false, // Ustaw singleLine na false, aby pozwolić na wieloliniowy tekst
+                    shape = shapes.large,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(mediumPadding),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    onValueChange = {
+                            newValue -> recipeInstructions = newValue
+                    },
+                    label = { Text(stringResource(R.string.enter_recipe_instructions),fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,) },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { }
                     )
-                }
-                item {
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     OutlinedTextField(
-                        value = recipeName,
+                        value = recipeCaloriesPerServing,
                         singleLine = true,
                         shape = shapes.large,
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            disabledContainerColor = MaterialTheme.colorScheme.surface,
-                        ),
-                        onValueChange = { newValue ->
-                            recipeName = newValue
-                        },
-                        label = {
-                            Text(
-                                stringResource(R.string.enter_recipe_name),
-                                fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
-                            )
-                        },
-                        isError = false,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { }
-                        )
-                    )
-                }
-
-                item {
-                    OutlinedTextField(
-                        value = recipeInstructions,
-                        singleLine = false, // Ustaw singleLine na false, aby pozwolić na wieloliniowy tekst
-                        shape = shapes.large,
-                        modifier = Modifier
-                            .fillMaxWidth()
+                            .padding(mediumPadding)
                             .weight(1f),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -172,162 +182,124 @@ fun AddRecipeScreen() {
                             disabledContainerColor = MaterialTheme.colorScheme.surface,
                         ),
                         onValueChange = {
-                                newValue -> recipeInstructions = newValue
+                                newValue -> recipeCaloriesPerServing = newValue
                         },
-                        label = { Text(stringResource(R.string.enter_recipe_instructions),fontFamily = poppinsFontFamily,
+                        label = { Text(stringResource(R.string.enter_calories),fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,) },
                         isError = false,
                         keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = { }
                         )
                     )
-                }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        OutlinedTextField(
-                            value = recipeCaloriesPerServing,
-                            singleLine = true,
-                            shape = shapes.large,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = mediumPadding),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                            ),
-                            onValueChange = {
-                                    newValue -> recipeCaloriesPerServing = newValue
-                            },
-                            label = { Text(stringResource(R.string.enter_calories),fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Medium,) },
-                            isError = false,
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Number // Ustawienie inputType na liczbowy
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = { }
-                            )
+                    OutlinedTextField(
+                        value = recipeServings,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = mediumPadding),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        onValueChange = {
+                                newValue -> recipeServings = newValue
+                        },
+                        label = { Text(stringResource(R.string.enter_servings),fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,) },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number // Ustawienie inputType na liczbowy
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
                         )
+                    )
 
-                        OutlinedTextField(
-                            value = recipeServings,
-                            singleLine = true,
-                            shape = shapes.large,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = mediumPadding),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                            ),
-                            onValueChange = {
-                                    newValue -> recipeServings = newValue
-                            },
-                            label = { Text(stringResource(R.string.enter_servings),fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Medium,) },
-                            isError = false,
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Number // Ustawienie inputType na liczbowy
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {}
-                            )
+                    OutlinedTextField(
+                        value = recipeTime,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = mediumPadding),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        onValueChange = {
+                                newValue -> recipeTime = newValue
+                        },
+                        label = { Text(stringResource(R.string.enter_total_time),fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,) },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
                         )
-
-                        OutlinedTextField(
-                            value = recipeTime,
-                            singleLine = true,
-                            shape = shapes.large,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = mediumPadding),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                            ),
-                            onValueChange = {
-                                    newValue -> recipeTime = newValue
-                            },
-                            label = { Text(stringResource(R.string.enter_total_time),fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Medium,) },
-                            isError = false,
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Number
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {}
-                            )
-                        )
-                    }
+                    )
                 }
 
                 ingredients.forEachIndexed { index, ingredient ->
-                    item {
-                        IngredientRow(
-                            ingredient = ingredient,
-                            onIngredientChange = { newIngredient ->
-                                ingredients = ingredients.toMutableList().also {
-                                    it[index] = newIngredient
-                                }
-                            },
-                            onRemoveIngredient = {
-                                ingredients = ingredients.toMutableList().also {
-                                    it.removeAt(index)
-                                }
-                            }
-                        )
-                    }
-                }
-
-                item {
-                    AddIngredientRow(
-                        onAddIngredient = {
+                    IngredientRow(
+                        ingredient = ingredient,
+                        onIngredientChange = { newIngredient ->
                             ingredients = ingredients.toMutableList().also {
-                                it.add(Ingredient())
+                                it[index] = newIngredient
+                            }
+                        },
+                        onRemoveIngredient = {
+                            ingredients = ingredients.toMutableList().also {
+                                it.removeAt(index)
                             }
                         }
                     )
                 }
 
-
-                item {
-                    Button(
-                        modifier = Modifier
-                            .padding(top = mediumPadding),
-                        onClick = {
-                            val createRecipeRequest = CreateRecipeRequest(
-                                recipeInstructions,
-                                null,
-                                emptyList<RecipeIngredientForm>(),
-                                recipeCaloriesPerServing.toDouble(),
-                                recipeName,
-                                recipeServings.toInt(),
-                                recipeTime.toInt()
-                            )
-                            viewModel.addRecipe(createRecipeRequest)
+                AddIngredientRow(
+                    onAddIngredient = {
+                        ingredients = ingredients.toMutableList().also {
+                            it.add(Ingredient())
                         }
-
-                    ) {
-                        Text(
-                            text = stringResource(R.string.add_recipe_button),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
                     }
+                )
+
+
+                Button(
+                    modifier = Modifier
+                        .padding(top = mediumPadding),
+                    onClick = {
+                        val createRecipeRequest = CreateRecipeRequest(
+                            recipeInstructions,
+                            null,
+                            emptyList<RecipeIngredientForm>(),
+                            recipeCaloriesPerServing.toDouble(),
+                            recipeName,
+                            recipeServings.toInt(),
+                            recipeTime.toInt()
+                        )
+                        viewModel.addRecipe(createRecipeRequest)
+                    }
+
+                ) {
+                    Text(
+                        text = stringResource(R.string.add_recipe_button),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
+
+                    )
                 }
             }
         }
@@ -417,7 +389,7 @@ fun IngredientRow(
                 ),
                 displayText = { brand -> brand.name ?: "" },
                 filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
-                placeholder = { Text(text = (stringResource(R.string.enter_product_brand)),fontFamily = poppinsFontFamily,
+                placeholder = { Text(text = (stringResource(R.string.enter_recipe_product)),fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,) },
                 onDropDownItemSelected = { selectedBrands ->
                     for (brand in selectedBrands) {
@@ -542,15 +514,3 @@ class AddRecipeViewModel(
         }
     }
 }
-
-
-
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun AddRecipePreview() {
-//    MmmmobileTheme {
-//        AddRecipe(
-//            modifier = Modifier.fillMaxSize(),
-//        )
-//    }
-//}

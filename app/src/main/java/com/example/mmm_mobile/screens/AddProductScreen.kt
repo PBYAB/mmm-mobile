@@ -307,10 +307,9 @@ fun AddProductScreen(navController: NavController) {
                             Log.d("Selected Brands", brand.name ?: "Unknown")
                         }
                     },
-                    dropdownItem = { brand ->
-                        DropDownItem(item = brand) {
-                            Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                        }
+                    dropdownItem = {
+                        Text(text = (stringResource(R.string.enter_product_brand)),fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,)
                     },
                     defaultItem = {
                         it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
@@ -347,9 +346,10 @@ fun AddProductScreen(navController: NavController) {
                         }
                     },
                     dropdownItem = { allergen ->
-                        DropDownItem(item = allergen) {
-                            Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                        }
+                        Text(text = (stringResource(R.string.enter_product_allergen)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
                     },
                     defaultItem = {
                         it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
@@ -387,9 +387,10 @@ fun AddProductScreen(navController: NavController) {
                         }
                     },
                     dropdownItem = { category ->
-                        DropDownItem(item = category) {
-                            Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                        }
+                        Text(text = (stringResource(R.string.enter_product_category)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
                     },
                     defaultItem = {
                         it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
@@ -427,9 +428,10 @@ fun AddProductScreen(navController: NavController) {
                         }
                     },
                     dropdownItem = { country ->
-                        DropDownItem(item = country) {
-                            Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                        }
+                        Text(text = (stringResource(R.string.enter_product_country)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
                     },
                     defaultItem = {
                         it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
@@ -760,9 +762,10 @@ fun AddProductScreen(navController: NavController) {
                         }
                     },
                     dropdownItem = { country ->
-                        DropDownItem(item = country) {
-                            Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                        }
+                        Text(text = (stringResource(R.string.enter_product_ingredients)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
                     },
                     defaultItem = {
                         it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
@@ -806,11 +809,6 @@ fun AddProductScreen(navController: NavController) {
         }
     }
 }
-
-
-data class ProductIngredient(
-    var name: String = "",
-)
 
 
 @Composable
@@ -912,11 +910,10 @@ fun ElevatedButtonExample(onClick: () -> Unit) {
 }
 
 
-@OptIn( ExperimentalMaterial3Api::class)
 @Composable
 fun <T> SearchableExpandedDropDownMenu(
     modifier: Modifier = Modifier,
-    displayText: (T) -> String, // Lambda to extract display text from the item
+    displayText: (T) -> String,
     filterItems: (List<T>, String) -> List<T>,
     setOfItems: List<T>,
     enable: Boolean = true,
@@ -940,200 +937,199 @@ fun <T> SearchableExpandedDropDownMenu(
 ): Set<T> {
 
     var selectedOptions by rememberSaveable { mutableStateOf<Set<T>>(emptySet()) }
-        var searchedOption by rememberSaveable { mutableStateOf("") }
-        var expanded by remember { mutableStateOf(false) }
-        var filteredItems by remember { mutableStateOf(setOfItems) }
-        val keyboardController = LocalSoftwareKeyboardController.current
-        val focusRequester = remember { FocusRequester() }
-        val itemHeights = remember { mutableStateMapOf<Int, Int>() }
-        val baseHeight = 530.dp
-        val density = LocalDensity.current
-        filteredItems = filterItems(setOfItems, searchedOption)
+    var searchedOption by rememberSaveable { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var filteredItems by remember { mutableStateOf(setOfItems) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+    val itemHeights = remember { mutableStateMapOf<Int, Int>() }
+    val baseHeight = 530.dp
+    val density = LocalDensity.current
+    filteredItems = filterItems(setOfItems, searchedOption)
 
-        if (showDefaultSelectedItem && selectedOptions.isEmpty()) {
-            selectedOptions = setOfItems.take(defaultItemIndex + 1).toSet()
+    if (showDefaultSelectedItem && selectedOptions.isEmpty()) {
+        selectedOptions = setOfItems.take(defaultItemIndex + 1).toSet()
+    }
+
+    val maxHeight = remember(itemHeights.toMap()) {
+        if (itemHeights.keys.toSet() != setOfItems.indices.toSet()) {
+            return@remember baseHeight
         }
+        val baseHeightInt = with(density) { baseHeight.toPx().toInt() }
 
-        val maxHeight = remember(itemHeights.toMap()) {
-            if (itemHeights.keys.toSet() != setOfItems.indices.toSet()) {
-                return@remember baseHeight
+        var sum = with(density) { DropdownMenuVerticalPadding.toPx().toInt() } * 2
+        for ((_, itemSize) in itemHeights.toSortedMap()) {
+            sum += itemSize
+            if (sum >= baseHeightInt) {
+                return@remember with(density) { (sum - itemSize / 2).toDp() }
             }
-            val baseHeightInt = with(density) { baseHeight.toPx().toInt() }
+        }
+        baseHeight
+    }
 
-            var sum = with(density) { DropdownMenuVerticalPadding.toPx().toInt() } * 2
-            for ((_, itemSize) in itemHeights.toSortedMap()) {
-                sum += itemSize
-                if (sum >= baseHeightInt) {
-                    return@remember with(density) { (sum - itemSize / 2).toDp() }
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            if (expanded || (selectedOptions.isEmpty() && !showDefaultSelectedItem)) {
+                placeholder()
+            } else {
+                // Display selected items
+                selectedOptions.forEach { selectedOption ->
+                    dropdownItem(selectedOption)
                 }
             }
-            baseHeight
         }
 
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                if (expanded || (selectedOptions.isEmpty() && !showDefaultSelectedItem)) {
-                    placeholder()
-                } else {
-                    // Display selected items
-                    selectedOptions.forEach { selectedOption ->
-                        dropdownItem(selectedOption)
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            colors = colors,
+            value = selectedOptions.joinToString(", ", transform = displayText),
+            readOnly = readOnly,
+            enabled = enable,
+            onValueChange = {},
+            placeholder = {},
+            trailingIcon = {
+                IconToggleButton(
+                    checked = expanded,
+                    onCheckedChange = {
+                        expanded = it
+                    },
+                ) {
+                    if (expanded) {
+                        Icon(
+                            imageVector = Icons.Outlined.KeyboardArrowUp,
+                            contentDescription = null,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.KeyboardArrowDown,
+                            contentDescription = null,
+                        )
                     }
                 }
-            }
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                colors = colors,
-                value = selectedOptions.joinToString(", ", transform = displayText),
-                readOnly = readOnly,
-                enabled = enable,
-                onValueChange = {},
-                placeholder = {},
-                trailingIcon = {
-                    IconToggleButton(
-                        checked = expanded,
-                        onCheckedChange = {
-                            expanded = it
-                        },
-                    ) {
-                        if (expanded) {
-                            Icon(
-                                imageVector = Icons.Outlined.KeyboardArrowUp,
-                                contentDescription = null,
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Outlined.KeyboardArrowDown,
-                                contentDescription = null,
-                            )
+            },
+            shape = RoundedCornerShape(parentTextFieldCornerRadius),
+            isError = isError,
+            interactionSource = remember { MutableInteractionSource() }
+                .also { interactionSource ->
+                    LaunchedEffect(interactionSource) {
+                        keyboardController?.show()
+                        interactionSource.interactions.collect {
+                            if (it is PressInteraction.Release) {
+                                expanded = !expanded
+                            }
                         }
                     }
                 },
-                shape = RoundedCornerShape(parentTextFieldCornerRadius),
-                isError = isError,
-                interactionSource = remember { MutableInteractionSource() }
-                    .also { interactionSource ->
-                        LaunchedEffect(interactionSource) {
-                            keyboardController?.show()
-                            interactionSource.interactions.collect {
-                                if (it is PressInteraction.Release) {
-                                    expanded = !expanded
-                                }
-                            }
-                        }
-                    },
-            )
-            if (expanded) {
-                DropdownMenu(
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .requiredSizeIn(maxHeight = maxHeight),
-                    expanded = expanded,
-                    onDismissRequest = {
-                        expanded = false
-                        onSearchTextFieldClicked()
-                    },
+        )
+        if (expanded) {
+            DropdownMenu(
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .requiredSizeIn(maxHeight = maxHeight),
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                    onSearchTextFieldClicked()
+                },
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(5.dp),
-                    ) {
-                        OutlinedTextField(
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .focusRequester(focusRequester),
+                        value = searchedOption,
+                        onValueChange = { selectedSport ->
+                            searchedOption = selectedSport
+                            // Update filteredItems when search text changes
+                            filteredItems = setOfItems.filter {
+                                displayText(it).contains(
+                                    searchedOption,
+                                    ignoreCase = true,
+                                )
+                            }
+                        },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                        },
+                        placeholder = {
+                            Text(
+                                text = "Search",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        interactionSource = remember { MutableInteractionSource() }
+                            .also { interactionSource ->
+                                LaunchedEffect(interactionSource) {
+                                    focusRequester.requestFocus()
+                                    interactionSource.interactions.collect {
+                                        if (it is PressInteraction.Release) {
+                                            onSearchTextFieldClicked()
+                                        }
+                                    }
+                                }
+                            },
+                    )
+
+                    filteredItems.forEach { selectedItem ->
+                        val isChecked =
+                            selectedOptions.contains(selectedItem)
+
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .focusRequester(focusRequester),
-                            value = searchedOption,
-                            onValueChange = { selectedSport ->
-                                searchedOption = selectedSport
-                                // Update filteredItems when search text changes
-                                filteredItems = setOfItems.filter {
-                                    displayText(it).contains(
-                                        searchedOption,
-                                        ignoreCase = true,
-                                    )
+                                .clickable {
+                                    if (isChecked) {
+                                        selectedOptions = selectedOptions - selectedItem
+                                    } else {
+                                        selectedOptions = selectedOptions + selectedItem
+                                    }
                                 }
-                            },
-                            leadingIcon = {
-                                Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
-                            },
-                            placeholder = {
-                                Text(
-                                    text = "Search",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            },
-                            interactionSource = remember { MutableInteractionSource() }
-                                .also { interactionSource ->
-                                    LaunchedEffect(interactionSource) {
-                                        focusRequester.requestFocus()
-                                        interactionSource.interactions.collect {
-                                            if (it is PressInteraction.Release) {
-                                                onSearchTextFieldClicked()
-                                            }
-                                        }
-                                    }
+                                .padding(10.dp), // Add padding for better spacing
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = null,
+                                modifier = Modifier.weight(0.2f)
+                            )
+
+                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+
+                            DropdownMenuItem(
+                                modifier = Modifier.weight(0.5f),
+                                text = {
+                                    // Add your text content here
+                                    Text(
+                                        displayText(selectedItem),
+                                        fontFamily = poppinsFontFamily,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 },
-                        )
-
-                        filteredItems.forEach { selectedItem ->
-                            val isChecked =
-                                selectedOptions.contains(selectedItem)
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (isChecked) {
-                                            selectedOptions = selectedOptions - selectedItem
-                                        } else {
-                                            selectedOptions = selectedOptions + selectedItem
-                                        }
-                                    }
-                                    .padding(10.dp), // Add padding for better spacing
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = isChecked,
-                                    onCheckedChange = null,
-                                    modifier = Modifier.weight(0.2f)
-                                )
-
-                                Spacer(modifier = Modifier.width(120.dp)) // Add space between Checkbox and DropdownMenuItem
-
-                                DropdownMenuItem(
-                                    modifier = Modifier.weight(0.5f),
-                                    text = {
-                                        // Add your text content here
-                                        Text(
-                                            displayText(selectedItem),
-                                            fontFamily = poppinsFontFamily,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    },
-                                    onClick = {
-                                        keyboardController?.hide()
-                                        onDropDownItemSelected(selectedOptions)
-                                        searchedOption = ""
-                                        expanded = false
-
-                                    }
-                                )
-                            }
+                                onClick = {
+                                    keyboardController?.hide()
+                                    onDropDownItemSelected(selectedOptions)
+                                    searchedOption = ""
+                                    expanded = false
+                                }
+                            )
                         }
                     }
                 }
             }
         }
-    return selectedOptions;
     }
+    return selectedOptions
+}
 
 
 class AddProductViewModel(
@@ -1162,10 +1158,8 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageBrandDTO = withContext(Dispatchers.IO) {
-                    brandsApi.getAllBrands(0,9999)
+                    brandsApi.getAllBrands(0,50)
                 }
-
-                // Assuming PageBrandDTO has a property 'items' which is a List<BrandDTO>
                 val brands = pageBrandDTO.content
 
                 brands?.let { _brands.emit(it) }
@@ -1179,7 +1173,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageAllergenDTO = withContext(Dispatchers.IO) {
-                    allergenApi.listAllergens(0,9999)
+                    allergenApi.listAllergens(0,50)
                 }
 
                 // Assuming PageBrandDTO has a property 'items' which is a List<BrandDTO>
@@ -1197,7 +1191,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageCategoryDTO = withContext(Dispatchers.IO) {
-                    categoryApi.getCategories(0,9999)
+                    categoryApi.getCategories(0,50)
                 }
                 val categories = pageCategoryDTO.content
 
@@ -1212,7 +1206,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageCountriesDTO = withContext(Dispatchers.IO) {
-                    countryApi.getCountries(0,9999)
+                    countryApi.getCountries(0,50)
                 }
 
                 val countries = pageCountriesDTO.content
@@ -1229,7 +1223,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageProductIngredientDTO = withContext(Dispatchers.IO) {
-                    productIngredientApi.getProductIngredients(0,9999)
+                    productIngredientApi.getProductIngredients(0,50)
                 }
 
                 val productIngredients = pageProductIngredientDTO.content
