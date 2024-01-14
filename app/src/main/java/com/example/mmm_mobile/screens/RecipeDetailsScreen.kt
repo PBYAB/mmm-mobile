@@ -96,7 +96,7 @@ fun DeleteRecipeButton(favouriteRecipeViewModel: FavouriteRecipeViewModel, recip
         favouriteRecipeViewModel.viewModelScope.launch {
             favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
             snackbarHostState.showSnackbar(
-                message = "Recipe deleted",
+                message = "Recipe deleted from favourites",
                 duration = SnackbarDuration.Short
             )
         }

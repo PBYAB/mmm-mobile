@@ -85,13 +85,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable(Screen.Login.route) { LoginScreen(navController) }
                 composable(Screen.Registration.route) { RegistrationScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen(navController) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
+                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(Screen.AddProduct.route) { AddProductScreen() }
                 composable(Screen.AddRecipe.route) { AddRecipeScreen() }
                 composable(Screen.Barcode.route) { BarcodeScreen() }
-                composable(Screen.ProductList.route) { ProductsScreen(navController) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController) }
+                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
+                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(Screen.Search.route + "/products") { SearchScreen(navController) }
                 composable(Screen.Search.route + "/recipes") { SearchScreen(navController) }
                 composable("Product/{productId}") { backStackEntry ->
@@ -107,8 +107,15 @@ class MainActivity : ComponentActivity() {
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
                     RecipeDetailScreen(navController, recipeId = recipeId, snackbarHostState) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
                 }
-                composable(Screen.RecipeList.route + "/{query}") { RecipesScreen(navController) }
-                composable(Screen.ProductList.route + "/{query}") { ProductsScreen(navController) }
+                composable(Screen.RecipeList.route + "/{query}"){ backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    RecipesScreen(navController, query)
+
+                }
+                composable(Screen.ProductList.route + "/{query}") { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    ProductsScreen(navController, query)
+                }
             }
         }
     }

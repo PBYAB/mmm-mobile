@@ -21,15 +21,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +50,8 @@ import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.ProductApi
 
@@ -53,6 +59,9 @@ class ProductsListViewModel : ViewModel() {
 
     private val productApi = ProductApi()
     var state by mutableStateOf(ScreenState<Product>())
+
+    private val _filterApplied = MutableStateFlow(false)
+    val filterApplied: StateFlow<Boolean> = _filterApplied
 
 
     private var name : String? by mutableStateOf(null)
@@ -117,7 +126,13 @@ class ProductsListViewModel : ViewModel() {
     )
 
     init {
-        loadNextItems()
+        viewModelScope.launch {
+            filterApplied.collect {
+                if (it) {
+                    loadNextItems()
+                }
+            }
+        }
     }
 
     fun loadNextItems() {
@@ -136,21 +151,17 @@ class ProductsListViewModel : ViewModel() {
         this.country = country
         this.sortBy = sortBy ?: "id"
         this.sortDirection = sortDirection ?: "ASC"
+
+        _filterApplied.value = true
     }
 }
 
 
 
 @Composable
-fun ProductsScreen(navController: NavController) {
-    val backStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
-    val query = backStackEntry?.arguments?.getString("query")
-    Log.d("ProductList", "query: $query")
-
-    val viewModel = viewModel<ProductsListViewModel>()
+fun ProductsScreen(navController: NavController, query : String?) {
+    val viewModel: ProductsListViewModel = viewModel()
     viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
-
-
 
     Box(modifier = Modifier) {
         ProductList(navController = navController, viewModel = viewModel)
@@ -159,7 +170,6 @@ fun ProductsScreen(navController: NavController) {
 
     @Composable
     fun ProductListItem(product: Product, navController: NavController) {
-        val context = LocalContext.current
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(data = product.image)
@@ -180,7 +190,7 @@ fun ProductsScreen(navController: NavController) {
         ) {
             Image(
                 painter = painter,
-                contentDescription = context.getText(R.string.product_image_info).toString(),
+                contentDescription = stringResource(id = R.string.product_image_info),
                 modifier = Modifier
                     .size(200.dp, 150.dp)
                     .fillMaxWidth(),
@@ -218,7 +228,7 @@ fun ProductsScreen(navController: NavController) {
                 val novaGroupImage = getNovaGroupImage(product.novaGroup)
 
                 Image(painter = painterResource(id = nutriScoreImage),
-                    contentDescription = context.getText(R.string.nutri_score_image_info).toString(),
+                    contentDescription = stringResource(R.string.nutri_score_image_info),
                     modifier = Modifier
                         .padding(2.dp)
                         .size(32.dp)
@@ -226,7 +236,7 @@ fun ProductsScreen(navController: NavController) {
                 )
 
                 Image(painter = painterResource(id =  novaGroupImage),
-                    contentDescription = context.getText(R.string.nova_group_image_info).toString(),
+                    contentDescription = stringResource(R.string.nova_group_image_info),
                     modifier = Modifier
                         .padding(2.dp)
                         .size(32.dp)
@@ -268,14 +278,14 @@ fun ProductsScreen(navController: NavController) {
     }
 
 
-    @Preview(showBackground = true, showSystemUi = true)
-    @Composable
-    fun GreetingPreview() {
-
-        MmmmobileTheme {
-            ProductsScreen(navController = NavHostController(LocalContext.current))
-        }
-    }
+//    @Preview(showBackground = true, showSystemUi = true)
+//    @Composable
+//    fun GreetingPreview() {
+//
+//        MmmmobileTheme {
+//            ProductsScreen(navController = NavHostController(LocalContext.current))
+//        }
+//    }
 
 
 fun getNutriScoreImage(nutriScore: Int): Int {

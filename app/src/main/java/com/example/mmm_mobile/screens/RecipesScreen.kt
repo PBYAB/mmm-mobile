@@ -40,6 +40,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.room.Query
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
@@ -48,6 +49,8 @@ import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.RecipeApi
 
@@ -55,6 +58,9 @@ class RecipeListViewModel : ViewModel() {
 
     private val recipesApi = RecipeApi()
     var state by mutableStateOf(ScreenState<Recipe>())
+
+    private val _filterApplied = MutableStateFlow(false)
+    val filterApplied: StateFlow<Boolean> = _filterApplied
 
     private var name : String? by mutableStateOf(null)
     private var servings : List<Int>? by mutableStateOf(null)
@@ -110,7 +116,13 @@ class RecipeListViewModel : ViewModel() {
     )
 
     init {
-        loadNextItems()
+        viewModelScope.launch {
+            filterApplied.collect {
+                if (it) {
+                    loadNextItems()
+                }
+            }
+        }
     }
 
     fun loadNextItems() {
@@ -131,14 +143,13 @@ class RecipeListViewModel : ViewModel() {
         if (sortDirection != null) {
             this.sortDirection = sortDirection
         }
+
+        _filterApplied.value = true
     }
 }
 
 @Composable
-fun RecipesScreen(navController: NavController) {
-    val backStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
-    val query = backStackEntry?.arguments?.getString("query")
-    Log.d("RecipeList", "query: $query")
+fun RecipesScreen(navController: NavController, query: String?) {
 
     val viewModel = viewModel<RecipeListViewModel>()
     viewModel.filterRecipes(query, null, null, null, null, null)
@@ -233,10 +244,10 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun RecipeListPreview() {
-    MmmmobileTheme {
-        RecipesScreen(navController = NavHostController(LocalContext.current))
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun RecipeListPreview() {
+//    MmmmobileTheme {
+//        RecipesScreen(navController = NavHostController(LocalContext.current))
+//    }
+//}
