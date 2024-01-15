@@ -56,11 +56,12 @@ fun SearchScreen(navController: NavController) {
     val currentRoute = navController.currentBackStackEntry?.destination?.route
     var nextRoute = ""
     var suggestions = emptyList<String>()
-    when(currentRoute){
+    when (currentRoute) {
         Screen.Search.route + "/recipes" -> {
             suggestions = recipesSuggestions
             nextRoute = Screen.RecipeList.route
         }
+
         Screen.Search.route + "/products" -> {
             suggestions = productsSuggestions
             nextRoute = Screen.ProductList.route
@@ -71,15 +72,14 @@ fun SearchScreen(navController: NavController) {
         query = query,
         onQueryChange = { newQuery -> query = newQuery },
         onSearch = {
-            navController.navigate(nextRoute + if(query.isNotEmpty()) "/$query" else "")
-                   },
+            navController.navigate(nextRoute + if (query.isNotEmpty()) "/$query" else "")
+        },
         active = active,
         onActiveChange = { newActiveState -> active = newActiveState },
         placeholder = { Text(text = "Search") },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon") },
         modifier = Modifier
-            .fillMaxWidth()
-        ,
+            .fillMaxWidth(),
         colors = SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )

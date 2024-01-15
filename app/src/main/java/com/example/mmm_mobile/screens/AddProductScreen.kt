@@ -40,7 +40,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -83,8 +82,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.mmm_mobile.models.Nutriment
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.models.Nutriment
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,7 +112,6 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
     val brandsState by viewModel.brands.collectAsState(initial = emptyList())
     val allergensState by viewModel.allergens.collectAsState(initial = emptyList())
     val categoriesState by viewModel.categories.collectAsState(initial = emptyList())
-    var isVisible by rememberSaveable { mutableStateOf(true) }
     val countriesState by viewModel.countries.collectAsState(initial = emptyList())
     val productIngredientState by viewModel.productIngredients.collectAsState(initial = emptyList())
 
@@ -126,7 +124,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
     }
 
     val novaGroupOptions = listOf("1", "2", "3", "4", "5")
-    val nutriScoreOptions = listOf("A","B", "C", "D", "E")
+    val nutriScoreOptions = listOf("A", "B", "C", "D", "E")
     var name by rememberSaveable { mutableStateOf("") }
     var barcode by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableStateOf("") }
@@ -192,9 +190,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 onValueChange = { newValue ->
                     name = newValue
                 },
-                label = { Text(stringResource(R.string.enter_product_name),
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_product_name),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -218,8 +220,12 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 onValueChange = { newValue ->
                     barcode = newValue
                 },
-                label = { Text(stringResource(R.string.enter_barcode),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_barcode), fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -236,7 +242,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     navController.navigate(Screen.Barcode.route)
                 },
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(30))
+                    .background(colorScheme.primary, shape = RoundedCornerShape(30))
                     .fillMaxWidth(),
                 content = {
                     Row(
@@ -275,8 +281,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 onValueChange = { newValue ->
                     quantity = newValue
                 },
-                label = { Text(stringResource(R.string.enter_product_quantity),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_product_quantity),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done,
@@ -299,21 +310,36 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
-                    displayText = { brand -> brand.name ?: "" },
-                    filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
-                    placeholder = { Text(text = (stringResource(R.string.enter_product_brand)),fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    displayText = { brand -> brand.name },
+                    filterItems = { items, searchText ->
+                        items.filter {
+                            it.name.contains(
+                                searchText,
+                                true
+                            ) == true
+                        }
+                    },
+                    placeholder = {
+                        Text(
+                            text = (stringResource(R.string.enter_product_brand)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     onDropDownItemSelected = { selectedBrands ->
                         for (brand in selectedBrands) {
-                            Log.d("Selected Brands", brand.name ?: "Unknown")
+                            Log.d("Selected Brands", brand.name)
                         }
                     },
                     dropdownItem = {
-                        Text(text = (stringResource(R.string.enter_product_brand)),fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,)
+                        Text(
+                            text = (stringResource(R.string.enter_product_brand)),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
                     },
                     defaultItem = {
-                        it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
                     },
                     onSearchTextFieldClicked = {
                         keyboardController?.show()
@@ -334,26 +360,36 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
-                    displayText = { allergen -> allergen.name ?: "" },
-                    filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
+                    displayText = { allergen -> allergen.name },
+                    filterItems = { items, searchText ->
+                        items.filter {
+                            it.name.contains(
+                                searchText,
+                                true
+                            ) == true
+                        }
+                    },
                     placeholder = {
-                        Text(text = (stringResource(R.string.enter_product_allergen)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_allergen)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium
-                        ) },
+                        )
+                    },
                     onDropDownItemSelected = { selectedAllergens ->
                         for (allergen in selectedAllergens) {
-                            Log.d("Selected Allergens", allergen.name ?: "Unknown")
+                            Log.d("Selected Allergens", allergen.name)
                         }
                     },
                     dropdownItem = { allergen ->
-                        Text(text = (stringResource(R.string.enter_product_allergen)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_allergen)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
                     },
                     defaultItem = {
-                        it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
                     },
                     onSearchTextFieldClicked = {
                         keyboardController?.show()
@@ -375,26 +411,36 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
-                    displayText = { category -> category.name ?: "" },
-                    filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
+                    displayText = { category -> category.name },
+                    filterItems = { items, searchText ->
+                        items.filter {
+                            it.name.contains(
+                                searchText,
+                                true
+                            ) == true
+                        }
+                    },
                     placeholder = {
-                        Text(text = (stringResource(R.string.enter_product_category)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_category)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium
-                        ) },
+                        )
+                    },
                     onDropDownItemSelected = { selectedCategories ->
                         for (category in selectedCategories) {
-                            Log.d("Selected Categories", category.name ?: "Unknown")
+                            Log.d("Selected Categories", category.name)
                         }
                     },
                     dropdownItem = { category ->
-                        Text(text = (stringResource(R.string.enter_product_category)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_category)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium
                         )
                     },
                     defaultItem = {
-                        it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
                     },
                     onSearchTextFieldClicked = {
                         keyboardController?.show()
@@ -407,35 +453,45 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     .padding(10.dp)
                     .fillMaxWidth(),
             ) {
-               selectedCountries = SearchableExpandedDropDownMenu(
+                selectedCountries = SearchableExpandedDropDownMenu(
                     setOfItems = countriesState,
                     modifier = Modifier.fillMaxWidth(),
-                   colors = TextFieldDefaults.colors(
-                       focusedContainerColor = colorScheme.surface,
-                       unfocusedContainerColor = colorScheme.surface,
-                       disabledContainerColor = colorScheme.surface,
-                   ),
-                    displayText = { country -> country.name ?: "" },
-                    filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.surface,
+                        unfocusedContainerColor = colorScheme.surface,
+                        disabledContainerColor = colorScheme.surface,
+                    ),
+                    displayText = { country -> country.name },
+                    filterItems = { items, searchText ->
+                        items.filter {
+                            it.name.contains(
+                                searchText,
+                                true
+                            ) == true
+                        }
+                    },
                     placeholder = {
-                        Text(text = (stringResource(R.string.enter_product_country)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_country)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
-                        ) },
+                        )
+                    },
 
                     onDropDownItemSelected = { selectedCountries ->
                         for (country in selectedCountries) {
-                            Log.d("Selected Country", country.name ?: "Unknown")
+                            Log.d("Selected Country", country.name)
                         }
                     },
                     dropdownItem = { country ->
-                        Text(text = (stringResource(R.string.enter_product_country)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_country)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                         )
                     },
                     defaultItem = {
-                        it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
                     },
                     onSearchTextFieldClicked = {
                         keyboardController?.show()
@@ -461,11 +517,16 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                onValueChange = {
-                        newValue -> productIngredients = newValue
-                                },
-                label = { Text(stringResource(R.string.enter_product_ingredients),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                onValueChange = { newValue ->
+                    productIngredients = newValue
+                },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_product_ingredients),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -507,9 +568,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         caloriesPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_calorie),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_calorie),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -536,9 +601,12 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         fatPer100g = newValue
                     },
                     label = {
-                        Text(stringResource(R.string.enter_product_nutriment_fat),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium) },
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_fat),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -570,9 +638,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         fiberPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_fiber),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_fiber),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -598,9 +670,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         saltPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_salt),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_salt),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -632,9 +708,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         proteinsPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_proteins),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_proteins),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -660,9 +740,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         sugarPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_sugar),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_sugar),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -694,8 +778,13 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     onValueChange = { newValue ->
                         sodiumPer100g = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_product_nutriment_sodium),fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_nutriment_sodium),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -749,27 +838,37 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
-                    displayText = { productIngredient -> productIngredient.name ?: "" },
-                    filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
+                    displayText = { productIngredient -> productIngredient.name },
+                    filterItems = { items, searchText ->
+                        items.filter {
+                            it.name.contains(
+                                searchText,
+                                true
+                            ) == true
+                        }
+                    },
                     placeholder = {
-                        Text(text = (stringResource(R.string.enter_product_ingredients)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_ingredients)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
-                        ) },
+                        )
+                    },
 
                     onDropDownItemSelected = { selectedProductIngredients ->
                         for (country in selectedCountries) {
-                            Log.d("Selected Country", country.name ?: "Unknown")
+                            Log.d("Selected Country", country.name)
                         }
                     },
                     dropdownItem = { country ->
-                        Text(text = (stringResource(R.string.enter_product_ingredients)),
+                        Text(
+                            text = (stringResource(R.string.enter_product_ingredients)),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                         )
                     },
                     defaultItem = {
-                        it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
                     },
                     onSearchTextFieldClicked = {
                         keyboardController?.show()
@@ -857,14 +956,21 @@ private fun isProductValid(
             quantity.isNotBlank() &&
             fiberPer100g.isNotBlank()
 }
+
 @Composable
-fun CheckboxWithLabel(label: String, checked: MutableState<Boolean>, onCheckedChange: (Boolean) -> Unit) {
+fun CheckboxWithLabel(
+    label: String,
+    checked: MutableState<Boolean>,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(text = label,fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium)
+        Text(
+            text = label, fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Medium
+        )
         Checkbox(
             checked = checked.value,
             onCheckedChange = onCheckedChange,
@@ -945,9 +1051,10 @@ fun Demo_DropDownMenu2(
         }
     }
 }
+
 @Composable
 fun ElevatedButtonExample(onClick: () -> Unit) {
-    ElevatedButton({onClick()}){
+    ElevatedButton({ onClick() }) {
         Text(
             stringResource(R.string.add_button), fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
@@ -1202,7 +1309,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageBrandDTO = withContext(Dispatchers.IO) {
-                    brandsApi.getAllBrands(0,50)
+                    brandsApi.getAllBrands(0, 50)
                 }
                 val brands = pageBrandDTO.content
 
@@ -1213,11 +1320,12 @@ class AddProductViewModel(
 
         }
     }
+
     fun fetchAllergens() {
         viewModelScope.launch {
             try {
                 val pageAllergenDTO = withContext(Dispatchers.IO) {
-                    allergenApi.listAllergens(0,50)
+                    allergenApi.listAllergens(0, 50)
                 }
 
                 // Assuming PageBrandDTO has a property 'items' which is a List<BrandDTO>
@@ -1235,7 +1343,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageCategoryDTO = withContext(Dispatchers.IO) {
-                    categoryApi.getCategories(0,50)
+                    categoryApi.getCategories(0, 50)
                 }
                 val categories = pageCategoryDTO.content
 
@@ -1246,11 +1354,12 @@ class AddProductViewModel(
 
         }
     }
+
     fun fetchCountries() {
         viewModelScope.launch {
             try {
                 val pageCountriesDTO = withContext(Dispatchers.IO) {
-                    countryApi.getCountries(0,50)
+                    countryApi.getCountries(0, 50)
                 }
 
                 val countries = pageCountriesDTO.content
@@ -1267,7 +1376,7 @@ class AddProductViewModel(
         viewModelScope.launch {
             try {
                 val pageProductIngredientDTO = withContext(Dispatchers.IO) {
-                    productIngredientApi.getProductIngredients(0,50)
+                    productIngredientApi.getProductIngredients(0, 50)
                 }
 
                 val productIngredients = pageProductIngredientDTO.content
@@ -1280,11 +1389,15 @@ class AddProductViewModel(
         }
     }
 
-    fun addProduct(createProductRequest: CreateProductRequest, snackbarHostState: SnackbarHostState) {
+    fun addProduct(
+        createProductRequest: CreateProductRequest,
+        snackbarHostState: SnackbarHostState
+    ) {
         viewModelScope.launch {
 
             try {
-                val response = productApi.createProductWithHttpInfo(createProductRequest).statusCode == 201
+                val response =
+                    productApi.createProductWithHttpInfo(createProductRequest).statusCode == 201
 
                 if (response) {
                     viewModelScope.launch {

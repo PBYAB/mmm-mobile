@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,13 +56,21 @@ fun LoginScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                text = context.getText(R.string.login).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Bold,
+                text = context.getText(R.string.login).toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text(context.getText(R.string.email).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.email).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -75,7 +83,13 @@ fun LoginScreen(navController: NavController) {
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(context.getText(R.string.password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.password).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -93,10 +107,8 @@ fun LoginScreen(navController: NavController) {
                         try {
                             val apiInstance = Class1AuthenticationApi()
                             val loginRequest = AuthenticationRequest(
-                                "patrycja@ddd.pl",
-                                "pati2137"
-//                                email.value,
-//                                password.value
+                                email.value,
+                                password.value
                             )
                             val result = apiInstance.authenticate(loginRequest)
                             tokenManager.accessToken = result.accessToken
@@ -134,7 +146,11 @@ fun LoginScreen(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Go to Registration", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
+                Text(
+                    "Go to Registration",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

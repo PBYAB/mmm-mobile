@@ -1,6 +1,5 @@
 package com.example.mmm_mobile.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,24 +11,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,19 +34,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.R
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -61,8 +51,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.ProductApi
-import org.openapitools.client.apis.RecipeReviewApi
-import org.openapitools.client.models.RecipeReviewDTO
 
 class ProductsListViewModel : ViewModel() {
 
@@ -73,13 +61,13 @@ class ProductsListViewModel : ViewModel() {
     val filterApplied: StateFlow<Boolean> = _filterApplied
 
 
-    private var name : String? by mutableStateOf(null)
-    private var quantity : String? by mutableStateOf(null)
-    private var nutriScore : List<Int>? by mutableStateOf(null)
-    private var novaGroups : List<Int>? by mutableStateOf(null)
-    private var category : List<Long>? by mutableStateOf(null)
-    private var allergens : List<Long>? by mutableStateOf(null)
-    private var country : List<Long>? by mutableStateOf(null)
+    private var name: String? by mutableStateOf(null)
+    private var quantity: String? by mutableStateOf(null)
+    private var nutriScore: List<Int>? by mutableStateOf(null)
+    private var novaGroups: List<Int>? by mutableStateOf(null)
+    private var category: List<Long>? by mutableStateOf(null)
+    private var allergens: List<Long>? by mutableStateOf(null)
+    private var country: List<Long>? by mutableStateOf(null)
     private var sortBy by mutableStateOf("id")
     private var sortDirection by mutableStateOf("ASC")
 
@@ -109,7 +97,7 @@ class ProductsListViewModel : ViewModel() {
                             id = it.id,
                             name = it.name.orEmpty(),
                             quantity = it.quantity.orEmpty(),
-                            barcode = it.barcode.orEmpty(),
+                            barcode = it.barcode,
                             image = it.image?.url.orEmpty(),
                             nutriScore = it.nutriScore ?: 0,
                             novaGroup = it.novaGroup ?: 0
@@ -151,7 +139,17 @@ class ProductsListViewModel : ViewModel() {
         }
     }
 
-    fun filterProducts(name: String?, quantity: String?, nutriScore: List<Int>?, novaGroups: List<Int>?, category: List<Long>?, allergens: List<Long>?, country: List<Long>?, sortBy: String?, sortDirection: String?) {
+    fun filterProducts(
+        name: String?,
+        quantity: String?,
+        nutriScore: List<Int>?,
+        novaGroups: List<Int>?,
+        category: List<Long>?,
+        allergens: List<Long>?,
+        country: List<Long>?,
+        sortBy: String?,
+        sortDirection: String?
+    ) {
         this.name = name
         this.quantity = quantity
         this.nutriScore = nutriScore
@@ -167,9 +165,8 @@ class ProductsListViewModel : ViewModel() {
 }
 
 
-
 @Composable
-fun ProductsScreen(navController: NavController, query : String?) {
+fun ProductsScreen(navController: NavController, query: String?) {
     val viewModel: ProductsListViewModel = viewModel()
     viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
 
@@ -178,38 +175,39 @@ fun ProductsScreen(navController: NavController, query : String?) {
     }
 }
 
-    @Composable
-    fun ProductListItem(product: Product, navController: NavController) {
-        val painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(data = product.image)
-                .apply(block = fun ImageRequest.Builder.() {
-                    placeholder(R.drawable.baseline_breakfast_dining_24)
-                    error(R.drawable.baseline_breakfast_dining_24)
-                }).build()
-        )
-        Card(
+@Composable
+fun ProductListItem(product: Product, navController: NavController) {
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = product.image)
+            .apply(block = fun ImageRequest.Builder.() {
+                placeholder(R.drawable.baseline_breakfast_dining_24)
+                error(R.drawable.baseline_breakfast_dining_24)
+            }).build()
+    )
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .clickable(onClick = {})
+            .background(MaterialTheme.colorScheme.background)
+            .clickable {
+                navController.navigate("Product/${product.id}")
+            }
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = product.image,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-                .clickable(onClick = {})
-                .background(MaterialTheme.colorScheme.background)
-                .clickable {
-                    navController.navigate("Product/${product.id}")
-                }
-        ) {
-            Image(
-                painter = painter,
-                contentDescription = product.image,
-                modifier = Modifier
-                    .size(200.dp, 150.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
+                .size(200.dp, 150.dp)
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
 
-            Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = buildAnnotatedString {
+        Text(
+            text = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
                         fontSize = 18.sp,
@@ -220,89 +218,94 @@ fun ProductsScreen(navController: NavController, query : String?) {
                     append(product.name)
                 }
             },
-                modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp),
+            maxLines = 1,
+            minLines = 1,
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            shadowElevation = 1.dp,
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            Text(
+                text = product.quantity,
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                fontFamily = poppinsFontFamily,
                 maxLines = 1,
-                minLines = 1,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+
+        Row(
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth()
+        ) {
+
+            val nutriScoreImage = getNutriScoreImage(product.nutriScore)
+            val novaGroupImage = getNovaGroupImage(product.novaGroup)
+
+            Image(
+                painter = painterResource(id = nutriScoreImage),
+                contentDescription = stringResource(R.string.nutri_score_image_info),
+                modifier = Modifier
+                    .padding(2.dp)
+                    .size(32.dp)
+                    .weight(1f)
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-
-            Surface(shape = MaterialTheme.shapes.medium,
-                shadowElevation = 1.dp,
+            Image(
+                painter = painterResource(id = novaGroupImage),
+                contentDescription = stringResource(R.string.nova_group_image_info),
                 modifier = Modifier
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = product.quantity,
-                    modifier = Modifier.padding(4.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                    fontFamily = poppinsFontFamily,
-                    maxLines = 1,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-
-            Row(modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()) {
-
-                val nutriScoreImage = getNutriScoreImage(product.nutriScore)
-                val novaGroupImage = getNovaGroupImage(product.novaGroup)
-
-                Image(painter = painterResource(id = nutriScoreImage),
-                    contentDescription = stringResource(R.string.nutri_score_image_info),
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .size(32.dp)
-                        .weight(1f)
-                )
-
-                Image(painter = painterResource(id =  novaGroupImage),
-                    contentDescription = stringResource(R.string.nova_group_image_info),
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .size(32.dp)
-                        .weight(1f)
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
+                    .padding(2.dp)
+                    .size(32.dp)
+                    .weight(1f)
+            )
         }
+        Spacer(modifier = Modifier.height(4.dp))
     }
+}
 
 
-    @Composable
-    fun ProductList(navController: NavController, viewModel: ProductsListViewModel) {
-        val state = viewModel.state
-        val columnCount = 2
-        val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
+@Composable
+fun ProductList(navController: NavController, viewModel: ProductsListViewModel) {
+    val state = viewModel.state
+    val columnCount = 2
+    val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(columnCount),
-            Modifier.padding(8.dp)
-        ) {
-            items(state.items.size) { i ->
-                val item = state.items[i]
-                if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
-                    viewModel.loadNextItems()
-                }
-                ProductListItem(product = item, navController = navController)
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(columnCount),
+        Modifier.padding(8.dp)
+    ) {
+        items(state.items.size) { i ->
+            val item = state.items[i]
+            if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
+                viewModel.loadNextItems()
             }
-            item(span = span) {
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+            ProductListItem(product = item, navController = navController)
+        }
+        item(span = span) {
+            if (state.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
     }
+}
 
 
 fun getNutriScoreImage(nutriScore: Int): Int {

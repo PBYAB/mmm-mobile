@@ -11,8 +11,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
-import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.room.entity.Ingredient
+import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,9 +34,10 @@ class FavouriteRecipeViewModel(
 
     fun findAllFavouriteRecipes() = favouriteRecipeRepository.findAllFavouriteRecipes()
 
-    fun findAllFavouriteRecipesWithoutIngredients() = favouriteRecipeRepository.findAllFavouriteRecipesWithoutIngredients()
+    fun findAllFavouriteRecipesWithoutIngredients() =
+        favouriteRecipeRepository.findAllFavouriteRecipesWithoutIngredients()
 
-    fun insertFavouriteRecipeWithIngredients(recipe: RecipeDTO) : Long {
+    fun insertFavouriteRecipeWithIngredients(recipe: RecipeDTO): Long {
         var recipeId: Long = 0
         viewModelScope.launch {
             val ingredients = recipe.ingredients?.map { ingredient ->
