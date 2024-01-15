@@ -99,4 +99,7 @@
     <string name="avarage_rating">No ratings yet</string>
     <string name="draw_recipe">Draw the recipe of the day</string>
     <string name="draw_recipe_text">"There's still a recipe of the day waiting for you to draw "</string>
+    <string name="submit_review">Submit Review</string>
+    <string name="review_added">Review submitted successfully</string>
+    <string name="review_not_added">Error adding review</string>
 </resources>

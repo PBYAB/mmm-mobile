@@ -59,4 +59,10 @@ class FavouriteRecipeRepository(
             favouriteRecipeDao.deleteRecipeIngredientCrossRefs(recipeId)
         }
     }
+
+    suspend fun updateFavouriteRecipe(recipe: FavouriteRecipe) {
+        withContext(defaultDispatcher) {
+            favouriteRecipeDao.updateFavouriteRecipe(recipe)
+        }
+    }
 }

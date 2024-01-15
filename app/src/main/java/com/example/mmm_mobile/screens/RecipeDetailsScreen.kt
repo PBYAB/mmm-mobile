@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -85,30 +86,24 @@ fun RecipeDetailScreen(
 ) {
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
     val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
-    val recipe by recipeLiveData.observeAsState()
+    val recipeFromDB by recipeLiveData.observeAsState()
 
-    if (recipe != null) {
+    val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+
+    LaunchedEffect(recipeId) {
+        recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+    }
+    val recipeFromApi by recipeDetailsViewModel.recipe.collectAsState()
+
+    if (recipeFromDB != null) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId, snackbarHostState) }
-            item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
-        }
-    } else {
-        val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
-
-        LaunchedEffect(recipeId) {
-            recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
-        }
-
-        val recipe by recipeDetailsViewModel.recipe.collectAsState()
-
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
-            item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
+            item { recipeFromDB?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
             recipeId?.let { id ->
                 item {
                     AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
                 }
-                recipe?.averageRating?.let {
+                recipeFromApi?.averageRating?.let {
                     item {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -127,7 +122,7 @@ fun RecipeDetailScreen(
                             )
                         }
 
-                        recipe?.averageRating?.let {
+                        recipeFromApi?.averageRating?.let {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(4.dp)
@@ -159,7 +154,66 @@ fun RecipeDetailScreen(
                     }
                 }
             }
+        }
+    } else {
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            item { AddRecipeButton(favouriteRecipeViewModel, recipeFromApi, snackbarHostState) }
+            item { recipeFromApi?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
+            recipeId?.let { id ->
+                item {
+                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+                }
+                recipeFromApi?.averageRating?.let {
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = stringResource(id = R.string.reviews_icon_info),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
 
+                            Text(
+                                text = stringResource(id = R.string.reviews_label),
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            )
+                        }
+
+                        recipeFromApi?.averageRating?.let {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.recipe_average_rating_label),
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = String.format("%.2f", it),
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(450.dp)
+                        ) {
+                            val reviewViewModel =
+                                viewModel { ReviewListViewModel(recipeId = id) }
+                            ReviewList(viewModel = reviewViewModel)
+
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
         }
     }
 }
@@ -268,10 +322,12 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
         },
         modifier = Modifier.padding(10.dp)
     )
-    Spacer(modifier = Modifier.height(8.dp))
 
-    Row(modifier = Modifier.padding(8.dp)) {
+    if(recipeDetails.reviews.size != 0)
+    {
+        Spacer(modifier = Modifier.height(8.dp))
 
+        Row(modifier = Modifier.padding(8.dp)) {
         Text(
             text = recipeDetails.rating.toString(),
             fontFamily = poppinsFontFamily,
@@ -284,6 +340,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
             Icon(Icons.Filled.Star, stringResource(R.string.rating_info))
         }
     }
+    }
+
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -494,6 +552,15 @@ fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
                 amount = ingredient.amount ?: 0.0,
                 unit = ingredient.unit?.value?.let { RecipeIngredientDTO.Unit.valueOf(it.uppercase()) },
             )
+        } ?: emptyList(),
+        reviews = recipe.reviews?.map { review ->
+            RecipeReviewDTO(
+                id = review.id,
+                fullName = review.fullName,
+                rating = review.rating ?: 0.0,
+                comment = review.comment,
+                userId = review.userId
+            )
         } ?: emptyList()
     )
 }
@@ -529,7 +596,8 @@ class RecipeDetails(
     val instructions: String = "",
     val image: Any = "",
     val ingredients: List<RecipeIngredientDTO> = emptyList(),
-    val rating: Double = 0.0
+    val rating: Double = 0.0,
+    val reviews: List<RecipeReviewDTO> = emptyList()
 )
 
 
@@ -659,6 +727,19 @@ fun AddReviewInput(
 ) {
     var reviewText by remember { mutableStateOf("") }
     var rating by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+
+    Spacer(modifier = Modifier.height(8.dp))
+    Divider(thickness = 5.dp)
+    Spacer(modifier = Modifier.height(8.dp))
+    TextField(
+        value = reviewText,
+        onValueChange = { reviewText = it },
+        label = { Text("Your Review") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    )
 
     Row(
         modifier = Modifier
@@ -667,22 +748,24 @@ fun AddReviewInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        TextField(
-            value = reviewText,
-            onValueChange = { reviewText = it },
-            label = { Text("Your Review") },
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
         Slider(
             value = rating.toFloat(),
             onValueChange = { rating = it.toInt() },
             valueRange = 1f..5f,
             steps = 10,
-            modifier = Modifier.width(120.dp)
+            modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = rating.toString(),
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .weight(0.5f),
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Medium,
+
+        )
         Button(
+            modifier = Modifier.weight(1f),
             onClick = {
                 if (rating > 0) {
 
@@ -697,13 +780,13 @@ fun AddReviewInput(
                             api.addReview(recipeId, review)
                             recipeDetailsViewModel.fetchRecipe(recipeId)
                             snackbarHostState.showSnackbar(
-                                message = "Review submitted successfully",
+                                message = context.getText(R.string.review_added).toString(),
                                 duration = SnackbarDuration.Long
                             )
                  // TODO: odświeżenie listy recenzji albo dodać po prostu do page
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar(
-                                message = "Error adding review",
+                                message = context.getText(R.string.review_not_added).toString(),
                                 duration = SnackbarDuration.Long
                             )
 
@@ -716,7 +799,7 @@ fun AddReviewInput(
                 }
             }
         ) {
-            Text("Submit Review")
+            Text(stringResource(id = R.string.submit_review))
         }
     }
 }
