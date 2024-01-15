@@ -99,4 +99,11 @@
     <string name="avarage_rating">No ratings yet</string>
     <string name="draw_recipe">Draw the recipe of the day</string>
     <string name="draw_recipe_text">"There's still a recipe of the day waiting for you to draw "</string>
+    <string name="valitation_error">UZUPELNIJ WSZYSTKIE POLA!!!</string>
+    <string name="search">Search</string>
+    <string name="nova_group">Nova Group</string>
+    <string name="nutri_score">Nutri Score</string>
+    <string name="palm_oil">"Palm Oil: "</string>
+    <string name="vegan">"Vegan: "</string>
+    <string name="vegetarian">"Vegetarian: "</string>
 </resources>

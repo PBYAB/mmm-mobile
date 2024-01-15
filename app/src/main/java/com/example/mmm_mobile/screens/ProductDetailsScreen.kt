@@ -287,13 +287,23 @@ fun ProductDetails(productDetails: ProductDTO) {
 @Composable
 fun NutrimentTable(nutriment: NutrimentDTO) {
     val context = androidx.compose.ui.platform.LocalContext.current
-        // Definiowanie wag kolumn
-        val column1Weight = .3f
-        val column2Weight = .3f
+
+        val column1Weight = .2f
+        val column2Weight = .2f
 
         Row(Modifier.background(Color.Gray)) {
             TableCell(
-                text = "Nutriment Type" ,
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(stringResource(R.string.nutriment))
+                    }
+                }.toString(),
                 weight = column1Weight
             )
             TableCell(
@@ -304,7 +314,17 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
 
         Row(Modifier.fillMaxWidth()) {
             TableCell(
-                text = context.getText(R.string.energyKcalPer100G).toString(),
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(stringResource(R.string.energyKcalPer100G))
+                    }
+                }.toString(),
                 weight = column1Weight
             )
             TableCell(
@@ -315,7 +335,17 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
 
         Row(Modifier.fillMaxWidth()) {
             TableCell(
-                text = context.getText(R.string.fatPer100G).toString(),
+                text =buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(stringResource(R.string.fatPer100G))
+                    }
+                }.toString(),
                 weight = column1Weight
             )
             TableCell(
@@ -325,7 +355,17 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
         }
     Row(Modifier.fillMaxWidth()) {
         TableCell(
-            text = context.getText(R.string.sugarsPer100G).toString(),
+            text =buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 14.sp,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+                ) {
+                    append(stringResource(R.string.sugarsPer100G))
+                }
+            }.toString(),
             weight = column1Weight
         )
         TableCell(
@@ -335,7 +375,17 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
     }
         Row(Modifier.fillMaxWidth()) {
             TableCell(
-                text = context.getText(R.string.proteinsPer100G).toString(),
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(stringResource(R.string.proteinsPer100G))
+                    }
+                }.toString(),
                 weight = column1Weight
             )
             TableCell(
@@ -345,7 +395,17 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
         }
         Row(Modifier.fillMaxWidth()) {
             TableCell(
-                text = context.getText(R.string.saltPer100G).toString(),
+                text =buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(stringResource(R.string.saltPer100G))
+                    }
+                }.toString(),
                 weight = column1Weight
             )
             TableCell(
@@ -364,7 +424,7 @@ fun RowScope.TableCell(
     Text(
         text = text,
         Modifier
-            .border(1.dp, Color.Black)
+            .border(1.dp, Color.Black.copy(alpha = 0.5f))
             .weight(weight)
             .padding(8.dp)
     )

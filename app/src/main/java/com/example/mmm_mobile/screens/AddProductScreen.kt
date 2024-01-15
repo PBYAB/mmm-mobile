@@ -441,9 +441,9 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 )
             }
 
-            CheckboxWithLabel("Palm Oil: ",palmOil) { isChecked -> palmOil.value = isChecked }
-            CheckboxWithLabel("Vegan: ", vegan) { isChecked -> vegan.value = isChecked }
-            CheckboxWithLabel("Vegetarian: ", vegetarian) { isChecked ->
+            CheckboxWithLabel(stringResource(R.string.palm_oil),palmOil) { isChecked -> palmOil.value = isChecked }
+            CheckboxWithLabel(stringResource(R.string.vegan), vegan) { isChecked -> vegan.value = isChecked }
+            CheckboxWithLabel(stringResource(R.string.vegetarian), vegetarian) { isChecked ->
                 vegetarian.value = isChecked
             }
 
@@ -716,7 +716,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     modifier = Modifier.weight(1f)
                 ) {
                     Demo_DropDownMenu2(
-                       "Nutri score",
+                        stringResource(R.string.nutri_score),
                         nutriScoreOptions,
                         onItemSelected = { nutriScore = it }
                     )
@@ -726,7 +726,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     modifier = Modifier.weight(1f)
                 ) {
                     Demo_DropDownMenu2(
-                        "Nova Group",
+                        stringResource(R.string.nova_group),
                         novaGroupOptions,
                         onItemSelected = { novaGroup = it }
                     )
@@ -806,7 +806,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
 
                     navController.navigate(Screen.ProductList.route)
                     } else {
-                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                        Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
                     }
                 }
@@ -888,7 +888,7 @@ fun <T> DropDownItem(item: T, content: @Composable (T) -> Unit) {
 fun Demo_DropDownMenu2(
     name: String,
     list: List<String>,
-    onItemSelected: (String) -> Unit // Add a function to pass the selected item
+    onItemSelected: (String) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -1092,7 +1092,6 @@ fun <T> SearchableExpandedDropDownMenu(
                         value = searchedOption,
                         onValueChange = { selectedSport ->
                             searchedOption = selectedSport
-                            // Update filteredItems when search text changes
                             filteredItems = setOfItems.filter {
                                 displayText(it).contains(
                                     searchedOption,
@@ -1137,7 +1136,7 @@ fun <T> SearchableExpandedDropDownMenu(
                                         selectedOptions = selectedOptions + selectedItem
                                     }
                                 }
-                                .padding(10.dp), // Add padding for better spacing
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
@@ -1146,12 +1145,11 @@ fun <T> SearchableExpandedDropDownMenu(
                                 modifier = Modifier.weight(0.2f)
                             )
 
-                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+                            Spacer(modifier = Modifier.width(100.dp))
 
                             DropdownMenuItem(
                                 modifier = Modifier.weight(0.5f),
                                 text = {
-                                    // Add your text content here
                                     Text(
                                         displayText(selectedItem),
                                         fontFamily = poppinsFontFamily,

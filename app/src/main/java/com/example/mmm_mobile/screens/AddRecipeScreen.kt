@@ -108,7 +108,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
     var test by remember {
         mutableStateOf(RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G))
     }
-    val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
+
     val recipeIngredientList= emptyList<RecipeIngredientForm>().toMutableList()
 
     Card(
@@ -170,7 +170,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
 
             OutlinedTextField(
                 value = recipeInstructions,
-                singleLine = false, // Ustaw singleLine na false, aby pozwolić na wieloliniowy tekst
+                singleLine = false,
                 shape = shapes.large,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -246,7 +246,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number // Ustawienie inputType na liczbowy
+                        keyboardType = KeyboardType.Number
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {}
@@ -302,7 +302,6 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                 )
             }
 
-            // Przycisk "Dodaj składnik"
             AddIngredientRow {
                 ingredients += Ingredient("", "", RecipeIngredientForm.Unit.G)
 
@@ -334,7 +333,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
                     } else {
-                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                        Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
                     }
                 }
@@ -533,7 +532,7 @@ fun IngredientRow(
                     }
                     isDoneClicked = !isDoneClicked
                 } else {
-                    Toast.makeText(context, "UZUPELNIJ WSZYSTKIE DANE SKLADNIKA!!!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG).show()
                 }
                       },
             modifier = Modifier.weight(0.8f)
@@ -704,7 +703,6 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
         ) { if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
             placeholder()
         } else {
-            // Display selected item
             selectedOption?.let { selectedItem ->
                 dropdownItem(selectedItem)
             }
@@ -789,7 +787,7 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
                         },
                         placeholder = {
                             Text(
-                                text = "Search",
+                                text = stringResource(R.string.search),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium
                             )
@@ -820,7 +818,7 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
                                         selectedItem
                                     }
                                 }
-                                .padding(10.dp), // Add padding for better spacing
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
@@ -829,12 +827,11 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
                                 modifier = Modifier.weight(0.2f)
                             )
 
-                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+                            Spacer(modifier = Modifier.width(100.dp))
 
                             DropdownMenuItem(
                                 modifier = Modifier.weight(0.5f),
                                 text = {
-                                    // Add your text content here
                                     Text(
                                         displayText(selectedItem),
                                         fontFamily = poppinsFontFamily,
