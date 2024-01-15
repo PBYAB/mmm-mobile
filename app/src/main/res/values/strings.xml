@@ -102,4 +102,5 @@
     <string name="submit_review">Submit Review</string>
     <string name="review_added">Review submitted successfully</string>
     <string name="review_not_added">Error adding review</string>
+    <string name="reviews_delete_button_label">Delete</string>
 </resources>
