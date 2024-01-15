@@ -99,4 +99,5 @@
     <string name="avarage_rating">No ratings yet</string>
     <string name="draw_recipe">Draw the recipe of the day</string>
     <string name="draw_recipe_text">"There's still a recipe of the day waiting for you to draw "</string>
+    <string name="reviews_delete_button_label">Delete</string>
 </resources>
