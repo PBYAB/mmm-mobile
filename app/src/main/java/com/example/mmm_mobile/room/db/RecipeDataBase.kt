@@ -37,7 +37,10 @@ abstract class RecipeDataBase : RoomDatabase() {
                     super.onCreate(db)
                     INSTANCE?.let { database ->
                         GlobalScope.launch {
-                            populateDatabase(database.favouriteRecipeDao(), database.recipeIngredientDao())
+                            populateDatabase(
+                                database.favouriteRecipeDao(),
+                                database.recipeIngredientDao()
+                            )
                         }
                     }
                     Log.d("RecipeDataBase", "onCreate: ")
@@ -63,8 +66,10 @@ abstract class RecipeDataBase : RoomDatabase() {
         }
 
 
-
-        suspend fun populateDatabase(favouriteRecipeDao: FavouriteRecipeDao, recipeIngredientDao: RecipeIngredientDao) {
+        suspend fun populateDatabase(
+            favouriteRecipeDao: FavouriteRecipeDao,
+            recipeIngredientDao: RecipeIngredientDao
+        ) {
 //            val recipes = listOf(
 //                FavouriteRecipe(1, "Pierogi z kapustą", 1, "https://picsum.photos/200/300", "Pierogi z kapustą", 100.0, 1),
 //                FavouriteRecipe(2, "Pierogi z mięsem", 1, "https://picsum.photos/200/300", "Pierogi z mięsem", 100.0,2),
