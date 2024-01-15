@@ -94,9 +94,18 @@ fun RecipeDetailScreen(
         }
     } else {
         val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+        var canReview by remember { mutableStateOf(false) }
+        val reviewsApi = RecipeReviewApi()
 
         LaunchedEffect(recipeId) {
-            recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+            try {
+                recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+                canReview = withContext(Dispatchers.IO) {
+                    reviewsApi.checkIfUserReviewed(recipeId ?: 0).canUserCreateReview
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeDetailScreen", "Error fetching recipe", e)
+            }
         }
 
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
@@ -105,9 +114,18 @@ fun RecipeDetailScreen(
             item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
             recipeId?.let { id ->
-                item {
-                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+
+                if (canReview) {
+                    item {
+                        AddReviewInput(
+                            id,
+                            ReviewListViewModel(recipeId),
+                            recipeDetailsViewModel,
+                            snackbarHostState
+                        )
+                    }
                 }
+
                 recipe?.averageRating?.let {
                     item {
                         Row(
@@ -700,7 +718,7 @@ fun AddReviewInput(
                                 message = "Review submitted successfully",
                                 duration = SnackbarDuration.Long
                             )
-                 // TODO: odświeżenie listy recenzji albo dodać po prostu do page
+                            // TODO: odświeżenie listy recenzji albo dodać po prostu do page
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar(
                                 message = "Error adding review",
