@@ -37,7 +37,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
-@androidx.annotation.OptIn(ExperimentalGetImage::class) @OptIn(ExperimentalPermissionsApi::class)
+@androidx.annotation.OptIn(ExperimentalGetImage::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun BarcodeScreen(navController: NavController) {
     val cameraPermission = rememberPermissionState(
@@ -58,7 +59,7 @@ fun BarcodeScreen(navController: NavController) {
     }
 
     Scaffold(
-    modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Box {
             Box(
@@ -84,7 +85,7 @@ fun BarcodeScreen(navController: NavController) {
                 }
             }
             Box(
-                modifier = androidx.compose.ui.Modifier
+                modifier = Modifier
                     .padding(paddingValues)
                     .drawWithContent {
                         val canvasWidth = size.width
@@ -137,8 +138,6 @@ fun BarcodeScreen(navController: NavController) {
         }
     }
 }
-
-
 
 
 @Composable

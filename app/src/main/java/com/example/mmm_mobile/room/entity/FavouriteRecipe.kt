@@ -15,7 +15,7 @@ data class FavouriteRecipe(
     val instructions: String,
     val kcalPerServing: Double,
     val totalTime: Int,
-    val rating : Double = 0.0
+    val rating: Double = 0.0
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

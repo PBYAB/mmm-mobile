@@ -3,7 +3,6 @@ package com.example.mmm_mobile.screens
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -30,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,25 +39,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.room.Query
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Recipe
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
-import com.example.mmm_mobile.utils.NotificationReceiver
-import com.example.mmm_mobile.utils.NotificationScheduler
 import com.example.mmm_mobile.utils.ScreenState
 import com.example.mmm_mobile.utils.ShakeDetector
 import com.example.mmm_mobile.utils.ShakeEventListener
@@ -280,7 +269,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
         Row(modifier = Modifier.padding(horizontal = 8.dp)) {
 
             Text(
-                text = if(recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
+                text = if (recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 15.sp

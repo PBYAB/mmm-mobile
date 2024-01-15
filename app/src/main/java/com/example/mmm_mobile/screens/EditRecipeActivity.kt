@@ -15,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -42,7 +41,7 @@ class EditRecipeActivity : ComponentActivity() {
             MmmmobileTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = colorScheme.background
                 ) {
                     EditRecipe()
                 }
@@ -54,10 +53,10 @@ class EditRecipeActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditRecipe(modifier: Modifier = Modifier) {
-    var recipeName = "";
-    var recipeInstructions = "";
-    var recipeServings = "";
-    var recipeCaloriesPerServing = "";
+    var recipeName = ""
+    var recipeInstructions = ""
+    var recipeServings = ""
+    var recipeCaloriesPerServing = ""
 
     Card(
         modifier = modifier.padding(10.dp),
@@ -86,9 +85,13 @@ fun EditRecipe(modifier: Modifier = Modifier) {
                 shape = shapes.large,
                 modifier = Modifier
                     .fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                onValueChange = {
-                        newValue -> recipeName = newValue
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = colorScheme.surface,
+                    unfocusedContainerColor = colorScheme.surface,
+                    disabledContainerColor = colorScheme.surface,
+                ),
+                onValueChange = { newValue ->
+                    recipeName = newValue
                 },
                 label = { Text(stringResource(R.string.edit_recipe_name)) },
                 isError = false,
@@ -107,9 +110,13 @@ fun EditRecipe(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f), // Ustawienie wagi, aby Textfield rozszerzał się w miarę potrzeb
-                colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                onValueChange = {
-                        newValue -> recipeInstructions = newValue
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = colorScheme.surface,
+                    unfocusedContainerColor = colorScheme.surface,
+                    disabledContainerColor = colorScheme.surface,
+                ),
+                onValueChange = { newValue ->
+                    recipeInstructions = newValue
                 },
                 label = { Text(stringResource(R.string.edit_recipe_instructions)) },
                 isError = false,
@@ -132,9 +139,13 @@ fun EditRecipe(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = mediumPadding),
-                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                    onValueChange = {
-                            newValue -> recipeCaloriesPerServing = newValue
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.surface,
+                        unfocusedContainerColor = colorScheme.surface,
+                        disabledContainerColor = colorScheme.surface,
+                    ),
+                    onValueChange = { newValue ->
+                        recipeCaloriesPerServing = newValue
                     },
                     label = { Text(stringResource(R.string.edit_calories)) },
                     isError = false,
@@ -154,9 +165,13 @@ fun EditRecipe(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = mediumPadding),
-                    colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
-                    onValueChange = {
-                            newValue -> recipeServings = newValue
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.surface,
+                        unfocusedContainerColor = colorScheme.surface,
+                        disabledContainerColor = colorScheme.surface,
+                    ),
+                    onValueChange = { newValue ->
+                        recipeServings = newValue
                     },
                     label = { Text(stringResource(R.string.edit_servings)) },
                     isError = false,
@@ -174,8 +189,6 @@ fun EditRecipe(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .padding(top = mediumPadding),
                 onClick = {
-                    recipeName = recipeName
-                    recipeInstructions = recipeInstructions
                     val recipeCaloriesPerServingInt = recipeCaloriesPerServing.toIntOrNull() ?: 0
                     val recipeServingsInt = recipeServings.toIntOrNull() ?: 0
                 }

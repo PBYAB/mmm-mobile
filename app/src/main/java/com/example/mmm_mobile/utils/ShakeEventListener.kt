@@ -5,6 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 
 typealias ShakeEventListener = () -> Unit
+
 class ShakeDetector(private val shakeEventListener: ShakeEventListener) : SensorEventListener {
 
     private var lastUpdate: Long = 0

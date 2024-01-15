@@ -40,7 +40,7 @@ var josefinSansFontFamily = FontFamily(
     Font(R.font.josefin_sans_light, FontWeight.Light),
     Font(R.font.josefin_sans_medium, FontWeight.Medium),
     Font(R.font.josefin_sans_regular, FontWeight.Normal),
-    )
+)
 
 var poppinsFontFamily = FontFamily(
     Font(R.font.poppins_black, FontWeight.Black),
@@ -48,4 +48,4 @@ var poppinsFontFamily = FontFamily(
     Font(R.font.poppins_italic, FontWeight.Light),
     Font(R.font.poppins_medium, FontWeight.Medium),
     Font(R.font.poppins_bold, FontWeight.Bold),
-    )
+)

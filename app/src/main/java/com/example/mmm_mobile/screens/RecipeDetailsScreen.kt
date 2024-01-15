@@ -564,8 +564,8 @@ fun DisplayImage(
 
 fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
     return RecipeDetails(
-        id = recipe.id ?: 0,
-        name = recipe.name ?: "",
+        id = recipe.id,
+        name = recipe.name,
         servings = recipe.servings ?: 0,
         totalTime = recipe.totalTime ?: 0,
         kcalPerServing = recipe.kcalPerServing ?: 0.0,

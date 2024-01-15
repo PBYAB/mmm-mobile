@@ -103,13 +103,23 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
     var recipeServings by rememberSaveable { mutableStateOf("") }
     var recipeTime by rememberSaveable { mutableStateOf("") }
     var recipeCaloriesPerServing by rememberSaveable { mutableStateOf("") }
-    var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.G))) }
-    var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.G)) }
+    var ingredients by remember {
+        mutableStateOf(
+            listOf(
+                Ingredient(
+                    "",
+                    "",
+                    RecipeIngredientForm.Unit.G
+                )
+            )
+        )
+    }
+    var ingredient by remember { mutableStateOf(Ingredient("", "", RecipeIngredientForm.Unit.G)) }
     var test by remember {
-        mutableStateOf(RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G))
+        mutableStateOf(RecipeIngredientForm(0.0, 0, RecipeIngredientForm.Unit.G))
     }
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
-    val recipeIngredientList= emptyList<RecipeIngredientForm>().toMutableList()
+    val recipeIngredientList = emptyList<RecipeIngredientForm>().toMutableList()
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -154,11 +164,15 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
-                onValueChange = {
-                        newValue -> recipeName = newValue
+                onValueChange = { newValue ->
+                    recipeName = newValue
                 },
-                label = { Text(stringResource(R.string.enter_recipe_name),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_recipe_name), fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -180,11 +194,16 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
-                onValueChange = {
-                        newValue -> recipeInstructions = newValue
+                onValueChange = { newValue ->
+                    recipeInstructions = newValue
                 },
-                label = { Text(stringResource(R.string.enter_recipe_instructions),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
+                label = {
+                    Text(
+                        stringResource(R.string.enter_recipe_instructions),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                    )
+                },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
@@ -211,11 +230,15 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         disabledContainerColor = MaterialTheme.colorScheme.surface,
                     ),
-                    onValueChange = {
-                            newValue -> recipeCaloriesPerServing = newValue
+                    onValueChange = { newValue ->
+                        recipeCaloriesPerServing = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_calories),fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_calories), fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -238,11 +261,15 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         disabledContainerColor = MaterialTheme.colorScheme.surface,
                     ),
-                    onValueChange = {
-                            newValue -> recipeServings = newValue
+                    onValueChange = { newValue ->
+                        recipeServings = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_servings),fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_servings), fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -265,11 +292,16 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                         disabledContainerColor = MaterialTheme.colorScheme.surface,
                     ),
-                    onValueChange = {
-                            newValue -> recipeTime = newValue
+                    onValueChange = { newValue ->
+                        recipeTime = newValue
                     },
-                    label = { Text(stringResource(R.string.enter_total_time),fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_total_time),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -289,13 +321,14 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                             ingredients.toMutableList().apply { this[index] = newIngredient }
                     },
                     onRemoveIngredient = {
-                        ingredients = ingredients.toMutableList().apply { recipeIngredientList.removeAt(index) }
+                        ingredients = ingredients.toMutableList()
+                            .apply { recipeIngredientList.removeAt(index) }
                     },
                     onIngredientSelected = { selectedIngredient ->
                         val newRecipeIngredient = RecipeIngredientForm(
-                            selectedIngredient.amount.toDouble(),
+                            selectedIngredient.amount,
                             selectedIngredient.ingredientId,
-                            selectedIngredient.unit ?: RecipeIngredientForm.Unit.G
+                            selectedIngredient.unit
                         )
                         recipeIngredientList += newRecipeIngredient
                     }
@@ -306,9 +339,9 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
             AddIngredientRow {
                 ingredients += Ingredient("", "", RecipeIngredientForm.Unit.G)
 
-                test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G)
+                test = RecipeIngredientForm(0.0, 0, RecipeIngredientForm.Unit.G)
             }
-            val context = androidx.compose.ui.platform.LocalContext.current
+            val context = LocalContext.current
 
             Button(
                 modifier = Modifier
@@ -327,10 +360,10 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                             recipeInstructions,
                             null,
                             recipeIngredientList,
-                            recipeCaloriesPerServing.toDouble() ?: 0.0,
-                            recipeName ?: "",
-                            recipeServings.toInt() ?: 0,
-                            recipeTime.toInt() ?: 0
+                            recipeCaloriesPerServing.toDouble(),
+                            recipeName,
+                            recipeServings.toInt(),
+                            recipeTime.toInt()
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
                     } else {
@@ -350,21 +383,22 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
         }
     }
 }
+
 private fun isFormValid(
     recipeInstructions: String,
     recipeCaloriesPerServing: String,
     recipeName: String,
     recipeServings: String,
     recipeTime: String,
-    recipeIngredientList: MutableList<RecipeIngredientForm>, ): Boolean {
+    recipeIngredientList: MutableList<RecipeIngredientForm>,
+): Boolean {
     return recipeInstructions.isNotBlank() &&
             recipeName.isNotBlank() &&
             recipeIngredientList.isNullOrEmpty() &&
-            recipeCaloriesPerServing.toDouble()!=0.0 &&
-            recipeServings.toInt() !=0 &&
+            recipeCaloriesPerServing.toDouble() != 0.0 &&
+            recipeServings.toInt() != 0 &&
             recipeTime.toInt() != 0
 }
-
 
 
 data class Ingredient(
@@ -372,8 +406,6 @@ data class Ingredient(
     var quantity: String = "",
     var unit: RecipeIngredientForm.Unit
 )
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -407,8 +439,12 @@ fun Demo_DropDownMenu() {
         ) {
             unitList.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(text = item, fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,) },
+                    text = {
+                        Text(
+                            text = item, fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     onClick = {
                         selectedText = item
                         expanded = false
@@ -433,7 +469,7 @@ fun IngredientRow(
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
     var recipeIngredient = IngredientListItem(0, "")
     var isDoneClicked by remember { mutableStateOf(false) }
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
 
@@ -453,10 +489,22 @@ fun IngredientRow(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 disabledContainerColor = MaterialTheme.colorScheme.surface,
             ),
-            displayText = { brand -> brand.name ?: "" },
-            filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
-            placeholder = { Text(text = (stringResource(R.string.enter_recipe_product)),fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,) },
+            displayText = { brand -> brand.name },
+            filterItems = { items, searchText ->
+                items.filter {
+                    it.name.contains(
+                        searchText,
+                        true
+                    ) == true
+                }
+            },
+            placeholder = {
+                Text(
+                    text = (stringResource(R.string.enter_recipe_product)),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                )
+            },
             onDropDownItemSelected = { selectedBrands ->
                 if (selectedBrands != null) {
                     recipeIngredient = selectedBrands
@@ -464,11 +512,15 @@ fun IngredientRow(
             },
             dropdownItem = { brand ->
                 DropDownItem(item = brand) {
-                    Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
+                    Text(
+                        text = it.name,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             },
             defaultItem = {
-                it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
             },
             onSearchTextFieldClicked = {
                 keyboardController?.show()
@@ -495,8 +547,13 @@ fun IngredientRow(
             onValueChange = { newValue ->
                 onIngredientChange(ingredient.copy(quantity = newValue))
             },
-            label = { Text(stringResource(R.string.enter_ingredient_quantity),fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,) },
+            label = {
+                Text(
+                    stringResource(R.string.enter_ingredient_quantity),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                )
+            },
             isError = false,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
@@ -519,23 +576,32 @@ fun IngredientRow(
 
         IconButton(
             onClick = {
-                if (isIngredientFormValid(ingredient.quantity,recipeIngredient.id,ingredient.unit)) {
+                if (isIngredientFormValid(
+                        ingredient.quantity,
+                        recipeIngredient.id,
+                        ingredient.unit
+                    )
+                ) {
                     if (isDoneClicked) {
                         onRemoveIngredient()
                     } else {
                         val selectedIngredientForm = RecipeIngredientForm(
                             ingredient.quantity.toDouble(),
                             recipeIngredient.id,
-                            ingredient.unit ?: RecipeIngredientForm.Unit.G
+                            ingredient.unit
                         )
                         onIngredientSelected(selectedIngredientForm)
                         keyboardController?.hide()
                     }
                     isDoneClicked = !isDoneClicked
                 } else {
-                    Toast.makeText(context, "UZUPELNIJ WSZYSTKIE DANE SKLADNIKA!!!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "UZUPELNIJ WSZYSTKIE DANE SKLADNIKA!!!",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                      },
+            },
             modifier = Modifier.weight(0.8f)
         ) {
             if (isDoneClicked) {
@@ -554,10 +620,12 @@ fun IngredientRow(
         }
     }
 }
+
 private fun isIngredientFormValid(
     quantity: String,
     id: Long,
-    unit: RecipeIngredientForm.Unit): Boolean {
+    unit: RecipeIngredientForm.Unit
+): Boolean {
     return quantity.isNotBlank() &&
             id.toInt() != 0 &&
             unit.value.isNotBlank()
@@ -578,7 +646,8 @@ fun AddIngredientRow(onAddIngredient: () -> Unit) {
         ) {
             Icon(
                 Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_ingredient))
+                contentDescription = stringResource(R.string.add_ingredient)
+            )
         }
     }
 }
@@ -595,7 +664,7 @@ class AddRecipeViewModel(
         viewModelScope.launch {
             try {
                 val pageRecipeIngredientDTO = withContext(Dispatchers.IO) {
-                    ingredientApi.findAll(0,100)
+                    ingredientApi.findAll(0, 100)
                 }
                 val recipeIngredients = pageRecipeIngredientDTO.content
 
@@ -609,7 +678,8 @@ class AddRecipeViewModel(
     fun addRecipe(createRecipeRequest: CreateRecipeRequest, snackbarHostState: SnackbarHostState) {
         viewModelScope.launch {
             try {
-                val response = recipeApi.createRecipeWithHttpInfo(createRecipeRequest).statusCode == 201
+                val response =
+                    recipeApi.createRecipeWithHttpInfo(createRecipeRequest).statusCode == 201
 
                 if (response) {
                     viewModelScope.launch {
@@ -637,7 +707,7 @@ class AddRecipeViewModel(
 
 
 @Composable
-fun <T: IngredientListItem> SearchOneItemDropDownMenu(
+fun <T : IngredientListItem> SearchOneItemDropDownMenu(
     modifier: Modifier = Modifier,
     displayText: (IngredientListItem) -> String,
     filterItems: (List<T>, String) -> List<T>,
@@ -701,14 +771,15 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ) { if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
-            placeholder()
-        } else {
-            // Display selected item
-            selectedOption?.let { selectedItem ->
-                dropdownItem(selectedItem)
+        ) {
+            if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
+                placeholder()
+            } else {
+                // Display selected item
+                selectedOption?.let { selectedItem ->
+                    dropdownItem(selectedItem)
+                }
             }
-        }
         }
 
         OutlinedTextField(

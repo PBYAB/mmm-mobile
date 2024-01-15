@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,11 +29,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,6 +52,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,36 +64,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.ProductApi
 import org.openapitools.client.models.AllergenDTO
-import org.openapitools.client.models.NutrimentDTO
-import org.openapitools.client.models.ProductDTO
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.PageSize
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.sp
-import com.example.mmm_mobile.models.Nutriment
-import com.example.mmm_mobile.ui.theme.poppinsFontFamily
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CategoryDTO
-import org.openapitools.client.models.Country
 import org.openapitools.client.models.CountryDTO
+import org.openapitools.client.models.NutrimentDTO
+import org.openapitools.client.models.ProductDTO
 import org.openapitools.client.models.ProductImageDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
 import org.openapitools.client.models.ProductIngredientDTO
-import java.util.Locale.Category
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -88,7 +84,8 @@ fun ProductDetailScreen(productId: Long?) {
 
     val product by productDetailsViewModel.product.collectAsState()
 
-        ProductDetails(productDetails = product ?: ProductDTO(
+    ProductDetails(
+        productDetails = product ?: ProductDTO(
             id = 0,
             name = "",
             barcode = "",
@@ -117,7 +114,8 @@ fun ProductDetailScreen(productId: Long?) {
                 sugarsPer100g = 0.0,
                 id = 0
             )
-        ))
+        )
+    )
 
 }
 
@@ -136,8 +134,8 @@ fun ProductDetails(productDetails: ProductDTO) {
                     .size(200.dp)
             ) {
                 SwipeableImages(images = images)
-                }
             }
+        }
 
         item {
             productDetails.name?.let {
@@ -250,79 +248,79 @@ fun ProductDetails(productDetails: ProductDTO) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-                Row(
+            Row(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
+            ) {
+
+                val nutriScoreImage = getNutriScoreImage(productDetails.nutriScore ?: 5)
+                val novaGroupImage = getNovaGroupImage(productDetails.novaGroup ?: 4)
+
+                Image(
+                    painter = painterResource(id = nutriScoreImage),
+                    contentDescription = context.getText(R.string.nutri_score_image_info)
+                        .toString(),
                     modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth()
-                ) {
+                        .padding(2.dp)
+                        .size(40.dp)
+                        .weight(1f)
+                )
 
-                    val nutriScoreImage = getNutriScoreImage(productDetails.nutriScore ?: 5)
-                    val novaGroupImage = getNovaGroupImage(productDetails.novaGroup ?: 4)
-
-                    Image(
-                        painter = painterResource(id = nutriScoreImage),
-                        contentDescription = context.getText(R.string.nutri_score_image_info)
-                            .toString(),
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .size(40.dp)
-                            .weight(1f)
-                    )
-
-                    Image(
-                        painter = painterResource(id = novaGroupImage),
-                        contentDescription = context.getText(R.string.nova_group_image_info)
-                            .toString(),
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .size(40.dp)
-                            .weight(1f)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+                Image(
+                    painter = painterResource(id = novaGroupImage),
+                    contentDescription = context.getText(R.string.nova_group_image_info)
+                        .toString(),
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .size(40.dp)
+                        .weight(1f)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
 
 @Composable
 fun NutrimentTable(nutriment: NutrimentDTO) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-        // Definiowanie wag kolumn
-        val column1Weight = .3f
-        val column2Weight = .3f
+    val context = LocalContext.current
+    // Definiowanie wag kolumn
+    val column1Weight = .3f
+    val column2Weight = .3f
 
-        Row(Modifier.background(Color.Gray)) {
-            TableCell(
-                text = "Nutriment Type" ,
-                weight = column1Weight
-            )
-            TableCell(
-                text = "Score",
-                weight = column2Weight
-            )
-        }
+    Row(Modifier.background(Color.Gray)) {
+        TableCell(
+            text = "Nutriment Type",
+            weight = column1Weight
+        )
+        TableCell(
+            text = "Score",
+            weight = column2Weight
+        )
+    }
 
-        Row(Modifier.fillMaxWidth()) {
-            TableCell(
-                text = context.getText(R.string.energyKcalPer100G).toString(),
-                weight = column1Weight
-            )
-            TableCell(
-                text = nutriment.energyKcalPer100g.toString(),
-                weight = column2Weight
-            )
-        }
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(
+            text = context.getText(R.string.energyKcalPer100G).toString(),
+            weight = column1Weight
+        )
+        TableCell(
+            text = nutriment.energyKcalPer100g.toString(),
+            weight = column2Weight
+        )
+    }
 
-        Row(Modifier.fillMaxWidth()) {
-            TableCell(
-                text = context.getText(R.string.fatPer100G).toString(),
-                weight = column1Weight
-            )
-            TableCell(
-                text = nutriment.fatPer100g.toString(),
-                weight = column2Weight
-            )
-        }
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(
+            text = context.getText(R.string.fatPer100G).toString(),
+            weight = column1Weight
+        )
+        TableCell(
+            text = nutriment.fatPer100g.toString(),
+            weight = column2Weight
+        )
+    }
     Row(Modifier.fillMaxWidth()) {
         TableCell(
             text = context.getText(R.string.sugarsPer100G).toString(),
@@ -333,27 +331,27 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             weight = column2Weight
         )
     }
-        Row(Modifier.fillMaxWidth()) {
-            TableCell(
-                text = context.getText(R.string.proteinsPer100G).toString(),
-                weight = column1Weight
-            )
-            TableCell(
-                text = nutriment.proteinsPer100g.toString(),
-                weight = column2Weight
-            )
-        }
-        Row(Modifier.fillMaxWidth()) {
-            TableCell(
-                text = context.getText(R.string.saltPer100G).toString(),
-                weight = column1Weight
-            )
-            TableCell(
-                text = nutriment.saltPer100g.toString(),
-                weight = column2Weight
-            )
-        }
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(
+            text = context.getText(R.string.proteinsPer100G).toString(),
+            weight = column1Weight
+        )
+        TableCell(
+            text = nutriment.proteinsPer100g.toString(),
+            weight = column2Weight
+        )
     }
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(
+            text = context.getText(R.string.saltPer100G).toString(),
+            weight = column1Weight
+        )
+        TableCell(
+            text = nutriment.saltPer100g.toString(),
+            weight = column2Weight
+        )
+    }
+}
 
 
 @Composable
@@ -383,19 +381,21 @@ fun AllergensList(allergens: Set<AllergenDTO>) {
     )
     LazyRow {
         items(allergens.toList()) { allergen ->
-            Surface(shape = MaterialTheme.shapes.medium,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Row {
-                    Image(painter = painterResource(id = getAllergenImage(allergen.name ?: "")),
-                        contentDescription = allergen.name ?: "",
+                    Image(
+                        painter = painterResource(id = getAllergenImage(allergen.name)),
+                        contentDescription = allergen.name,
                         modifier = Modifier
                             .padding(4.dp)
                             .size(20.dp)
                     )
                     Text(
-                        text = allergen.name ?: "",
+                        text = allergen.name,
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp,
@@ -422,13 +422,14 @@ fun CategoryList(category: Set<CategoryDTO>) {
     )
     LazyRow {
         items(category.toList()) { category ->
-            Surface(shape = MaterialTheme.shapes.medium,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Row {
                     Text(
-                        text = category.name ?: "",
+                        text = category.name,
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp,
@@ -454,13 +455,14 @@ fun CountryList(country: Set<CountryDTO>) {
     )
     LazyRow {
         items(country.toList()) { country ->
-            Surface(shape = MaterialTheme.shapes.medium,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Row {
                     Text(
-                        text = country.name ?: "",
+                        text = country.name,
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp,
@@ -486,13 +488,14 @@ fun IngredientList(ingredient: Set<ProductIngredientDTO>) {
     )
     LazyRow {
         items(ingredient.toList()) { ingredient ->
-            Surface(shape = MaterialTheme.shapes.medium,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Row {
                     Text(
-                        text = ingredient.name ?: "",
+                        text = ingredient.name,
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp,
@@ -518,19 +521,20 @@ fun BrandsList(brands: Set<BrandDTO>) {
     )
     LazyRow {
         items(brands.toList()) { brand ->
-            Surface(shape = MaterialTheme.shapes.medium,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
                 modifier = Modifier.padding(8.dp)
             ) {
-                    Text(
-                        text = brand.name ?: "",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(4.dp),
-                        maxLines = 1,
-                    )
-                }
+                Text(
+                    text = brand.name,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(4.dp),
+                    maxLines = 1,
+                )
+            }
         }
     }
 }
@@ -625,7 +629,7 @@ fun DefaultDivider() {
     )
 }
 
-fun getAllergenImage(name : String) : Int {
+fun getAllergenImage(name: String): Int {
     return when {
         name.contains("egg", ignoreCase = true) -> R.drawable.allergen_egg_icon
         name.contains("soy", ignoreCase = true) -> R.drawable.allergen_soybean_icon
@@ -645,39 +649,39 @@ fun getAllergenImage(name : String) : Int {
 fun ProductDetailsPreview() {
     MmmmobileTheme {
 
-    ProductDetails(
-        productDetails = ProductDTO(
-            id = 0,
-            name = "name",
-            barcode = "barcode",
-            quantity = "quantity",
-            allergens = emptySet(),
-            brands = emptySet(),
-            categories = emptySet(),
-            countries = emptySet(),
-            ingredients = emptySet(),
-            nutriScore = 0,
-            novaGroup = 0,
-            ingredientAnalysis = ProductIngredientAnalysisDTO(
-                fromPalmOil = false,
-                ingredientsDescription = "",
-                vegan = false,
-                vegetarian = false,
-                id = 0
-            ),
-            nutriment = NutrimentDTO(
-                energyKcalPer100g = 0.0,
-                fatPer100g = 0.0,
-                fiberPer100g = 0.0,
-                proteinsPer100g = 0.0,
-                saltPer100g = 0.0,
-                sodiumPer100g = 0.0,
-                sugarsPer100g = 0.0,
-                id = 0
+        ProductDetails(
+            productDetails = ProductDTO(
+                id = 0,
+                name = "name",
+                barcode = "barcode",
+                quantity = "quantity",
+                allergens = emptySet(),
+                brands = emptySet(),
+                categories = emptySet(),
+                countries = emptySet(),
+                ingredients = emptySet(),
+                nutriScore = 0,
+                novaGroup = 0,
+                ingredientAnalysis = ProductIngredientAnalysisDTO(
+                    fromPalmOil = false,
+                    ingredientsDescription = "",
+                    vegan = false,
+                    vegetarian = false,
+                    id = 0
+                ),
+                nutriment = NutrimentDTO(
+                    energyKcalPer100g = 0.0,
+                    fatPer100g = 0.0,
+                    fiberPer100g = 0.0,
+                    proteinsPer100g = 0.0,
+                    saltPer100g = 0.0,
+                    sodiumPer100g = 0.0,
+                    sugarsPer100g = 0.0,
+                    id = 0
+                )
             )
         )
-    )
-}
+    }
 }
 
 class ProductDetailsViewModel(private val productApi: ProductApi = ProductApi()) : ViewModel() {

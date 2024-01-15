@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -19,12 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,13 +47,21 @@ fun RegistrationScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                text = context.getText(R.string.register).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Bold,
+                text = context.getText(R.string.register).toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )
             OutlinedTextField(
                 value = firstName.value,
                 onValueChange = { firstName.value = it },
-                label = { Text(context.getText(R.string.firstName).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.firstName).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -68,7 +74,13 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = lastName.value,
                 onValueChange = { lastName.value = it },
-                label = { Text(context.getText(R.string.lastName).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.lastName).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -81,7 +93,13 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text(context.getText(R.string.email).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.email).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp),
@@ -94,7 +112,13 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(context.getText(R.string.password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.password).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -108,7 +132,13 @@ fun RegistrationScreen(navController: NavController) {
             OutlinedTextField(
                 value = confirmPassword.value,
                 onValueChange = { confirmPassword.value = it },
-                label = { Text(context.getText(R.string.confirm_password).toString(), fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium) },
+                label = {
+                    Text(
+                        context.getText(R.string.confirm_password).toString(),
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -140,7 +170,11 @@ fun RegistrationScreen(navController: NavController) {
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "Registration failed. Try again", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Registration failed. Try again",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             }
                         }

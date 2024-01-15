@@ -29,7 +29,9 @@ class RecipeIngredientRepository(
     suspend fun insertIngredientIfNotExists(ingredient: Ingredient): Long {
         return withContext(defaultDispatcher) {
             val existingIngredient = recipeIngredientDao.getIngredientById(ingredient.id)
-            return@withContext existingIngredient?.id ?: recipeIngredientDao.insertRecipeIngredient(ingredient)
+            return@withContext existingIngredient?.id ?: recipeIngredientDao.insertRecipeIngredient(
+                ingredient
+            )
         }
     }
 

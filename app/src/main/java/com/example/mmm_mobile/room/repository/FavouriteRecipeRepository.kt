@@ -22,7 +22,8 @@ class FavouriteRecipeRepository(
 
     fun findAllFavouriteRecipes() = favouriteRecipeDao.getFavouriteRecipes()
 
-    fun findAllFavouriteRecipesWithoutIngredients() = favouriteRecipeDao.getFavouriteRecipesWithoutIngredients()
+    fun findAllFavouriteRecipesWithoutIngredients() =
+        favouriteRecipeDao.getFavouriteRecipesWithoutIngredients()
 
     suspend fun findRecipeById(recipeId: Long): FavouriteRecipe {
         return withContext(defaultDispatcher) {
@@ -30,11 +31,15 @@ class FavouriteRecipeRepository(
         }
     }
 
-    suspend fun insertFavouriteRecipe(recipe: FavouriteRecipe, ingredients: List<Ingredient>) : Long {
+    suspend fun insertFavouriteRecipe(
+        recipe: FavouriteRecipe,
+        ingredients: List<Ingredient>
+    ): Long {
         return withContext(defaultDispatcher) {
             val recipeId = favouriteRecipeDao.insertFavouriteRecipe(recipe)
             ingredients.forEach { ingredient ->
-                val crossRef = RecipeIngredientCrossRef(recipeId = recipeId, ingredientId = ingredient.id)
+                val crossRef =
+                    RecipeIngredientCrossRef(recipeId = recipeId, ingredientId = ingredient.id)
                 favouriteRecipeDao.insertRecipeIngredientCrossRef(crossRef)
             }
             recipeId
