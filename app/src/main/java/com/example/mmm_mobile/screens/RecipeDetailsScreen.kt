@@ -156,12 +156,37 @@ fun RecipeDetailScreen(
             }
         }
     } else {
+        val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+        var canReview by remember { mutableStateOf(false) }
+        val reviewsApi = RecipeReviewApi()
+
+        LaunchedEffect(recipeId) {
+            try {
+                recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+                canReview = withContext(Dispatchers.IO) {
+                    reviewsApi.checkIfUserReviewed(recipeId ?: 0).canUserCreateReview
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeDetailScreen", "Error fetching recipe", e)
+            }
+        }
+
+        val recipe by recipeDetailsViewModel.recipe.collectAsState()
+
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item { AddRecipeButton(favouriteRecipeViewModel, recipeFromApi, snackbarHostState) }
             item { recipeFromApi?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
             recipeId?.let { id ->
-                item {
-                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+
+                if (canReview) {
+                    item {
+                        AddReviewInput(
+                            id,
+                            ReviewListViewModel(recipeId),
+                            recipeDetailsViewModel,
+                            snackbarHostState
+                        )
+                    }
                 }
                 recipeFromApi?.averageRating?.let {
                     item {
@@ -172,7 +197,7 @@ fun RecipeDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
@@ -748,6 +773,13 @@ fun AddReviewInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
+        TextField(
+            value = reviewText,
+            onValueChange = { reviewText = it },
+            label = { Text("Your Review") },
+            modifier = Modifier.weight(1.1f)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
         Slider(
             value = rating.toFloat(),
             onValueChange = { rating = it.toInt() },
@@ -765,7 +797,7 @@ fun AddReviewInput(
 
         )
         Button(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.9f),
             onClick = {
                 if (rating > 0) {
 
@@ -783,7 +815,7 @@ fun AddReviewInput(
                                 message = context.getText(R.string.review_added).toString(),
                                 duration = SnackbarDuration.Long
                             )
-                 // TODO: odświeżenie listy recenzji albo dodać po prostu do page
+                            // TODO: odświeżenie listy recenzji albo dodać po prostu do page
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar(
                                 message = context.getText(R.string.review_not_added).toString(),
