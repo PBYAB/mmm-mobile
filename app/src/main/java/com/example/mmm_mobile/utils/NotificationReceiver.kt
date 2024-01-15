@@ -36,7 +36,6 @@ class NotificationReceiver : BroadcastReceiver() {
             .setContentTitle(context.getString(R.string.draw_recipe))
             .setContentText(context.getString(R.string.draw_recipe_text) + "\uD83D\uDE42")
             .setSmallIcon(R.mipmap.mmm_mobile_icon_round)
-            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.mmm_mobile_icon_round))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
