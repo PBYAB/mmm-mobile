@@ -97,4 +97,6 @@
     <string name="recipe_average_rating_label">Average rating</string>
     <string name="rating_info">Recipe Rating</string>
     <string name="avarage_rating">No ratings yet</string>
+    <string name="draw_recipe">Draw the recipe of the day</string>
+    <string name="draw_recipe_text">"There's still a recipe of the day waiting for you to draw "</string>
 </resources>

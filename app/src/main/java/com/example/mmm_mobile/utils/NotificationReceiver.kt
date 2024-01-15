@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -32,9 +33,10 @@ class NotificationReceiver : BroadcastReceiver() {
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Powiadomienie")
-            .setContentText("Nowe powiadomienie")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.draw_recipe))
+            .setContentText(context.getString(R.string.draw_recipe_text) + "\uD83D\uDE42")
+            .setSmallIcon(R.mipmap.mmm_mobile_icon_round)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.mmm_mobile_icon_round))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()

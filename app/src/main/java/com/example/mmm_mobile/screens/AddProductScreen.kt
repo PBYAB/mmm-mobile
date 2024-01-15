@@ -47,6 +47,8 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -107,7 +109,7 @@ import org.openapitools.client.models.CreateProductRequest
 import org.openapitools.client.models.ProductIngredientDTO
 
 @Composable
-fun AddProductScreen(navController: NavController) {
+fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHostState) {
 
     val viewModel: AddProductViewModel = viewModel()
     val brandsState by viewModel.brands.collectAsState(initial = emptyList())
@@ -789,7 +791,7 @@ fun AddProductScreen(navController: NavController) {
                         selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         name ?: "",
                         novaGroup.toInt() ?: 1,
-                        1,
+                        nutriScore.toInt() ?: 1,
                         CreateNutrimentRequest(
                             energyKcalPer100g = caloriesPer100g.toDouble() ?: 0.0,
                             fatPer100g = fatPer100g.toDouble() ?: 0.0,
@@ -802,7 +804,8 @@ fun AddProductScreen(navController: NavController) {
                         quantity ?: ""
                     )
 
-                    viewModel.addProduct(createProductRequest)
+                    viewModel.addProduct(createProductRequest, snackbarHostState)
+
                     navController.navigate(Screen.ProductList.route)
                 }
             )
@@ -1236,10 +1239,29 @@ class AddProductViewModel(
         }
     }
 
-    fun addProduct(createProductRequest: CreateProductRequest) {
+    fun addProduct(createProductRequest: CreateProductRequest, snackbarHostState: SnackbarHostState) {
         viewModelScope.launch {
+
             try {
-               productApi.createProduct(createProductRequest)
+                val response = productApi.createProductWithHttpInfo(createProductRequest).statusCode == 201
+
+                if (response) {
+                    viewModelScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Product ${createProductRequest.name} added",
+                            actionLabel = "OK",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                } else {
+                    viewModelScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Error adding product ${createProductRequest.name}",
+                            actionLabel = "OK",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 Log.e("AddProductViewModel", "Error adding product", e)
             }

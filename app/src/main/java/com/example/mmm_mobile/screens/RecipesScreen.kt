@@ -60,6 +60,8 @@ import com.example.mmm_mobile.models.Recipe
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
+import com.example.mmm_mobile.utils.NotificationReceiver
+import com.example.mmm_mobile.utils.NotificationScheduler
 import com.example.mmm_mobile.utils.ScreenState
 import com.example.mmm_mobile.utils.ShakeDetector
 import com.example.mmm_mobile.utils.ShakeEventListener
@@ -271,7 +273,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             text = recipe.name,
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
             minLines = 2,
             maxLines = 2
         )
@@ -281,16 +283,19 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
                 text = if(recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
+                fontSize = 15.sp
             )
             val rating = recipe.rating ?: 0.0
             val fullStars = rating.toInt()
             for (i in 1..fullStars) {
-                Icon(Icons.Filled.Star, stringResource(R.string.rating_info))
+                Icon(
+                    Icons.Filled.Star, stringResource(R.string.rating_info),
+                    modifier = Modifier.width(20.dp)
+                )
             }
         }
 
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(top = 2.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)) {
             Icon(Icons.Filled.Person, stringResource(R.string.servings_count_info))
             Text(
                 text = recipe.servings.toString(),
