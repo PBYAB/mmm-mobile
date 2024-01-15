@@ -46,7 +46,7 @@ fun LoginScreen(navController: NavController) {
     println("LoginScreen: ${tokenManager.accessToken}")
     if (tokenManager.accessToken != null) {
         ApiClient.accessToken = tokenManager.accessToken
-        //navController.navigate(Screen.ProductList.route)
+        navController.navigate(Screen.ProductList.route)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

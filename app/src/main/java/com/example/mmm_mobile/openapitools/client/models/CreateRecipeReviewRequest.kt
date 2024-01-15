@@ -27,13 +27,13 @@ import com.squareup.moshi.JsonClass
  */
 
 
-data class CreateRecipeReviewRequest (
+data class CreateRecipeReviewRequest(
 
     @Json(name = "rating")
-    val rating: kotlin.Double,
+    val rating: Int,
 
     @Json(name = "comment")
-    val comment: kotlin.String? = null
+    val comment: String? = null
 
 )
 

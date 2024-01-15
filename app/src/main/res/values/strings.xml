@@ -92,4 +92,7 @@
     <string name="scan_qr_code">Scan a QR Code</string>
     <string name="add_button">Add</string>
     <string name="enter_recipe_product">Ingredient</string>
+    <string name="reviews_icon_info">Review icon</string>
+    <string name="reviews_label">Reviews</string>
+    <string name="recipe_average_rating_label">Average rating</string>
 </resources>
