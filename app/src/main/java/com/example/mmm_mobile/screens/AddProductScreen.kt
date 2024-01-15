@@ -903,9 +903,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         quantity ?: ""
                     )
 
-                    viewModel.addProduct(createProductRequest, snackbarHostState)
-
-                    navController.navigate(Screen.ProductList.route)
+                    viewModel.addProduct(createProductRequest, snackbarHostState, navController)
                     } else {
                         Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
@@ -1391,15 +1389,15 @@ class AddProductViewModel(
 
     fun addProduct(
         createProductRequest: CreateProductRequest,
-        snackbarHostState: SnackbarHostState
+        snackbarHostState: SnackbarHostState,
+        navController: NavController
     ) {
         viewModelScope.launch {
 
             try {
-                val response =
-                    productApi.createProductWithHttpInfo(createProductRequest).statusCode == 201
+                val response = productApi.createProductWithHttpInfo(createProductRequest)
 
-                if (response) {
+                if (response.statusCode == 201) {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(
                             message = "Product ${createProductRequest.name} added",
@@ -1407,6 +1405,15 @@ class AddProductViewModel(
                             duration = SnackbarDuration.Short
                         )
                     }
+
+                    val location = response.headers["Location"]?.firstOrNull()
+                    val productId = location?.substringAfterLast("/")?.toLongOrNull()
+                    Log.d("AddRecipeViewModel", "Headers: ${response.headers}")
+
+                    productId?.let {
+                        navController.navigate("Product/$productId")
+                    }
+
                 } else {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(

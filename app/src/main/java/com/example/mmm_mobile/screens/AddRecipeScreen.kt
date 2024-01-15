@@ -368,7 +368,6 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
                         viewModel.addRecipe(createRecipeRequest, snackbarHostState, navController)
-                        navController.navigate(Screen.RecipeList.route)
                     } else {
                         Toast.makeText(
                             context,
