@@ -108,55 +108,58 @@ fun RecipeDetailScreen(
             item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
 
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
-
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(10.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = stringResource(id = R.string.reviews_icon_info),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.reviews_label),
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
-                    )
-                }
-
+            recipeId?.let { id ->
                 recipe?.averageRating?.let {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(4.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.recipe_average_rating_label),
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = String.format("%.2f", it),
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = stringResource(id = R.string.reviews_icon_info),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                ) {
-                    recipeId?.let {
-                        val reviewViewModel =
-                            viewModel { ReviewListViewModel(recipeId = it) }
-                        ReviewList(viewModel = reviewViewModel)
+                            Text(
+                                text = stringResource(id = R.string.reviews_label),
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            )
+                        }
+
+                        recipe?.averageRating?.let {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.recipe_average_rating_label),
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = String.format("%.2f", it),
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(400.dp)
+                        ) {
+                            val reviewViewModel =
+                                viewModel { ReviewListViewModel(recipeId = id) }
+                            ReviewList(viewModel = reviewViewModel)
+
+                        }
                     }
                 }
             }
+
         }
     }
 }
