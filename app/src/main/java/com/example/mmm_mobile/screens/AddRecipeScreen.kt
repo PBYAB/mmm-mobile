@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -80,6 +82,7 @@ fun AddRecipeScreen() {
         var recipeTime by remember { mutableStateOf("") }
         var recipeCaloriesPerServing by remember { mutableStateOf("") }
         var ingredients by remember { mutableStateOf(listOf(Ingredient())) }
+        var recipeIngredientList = emptyList<RecipeIngredientForm>()
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -140,7 +143,7 @@ fun AddRecipeScreen() {
 
                 OutlinedTextField(
                     value = recipeInstructions,
-                    singleLine = false, // Ustaw singleLine na false, aby pozwolić na wieloliniowy tekst
+                    singleLine = false,
                     shape = shapes.large,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -167,7 +170,7 @@ fun AddRecipeScreen() {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
                         value = recipeCaloriesPerServing,
@@ -251,29 +254,29 @@ fun AddRecipeScreen() {
                     )
                 }
 
-                ingredients.forEachIndexed { index, ingredient ->
-                    IngredientRow(
-                        ingredient = ingredient,
-                        onIngredientChange = { newIngredient ->
-                            ingredients = ingredients.toMutableList().also {
-                                it[index] = newIngredient
-                            }
-                        },
-                        onRemoveIngredient = {
-                            ingredients = ingredients.toMutableList().also {
-                                it.removeAt(index)
-                            }
-                        }
-                    )
-                }
-
-                AddIngredientRow(
-                    onAddIngredient = {
+            ingredients.forEachIndexed { index, ingredient ->
+                recipeIngredientList = recipeIngredientList + IngredientRow(
+                    ingredient = ingredient,
+                    onIngredientChange = { newIngredient ->
                         ingredients = ingredients.toMutableList().also {
-                            it.add(Ingredient())
+                            it[index] = newIngredient
+                        }
+                    },
+                    onRemoveIngredient = {
+                        ingredients = ingredients.toMutableList().also {
+                            it.removeAt(index)
                         }
                     }
                 )
+            }
+
+            AddIngredientRow(
+                onAddIngredient = {
+                    ingredients = ingredients.toMutableList().also {
+                        it.add(Ingredient())
+                    }
+                }
+            )
 
 
                 Button(
@@ -283,7 +286,7 @@ fun AddRecipeScreen() {
                         val createRecipeRequest = CreateRecipeRequest(
                             recipeInstructions,
                             null,
-                            emptyList<RecipeIngredientForm>(),
+                            recipeIngredientList,
                             recipeCaloriesPerServing.toDouble(),
                             recipeName,
                             recipeServings.toInt(),
@@ -315,7 +318,7 @@ data class Ingredient(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Demo_DropDownMenu() {
+fun Demo_DropDownMenu(onUnitSelected: (RecipeIngredientForm.Unit) -> Unit) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
@@ -323,99 +326,118 @@ fun Demo_DropDownMenu() {
     val firstUnit = unitList[0]
     var selectedText by remember { mutableStateOf(firstUnit) }
 
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+        }
+    ) {
+        TextField(
+            value = selectedText,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor(),
+        )
 
-        ExposedDropdownMenuBox(
+        ExposedDropdownMenu(
             expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
+            onDismissRequest = { expanded = false }
         ) {
-            TextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(),
-            )
+            unitList.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = item,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
+                    onClick = {
+                        selectedText = item
+                        expanded = false
+                        Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
 
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                unitList.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item, fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,) },
-                        onClick = {
-                            selectedText = item
-                            expanded = false
-                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                        // Assuming you have a way to convert the String to RecipeIngredientForm.Unit
+                        val selectedUnit = getRecipeIngredientUnit(selectedText)// Convert item to RecipeIngredientForm.Unit
+                        if (selectedUnit != null) {
+                            onUnitSelected(selectedUnit)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
+    }
 }
 
+fun getRecipeIngredientUnit(unitString: String): RecipeIngredientForm.Unit? {
+    return try {
+        RecipeIngredientForm.Unit.valueOf(unitString.uppercase())
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+}
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun IngredientRow(
     ingredient: Ingredient,
     onIngredientChange: (Ingredient) -> Unit,
     onRemoveIngredient: () -> Unit
-) {
+): RecipeIngredientForm  {
 
     val viewModel: AddRecipeViewModel = viewModel()
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
     var ingredients = emptySet<IngredientListItem>()
+    var quantity by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf(RecipeIngredientForm.Unit.g) }
 
     LaunchedEffect(Unit) {
-
         viewModel.fetchRecipeIngredients()
     }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-        ) {
-            ingredients = SearchableExpandedDropDownMenu(
-                setOfItems = recipeIngredientState,
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                ),
-                displayText = { brand -> brand.name ?: "" },
-                filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
-                placeholder = { Text(text = (stringResource(R.string.enter_recipe_product)),fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,) },
-                onDropDownItemSelected = { selectedBrands ->
-                    for (brand in selectedBrands) {
-                        Log.d("Selected Brands", brand.name ?: "Unknown")
-                    }
-                },
-                dropdownItem = { brand ->
-                    DropDownItem(item = brand) {
-                        Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
-                    }
-                },
-                defaultItem = {
-                    it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                },
-                onSearchTextFieldClicked = {
-                    keyboardController?.show()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) {
+        ingredients = SearchableExpandedDropDownMenu(
+            setOfItems = recipeIngredientState,
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+            ),
+            displayText = { brand -> brand.name ?: "" },
+            filterItems = { items, searchText -> items.filter { it.name?.contains(searchText, true) == true } },
+            placeholder = { Text(text = (stringResource(R.string.enter_recipe_product)),fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,) },
+            onDropDownItemSelected = { selectedBrands ->
+                for (brand in selectedBrands) {
+                    Log.d("Selected Brands", brand.name ?: "Unknown")
                 }
-            )
-        }
+            },
+            dropdownItem = { brand ->
+                DropDownItem(item = brand) {
+                    Text(text = it.name ?: "", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
+                }
+            },
+            defaultItem = {
+                it.name?.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+            },
+            onSearchTextFieldClicked = {
+                keyboardController?.show()
+            }
+        )
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         OutlinedTextField(
-            value = ingredient.quantity,
+            value = quantity,
             singleLine = true,
             shape = shapes.large,
             modifier = Modifier
@@ -438,10 +460,13 @@ fun IngredientRow(
             )
         )
 
+
         Box(
             modifier = Modifier.weight(1f)
         ) {
-            Demo_DropDownMenu()
+            Demo_DropDownMenu { selectedUnit ->
+                unit = selectedUnit
+            }
         }
 
         IconButton(
@@ -458,6 +483,12 @@ fun IngredientRow(
             )
         }
     }
+    val quantityValue = if (quantity.isNotEmpty()) {
+        quantity.toDouble()
+    } else {
+        0.0
+    }
+    return RecipeIngredientForm(quantityValue, ingredients.first().id ?: 0, unit ?: RecipeIngredientForm.Unit.g)
 }
 
 @Composable
