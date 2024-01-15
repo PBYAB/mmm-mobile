@@ -96,14 +96,15 @@ class ProductsListViewModel : ViewModel() {
                         allergens = allergens,
                         country = country,
                         sortBy = sortBy,
-                        sortDirection = sortDirection
+                        sortDirection = sortDirection,
+                        //hasPhotos = true
                     ).content.orEmpty().map {
                         Product(
-                            id = it.id!!,
+                            id = it.id,
                             name = it.name.orEmpty(),
                             quantity = it.quantity.orEmpty(),
                             barcode = it.barcode.orEmpty(),
-                            image = "",
+                            image = it.image?.url.orEmpty(),
                             nutriScore = it.nutriScore ?: 0,
                             novaGroup = it.novaGroup ?: 0
                         )
@@ -193,7 +194,7 @@ fun ProductsScreen(navController: NavController, query : String?) {
         ) {
             Image(
                 painter = painter,
-                contentDescription = stringResource(id = R.string.product_image_info),
+                contentDescription = product.image,
                 modifier = Modifier
                     .size(200.dp, 150.dp)
                     .fillMaxWidth(),

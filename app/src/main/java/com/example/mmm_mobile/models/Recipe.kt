@@ -7,4 +7,5 @@ data class Recipe(
     val servings: Int?,
     val image: Any?,
     val time: Int?,
+    val rating: Double?,
 )

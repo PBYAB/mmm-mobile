@@ -1,6 +1,7 @@
 package com.example.mmm_mobile.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -91,7 +92,6 @@ fun RecipeDetailScreen(
 
     if (recipe != null) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { Text(text = "" + recipeId + "|" + recipe?.recipe?.id) }
             item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
         }
@@ -201,7 +201,8 @@ fun AddRecipeButton(
                         kcalPerServing = recipe?.kcalPerServing ?: 0.0,
                         instructions = recipe?.instructions ?: "",
                         coverImageUrl = recipe?.coverImageUrl ?: "",
-                        ingredients = recipe?.ingredients ?: emptyList()
+                        ingredients = recipe?.ingredients ?: emptyList(),
+                        averageRating = recipe?.averageRating ?: 0.0
                     )
                 )
                 snackbarHostState.showSnackbar(
@@ -212,6 +213,22 @@ fun AddRecipeButton(
         }
     ) {
         Icon(Icons.Filled.Add, contentDescription = null)
+    }
+}
+
+
+@Composable
+fun OpenYoutubeButton(recipeTitle: String) {
+    val context = LocalContext.current
+    Button(onClick = {
+        val intent = Intent(Intent.ACTION_SEARCH)
+        intent.setPackage("com.google.android.youtube")
+        intent.putExtra("query", recipeTitle)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        }
+    }) {
+        Text(text = "Open in YouTube")
     }
 }
 
@@ -251,7 +268,22 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
         },
         modifier = Modifier.padding(10.dp)
     )
+    Spacer(modifier = Modifier.height(8.dp))
 
+    Row(modifier = Modifier.padding(8.dp)) {
+
+        Text(
+            text = recipeDetails.rating.toString(),
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 20.sp
+        )
+        val rating = recipeDetails.rating
+        val fullStars = rating.toInt()
+        for (i in 1..fullStars) {
+            Icon(Icons.Filled.Star, stringResource(R.string.rating_info))
+        }
+    }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -454,6 +486,7 @@ fun mapToRecipeDetails(recipe: RecipeDTO): RecipeDetails {
         kcalPerServing = recipe.kcalPerServing ?: 0.0,
         instructions = recipe.instructions ?: "",
         image = recipe.coverImageUrl ?: "",
+        rating = recipe.averageRating ?: 0.0,
         ingredients = recipe.ingredients?.map { ingredient ->
             RecipeIngredientDTO(
                 id = ingredient.id,
@@ -474,6 +507,7 @@ fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
         kcalPerServing = recipe.recipe.kcalPerServing,
         instructions = recipe.recipe.instructions,
         image = recipe.recipe.image,
+        rating = recipe.recipe.rating,
         ingredients = recipe.ingredients.map { ingredient ->
             RecipeIngredientDTO(
                 id = ingredient.id,
@@ -494,7 +528,8 @@ class RecipeDetails(
     val kcalPerServing: Double = 0.0,
     val instructions: String = "",
     val image: Any = "",
-    val ingredients: List<RecipeIngredientDTO> = emptyList()
+    val ingredients: List<RecipeIngredientDTO> = emptyList(),
+    val rating: Double = 0.0
 )
 
 

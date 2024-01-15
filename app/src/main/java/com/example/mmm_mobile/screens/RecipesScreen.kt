@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -38,9 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -96,11 +102,12 @@ class RecipeListViewModel : ViewModel() {
                         sortDirection = sortDirection
                     ).content.orEmpty().map {
                         Recipe(
-                            id = it.id!!,
-                            name = it.name.orEmpty(),
+                            id = it.id,
+                            name = it.name,
                             servings = it.servings,
                             image = it.coverImageUrl,
-                            time = it.totalTime
+                            time = it.totalTime,
+                            rating = it.averageRating
                         )
                     }
                 Result.success(content)
@@ -253,7 +260,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
     ) {
         Image(
             painter = painter,
-            contentDescription = context.getText(R.string.recipe_image_info).toString(),
+            contentDescription = stringResource(R.string.recipe_image_info),
             modifier = Modifier
                 .size(200.dp, 150.dp)
                 .fillMaxWidth(),
@@ -268,9 +275,23 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             minLines = 2,
             maxLines = 2
         )
+        Row(modifier = Modifier.padding(4.dp)) {
+
+            Text(
+                text = recipe.rating.toString(),
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 20.sp
+            )
+            val rating = recipe.rating ?: 0.0
+            val fullStars = rating.toInt()
+            for (i in 1..fullStars) {
+                Icon(Icons.Filled.Star, stringResource(R.string.rating_info))
+            }
+        }
 
         Row(modifier = Modifier.padding(8.dp)) {
-            Icon(Icons.Filled.Person, context.getText(R.string.servings_count_info).toString())
+            Icon(Icons.Filled.Person, stringResource(R.string.servings_count_info))
             Text(
                 text = recipe.servings.toString(),
                 fontFamily = poppinsFontFamily,
@@ -279,7 +300,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
                 painter = painterResource(id = R.drawable.timer_fill0_wght400_grad0_opsz24),
-                contentDescription = context.getText(R.string.time_info).toString()
+                contentDescription = stringResource(R.string.time_info)
             )
             Text(
                 text = recipe.time.toString() + " min",

@@ -14,9 +14,9 @@ data class FavouriteRecipe(
     val image: ByteArray,
     val instructions: String,
     val kcalPerServing: Double,
-    val totalTime: Int
+    val totalTime: Int,
+    val rating : Double = 0.0
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -29,7 +29,8 @@ data class FavouriteRecipe(
         if (!image.contentEquals(other.image)) return false
         if (instructions != other.instructions) return false
         if (kcalPerServing != other.kcalPerServing) return false
-        return totalTime == other.totalTime
+        if (totalTime != other.totalTime) return false
+        return rating == other.rating
     }
 
     override fun hashCode(): Int {
@@ -40,6 +41,7 @@ data class FavouriteRecipe(
         result = 31 * result + instructions.hashCode()
         result = 31 * result + kcalPerServing.hashCode()
         result = 31 * result + totalTime
+        result = 31 * result + rating.hashCode()
         return result
     }
 }

@@ -5,15 +5,18 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
@@ -46,16 +49,27 @@ import org.openapitools.client.models.AllergenDTO
 import org.openapitools.client.models.NutrimentDTO
 import org.openapitools.client.models.ProductDTO
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.mmm_mobile.models.Nutriment
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CategoryDTO
 import org.openapitools.client.models.Country
 import org.openapitools.client.models.CountryDTO
+import org.openapitools.client.models.ProductImageDTO
 import org.openapitools.client.models.ProductIngredientAnalysisDTO
 import org.openapitools.client.models.ProductIngredientDTO
 import java.util.Locale.Category
@@ -106,16 +120,8 @@ fun ProductDetailScreen(productId: Long?) {
 
 @Composable
 fun ProductDetails(productDetails: ProductDTO) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current)
-            .data(data = "https://static.openfoodfacts.org/images/products/${productDetails.barcode}/${productDetails.barcode}_front_fr.100.200.jpg")
-            .apply(block = fun ImageRequest.Builder.() {
-                placeholder(R.drawable.baseline_breakfast_dining_24)
-                error(R.drawable.baseline_breakfast_dining_24)
-            }).build()
-    )
+    val context = LocalContext.current
+    val images = productDetails.images?.toList() ?: emptyList()
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         item {
@@ -123,19 +129,13 @@ fun ProductDetails(productDetails: ProductDTO) {
                 modifier = Modifier
                     .padding(4.dp)
                     .fillMaxWidth()
-                    .background(color = androidx.compose.ui.graphics.Color.LightGray)
+                    .background(color = Color.LightGray)
+                    .size(200.dp)
             ) {
-                Image(
-                    painter = painter,
-                    contentDescription = context.getText(R.string.recipe_image_info).toString(),
-                    modifier = Modifier
-                        .size(200.dp, 200.dp)
-                        .align(alignment = androidx.compose.ui.Alignment.Center)
-                        .fillMaxWidth(),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                )
+                SwipeableImages(images = images)
+                }
             }
-        }
+
         item {
             productDetails.name?.let {
                 Text(
@@ -526,6 +526,88 @@ fun BrandsList(brands: Set<BrandDTO>) {
         }
     }
 }
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun SwipeableImages(images: List<ProductImageDTO>) {
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedImage by remember { mutableStateOf("") }
+
+    val smallImages = images.filter {
+        it.propertySize == ProductImageDTO.PropertySize.sMALL
+    }.map { it.url }.toList()
+
+    val bigImages = images.filter {
+        it.propertySize == ProductImageDTO.PropertySize.bIG
+    }.map { it.url }.toList()
+
+
+    if (smallImages.isEmpty()) {
+        Image(
+            painter = painterResource(id = R.drawable.baseline_breakfast_dining_24),
+            contentDescription = stringResource(R.string.recipe_image_info),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { /* Do nothing if there are no images */ },
+            contentScale = ContentScale.FillHeight
+        )
+    } else {
+        val pagerState = rememberPagerState()
+
+        HorizontalPager(
+            count = smallImages.size,
+            modifier = Modifier.fillMaxWidth(),
+            state = pagerState,
+            key = { smallImages[it] },
+        ) { index ->
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(context)
+                    .data(data = smallImages[index])
+                    .apply(block = fun ImageRequest.Builder.() {
+                        placeholder(R.drawable.baseline_breakfast_dining_24)
+                        error(R.drawable.baseline_breakfast_dining_24)
+                    }).build()
+            )
+
+            Image(
+                painter = painter,
+                contentDescription = stringResource(R.string.recipe_image_info),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        selectedImage = smallImages[index]
+                        showDialog = true
+                    },
+                contentScale = ContentScale.FillHeight
+            )
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            text = {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(context)
+                            .data(data = selectedImage)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                placeholder(R.drawable.baseline_breakfast_dining_24)
+                                error(R.drawable.baseline_breakfast_dining_24)
+                            }).build()
+                    ),
+                    contentDescription = stringResource(R.string.recipe_image_info),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            },
+            confirmButton = { },
+            modifier = Modifier.wrapContentSize()
+        )
+    }
+}
+
 
 @Composable
 fun DefaultDivider() {

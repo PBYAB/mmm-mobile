@@ -18,7 +18,7 @@ import java.util.concurrent.Executors
 
 @Database(
     entities = [FavouriteRecipe::class, Ingredient::class, RecipeIngredientCrossRef::class],
-    version = 7
+    version = 8
 )
 abstract class RecipeDataBase : RoomDatabase() {
 

@@ -95,4 +95,5 @@
     <string name="reviews_icon_info">Review icon</string>
     <string name="reviews_label">Reviews</string>
     <string name="recipe_average_rating_label">Average rating</string>
+    <string name="rating_info">Recipe Rating</string>
 </resources>

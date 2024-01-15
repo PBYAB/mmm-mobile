@@ -67,7 +67,8 @@ class FavouriteRecipeViewModel(
                     ) ?: byteArrayOf(),
                     instructions = recipe.instructions ?: "",
                     kcalPerServing = recipe.kcalPerServing ?: 0.0,
-                    totalTime = recipe.totalTime ?: 0
+                    totalTime = recipe.totalTime ?: 0,
+                    rating = recipe.averageRating ?: 0.0
                 ),
                 ingredientsWithIds
             )
@@ -114,5 +115,4 @@ class FavouriteRecipeViewModel(
             }
         }
     }
-
 }
