@@ -46,6 +46,8 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -93,7 +95,7 @@ import org.openapitools.client.models.RecipeIngredientForm
 
 
 @Composable
-fun AddRecipeScreen() {
+fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
 
     val viewModel: AddRecipeViewModel = viewModel()
     var recipeName by rememberSaveable { mutableStateOf("") }
@@ -604,10 +606,28 @@ class AddRecipeViewModel(
         }
     }
 
-    fun addRecipe(createRecipeRequest: CreateRecipeRequest) {
+    fun addRecipe(createRecipeRequest: CreateRecipeRequest, snackbarHostState: SnackbarHostState) {
         viewModelScope.launch {
             try {
-                recipeApi.createRecipe(createRecipeRequest)
+                val response = recipeApi.createRecipeWithHttpInfo(createRecipeRequest).statusCode == 201
+
+                if (response) {
+                    viewModelScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Recipe ${createRecipeRequest.name} added successfully",
+                            actionLabel = "OK",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                } else {
+                    viewModelScope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Error adding recipe ${createRecipeRequest.name}",
+                            actionLabel = "OK",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 Log.e("AddRecipeViewModel", "Error adding recipe", e)
             }

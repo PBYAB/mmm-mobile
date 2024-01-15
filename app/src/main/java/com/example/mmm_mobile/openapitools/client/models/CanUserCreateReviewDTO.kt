@@ -22,18 +22,14 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param rating 
- * @param comment 
+ * @param canUserCreateReview 
  */
 
 
-data class CreateRecipeReviewRequest (
+data class CanUserCreateReviewDTO (
 
-    @Json(name = "rating")
-    val rating: kotlin.Int,
-
-    @Json(name = "comment")
-    val comment: kotlin.String? = null
+    @Json(name = "canUserCreateReview")
+    val canUserCreateReview: kotlin.Boolean
 
 )
 

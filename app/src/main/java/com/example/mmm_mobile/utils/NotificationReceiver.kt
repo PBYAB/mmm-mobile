@@ -9,16 +9,37 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.mmm_mobile.MainActivity
 import com.example.mmm_mobile.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.openapitools.client.apis.RecipeApi
 import java.util.*
 
 class NotificationReceiver : BroadcastReceiver() {
+    companion object {
+        private val api = RecipeApi()
+    }
     override fun onReceive(context: Context, intent: Intent) {
-        showNotification(context)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val shouldSendNotification = api.canShakeRecipe().canUserShakeRecipe
+                if (shouldSendNotification) {
+                    withContext(Dispatchers.Main) {
+                        showNotification(context)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("NotificationReceiver", e.toString())
+            }
+        }
     }
 
     private fun showNotification(context: Context) {
@@ -32,11 +53,11 @@ class NotificationReceiver : BroadcastReceiver() {
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Powiadomienie")
-            .setContentText("Nowe powiadomienie")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.draw_recipe))
+            .setContentText(context.getString(R.string.draw_recipe_text) + "\uD83D\uDE42")
+            .setSmallIcon(R.mipmap.mmm_mobile_icon_round)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
@@ -78,7 +99,10 @@ class NotificationScheduler {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(context, cls)
             val pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = System.currentTimeMillis()
@@ -96,7 +120,10 @@ class NotificationScheduler {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(context, cls)
             val pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             alarmManager.cancel(pendingIntent)
         }

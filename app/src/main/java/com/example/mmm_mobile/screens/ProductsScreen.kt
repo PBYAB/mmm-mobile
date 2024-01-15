@@ -97,7 +97,7 @@ class ProductsListViewModel : ViewModel() {
                         country = country,
                         sortBy = sortBy,
                         sortDirection = sortDirection,
-                        //hasPhotos = true
+                        hasPhotos = name == null
                     ).content.orEmpty().map {
                         Product(
                             id = it.id,
@@ -198,7 +198,7 @@ fun ProductsScreen(navController: NavController, query : String?) {
                 modifier = Modifier
                     .size(200.dp, 150.dp)
                     .fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
+                contentScale = ContentScale.Crop
             )
 
             Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Medium,
