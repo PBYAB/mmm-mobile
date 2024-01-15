@@ -1248,5 +1248,5 @@ class AddProductViewModel(
 }
 
 
-private val DropdownMenuVerticalPadding = 5.dp
+val DropdownMenuVerticalPadding = 5.dp
 

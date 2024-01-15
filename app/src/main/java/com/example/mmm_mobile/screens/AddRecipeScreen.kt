@@ -2,55 +2,77 @@ package com.example.mmm_mobile.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -68,6 +90,7 @@ import org.openapitools.client.apis.IngredientApi
 import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.models.CreateRecipeRequest
 import org.openapitools.client.models.IngredientListItem
+import org.openapitools.client.models.RecipeIngredient
 import org.openapitools.client.models.RecipeIngredientForm
 
 
@@ -80,8 +103,11 @@ fun AddRecipeScreen() {
     var recipeServings by remember { mutableStateOf("") }
     var recipeTime by remember { mutableStateOf("") }
     var recipeCaloriesPerServing by remember { mutableStateOf("") }
-    var ingredients by remember { mutableStateOf(listOf(Ingredient())) }
-    var ingredient by remember { mutableStateOf(Ingredient()) }
+    var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.g))) }
+    var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.g)) }
+    var test by remember {
+        mutableStateOf(RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.g))
+    }
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
     var recipeIngredientList= emptyList<RecipeIngredientForm>()
 
@@ -260,20 +286,23 @@ fun AddRecipeScreen() {
                 onIngredientChange = { newIngredient ->
                     ingredient = newIngredient
                 },
-                onRemoveIngredient = {}
-            )
+                onRemoveIngredient = {},
+                onIngredientSelected = {
+                        selectedIngredient -> test = selectedIngredient
 
+                }
+            )
             // Przycisk "Dodaj składnik"
             AddIngredientRow {
                 // Stwórz nowy obiekt RecipeIngredientForm i dodaj go do listy
                 val newRecipeIngredient = RecipeIngredientForm(
-                    ingredient.quantity.toDouble(),
-                    0,
-                    getRecipeIngredientUnit(ingredient.unit) ?: RecipeIngredientForm.Unit.g
+                    test.amount.toDouble(),
+                    test.ingredientId,
+                    test.unit ?: RecipeIngredientForm.Unit.g
                 )
                 recipeIngredientList = recipeIngredientList + newRecipeIngredient
 
-                ingredient = Ingredient()
+                test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.g)
             }
 
 
@@ -310,7 +339,7 @@ fun AddRecipeScreen() {
 data class Ingredient(
     var name: String = "",
     var quantity: String = "",
-    var unit: String = ""
+    var unit: RecipeIngredientForm.Unit
 )
 
 fun getRecipeIngredientUnit(unitString: String): RecipeIngredientForm.Unit? {
@@ -373,12 +402,13 @@ fun Demo_DropDownMenu() {
 fun IngredientRow(
     ingredient: Ingredient,
     onIngredientChange: (Ingredient) -> Unit,
-    onRemoveIngredient: () -> Unit
+    onRemoveIngredient: () -> Unit,
+    onIngredientSelected: (RecipeIngredientForm) -> Unit
 ) {
 
     val viewModel: AddRecipeViewModel = viewModel()
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
-    var ingredients = emptySet<IngredientListItem>()
+    var recipeIngredient = IngredientListItem(0, "")
 
     LaunchedEffect(Unit) {
 
@@ -390,7 +420,7 @@ fun IngredientRow(
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-        ingredients = SearchableExpandedDropDownMenu(
+        val selectedIngredient = SearchOneItemDropDownMenu(
             setOfItems = recipeIngredientState,
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
@@ -403,8 +433,8 @@ fun IngredientRow(
             placeholder = { Text(text = (stringResource(R.string.enter_recipe_product)),fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,) },
             onDropDownItemSelected = { selectedBrands ->
-                for (brand in selectedBrands) {
-                    Log.d("Selected Brands", brand.name ?: "Unknown")
+                if (selectedBrands != null) {
+                    recipeIngredient = selectedBrands
                 }
             },
             dropdownItem = { brand ->
@@ -419,7 +449,11 @@ fun IngredientRow(
                 keyboardController?.show()
             }
         )
+        if (selectedIngredient != null) {
+            recipeIngredient = selectedIngredient
+        }
     }
+
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -458,13 +492,19 @@ fun IngredientRow(
 
         IconButton(
             onClick = {
+                val selectedIngredientForm = RecipeIngredientForm(
+                    ingredient.quantity.toDouble(),
+                    recipeIngredient.id,
+                    ingredient.unit ?: RecipeIngredientForm.Unit.g
+                )
+                onIngredientSelected(selectedIngredientForm)
                 onRemoveIngredient()
                 keyboardController?.hide()
             },
             modifier = Modifier.weight(0.8f)
         ) {
             Icon(
-                imageVector = Icons.Default.Delete,
+                imageVector = Icons.Default.Done,
                 contentDescription = stringResource(R.string.delete),
                 modifier = Modifier.size(24.dp)
             )
@@ -525,4 +565,227 @@ class AddRecipeViewModel(
             }
         }
     }
+}
+
+
+@Composable
+fun <T: IngredientListItem> SearchOneItemDropDownMenu(
+    modifier: Modifier = Modifier,
+    displayText: (IngredientListItem) -> String,
+    filterItems: (List<T>, String) -> List<T>,
+    setOfItems: List<T>,
+    enable: Boolean = true,
+    readOnly: Boolean = true,
+    placeholder: @Composable (() -> Unit) = {
+        Text(
+            text = "Select Items",
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Medium
+        )
+    },
+    parentTextFieldCornerRadius: Dp = 12.dp,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+    onDropDownItemSelected: (IngredientListItem?) -> Unit = {},
+    dropdownItem: @Composable (IngredientListItem) -> Unit,
+    isError: Boolean = false,
+    showDefaultSelectedItem: Boolean = false,
+    defaultItemIndex: Int = 0,
+    defaultItem: (T) -> Unit,
+    onSearchTextFieldClicked: () -> Unit,
+): IngredientListItem? {
+
+    var selectedOption by rememberSaveable { mutableStateOf<IngredientListItem?>(null) }
+    var searchedOption by rememberSaveable { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(expanded) }
+    var filteredItems by remember { mutableStateOf(setOfItems) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+    val itemHeights = remember { mutableStateMapOf<Int, Int>() }
+    val baseHeight = 530.dp
+    val density = LocalDensity.current
+    filteredItems = filterItems(setOfItems, searchedOption)
+
+    if (showDefaultSelectedItem && selectedOption == null) {
+        selectedOption = setOfItems.getOrNull(defaultItemIndex)
+    }
+
+    val maxHeight = remember(itemHeights.toMap()) {
+        if (itemHeights.keys.toSet() != setOfItems.indices.toSet()) {
+            return@remember baseHeight
+        }
+        val baseHeightInt = with(density) { baseHeight.toPx().toInt() }
+
+        var sum = with(density) { DropdownMenuVerticalPadding.toPx().toInt() } * 2
+        for ((_, itemSize) in itemHeights.toSortedMap()) {
+            sum += itemSize
+            if (sum >= baseHeightInt) {
+                return@remember with(density) { (sum - itemSize / 2).toDp() }
+            }
+        }
+        baseHeight
+    }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
+        ) { if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
+            placeholder()
+        } else {
+            // Display selected item
+            selectedOption?.let { selectedItem ->
+                dropdownItem(selectedItem)
+            }
+        }
+        }
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            colors = colors,
+            value = selectedOption?.let { displayText(it) } ?: "",
+            readOnly = readOnly,
+            enabled = enable,
+            onValueChange = {},
+            placeholder = {},
+            trailingIcon = {
+                IconToggleButton(
+                    checked = isExpanded,
+                    onCheckedChange = {
+                        isExpanded = it
+                        expanded = it
+                    },
+                ) {
+                    if (isExpanded) {
+                        Icon(
+                            imageVector = Icons.Outlined.KeyboardArrowUp,
+                            contentDescription = null,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.KeyboardArrowDown,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            },
+            shape = RoundedCornerShape(parentTextFieldCornerRadius),
+            isError = isError,
+            interactionSource = remember { MutableInteractionSource() }
+                .also { interactionSource ->
+                    LaunchedEffect(interactionSource) {
+                        keyboardController?.show()
+                        interactionSource.interactions.collect {
+                            if (it is PressInteraction.Release) {
+                                isExpanded = !isExpanded
+                                expanded = isExpanded
+                            }
+                        }
+                    }
+                },
+        )
+        if (expanded) {
+            DropdownMenu(
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .requiredSizeIn(maxHeight = maxHeight),
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                    onSearchTextFieldClicked()
+                },
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .focusRequester(focusRequester),
+                        value = searchedOption,
+                        onValueChange = { selectedItem ->
+                            searchedOption = selectedItem
+                            filteredItems = setOfItems.filter {
+                                displayText(it).contains(
+                                    searchedOption,
+                                    ignoreCase = true,
+                                )
+                            }
+                        },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                        },
+                        placeholder = {
+                            Text(
+                                text = "Search",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        interactionSource = remember { MutableInteractionSource() }
+                            .also { interactionSource ->
+                                LaunchedEffect(interactionSource) {
+                                    focusRequester.requestFocus()
+                                    interactionSource.interactions.collect {
+                                        if (it is PressInteraction.Release) {
+                                            onSearchTextFieldClicked()
+                                        }
+                                    }
+                                }
+                            },
+                    )
+
+                    filteredItems.forEach { selectedItem ->
+                        val isChecked = selectedOption == selectedItem
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedOption = if (isChecked) {
+                                        null
+                                    } else {
+                                        selectedItem
+                                    }
+                                }
+                                .padding(10.dp), // Add padding for better spacing
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = null,
+                                modifier = Modifier.weight(0.2f)
+                            )
+
+                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+
+                            DropdownMenuItem(
+                                modifier = Modifier.weight(0.5f),
+                                text = {
+                                    // Add your text content here
+                                    Text(
+                                        displayText(selectedItem),
+                                        fontFamily = poppinsFontFamily,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                },
+                                onClick = {
+                                    keyboardController?.hide()
+                                    selectedOption = selectedItem
+                                    searchedOption = selectedItem.toString()
+                                    onDropDownItemSelected(selectedOption)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return selectedOption
 }
