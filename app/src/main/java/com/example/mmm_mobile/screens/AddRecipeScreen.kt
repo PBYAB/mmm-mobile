@@ -2,6 +2,7 @@ package com.example.mmm_mobile.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -79,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -95,13 +97,14 @@ import org.openapitools.client.models.RecipeIngredientForm
 
 
 @Composable
-fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
+fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHostState) {
 
     val viewModel: AddRecipeViewModel = viewModel()
     var recipeName by rememberSaveable { mutableStateOf("") }
     var recipeInstructions by rememberSaveable { mutableStateOf("") }
     var recipeServings by rememberSaveable { mutableStateOf("") }
     var recipeTime by rememberSaveable { mutableStateOf("") }
+    var isVisible by rememberSaveable { mutableStateOf(true) }
     var recipeCaloriesPerServing by rememberSaveable { mutableStateOf("") }
     var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.G))) }
     var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.G)) }
@@ -332,6 +335,8 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                             recipeTime.toInt() ?: 0
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
+                        viewModel.addRecipe(createRecipeRequest,snackbarHostState)
+                        navController.navigate(Screen.RecipeList.route)
                     } else {
                         Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
@@ -358,7 +363,7 @@ private fun isFormValid(
     recipeIngredientList: MutableList<RecipeIngredientForm>, ): Boolean {
     return recipeInstructions.isNotBlank() &&
             recipeName.isNotBlank() &&
-            recipeIngredientList.isNullOrEmpty() &&
+            recipeIngredientList.isNotEmpty() &&
             recipeCaloriesPerServing.toDouble()!=0.0 &&
             recipeServings.toInt() !=0 &&
             recipeTime.toInt() != 0

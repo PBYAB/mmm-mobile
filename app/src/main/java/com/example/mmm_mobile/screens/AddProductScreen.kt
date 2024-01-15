@@ -2,6 +2,7 @@ package com.example.mmm_mobile.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -112,6 +113,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
     val brandsState by viewModel.brands.collectAsState(initial = emptyList())
     val allergensState by viewModel.allergens.collectAsState(initial = emptyList())
     val categoriesState by viewModel.categories.collectAsState(initial = emptyList())
+    var isVisible by rememberSaveable { mutableStateOf(true) }
     val countriesState by viewModel.countries.collectAsState(initial = emptyList())
     val productIngredientState by viewModel.productIngredients.collectAsState(initial = emptyList())
 
@@ -789,7 +791,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         name ?: "",
                         novaGroup.toInt() ?: 1,
-                        nutriScore.toInt() ?:1,
+                        nutriScore.toInt() ?: 1,
                         CreateNutrimentRequest(
                             caloriesPer100g.toDouble() ?: 0.0,
                             fatPer100g.toDouble() ?: 0.0,
@@ -809,6 +811,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
                     }
+
                 }
             )
         }
