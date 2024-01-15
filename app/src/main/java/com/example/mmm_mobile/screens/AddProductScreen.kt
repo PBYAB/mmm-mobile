@@ -315,7 +315,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -380,7 +380,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Allergens", allergen.name)
                         }
                     },
-                    dropdownItem = { allergen ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_allergen)),
                             fontFamily = poppinsFontFamily,
@@ -431,7 +431,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Categories", category.name)
                         }
                     },
-                    dropdownItem = { category ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_category)),
                             fontFamily = poppinsFontFamily,
@@ -466,7 +466,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -482,7 +482,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Country", country.name)
                         }
                     },
-                    dropdownItem = { country ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_country)),
                             fontFamily = poppinsFontFamily,
@@ -843,7 +843,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -854,12 +854,12 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         )
                     },
 
-                    onDropDownItemSelected = { selectedProductIngredients ->
+                    onDropDownItemSelected = { _ ->
                         for (country in selectedCountries) {
                             Log.d("Selected Country", country.name)
                         }
                     },
-                    dropdownItem = { country ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_ingredients)),
                             fontFamily = poppinsFontFamily,
@@ -1065,8 +1065,8 @@ fun Demo_DropDownMenu2(
                             selectedText = item
                             onItemSelected(item)
                             expanded = false
-                        } catch (e: NumberFormatException) {
-
+                        } catch (_: NumberFormatException) {
+                            Log.e("DropdownMenu", "Unable to parse $item to number")
                         }
                     }
                 )
