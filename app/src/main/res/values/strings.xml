@@ -96,4 +96,5 @@
     <string name="reviews_label">Reviews</string>
     <string name="recipe_average_rating_label">Average rating</string>
     <string name="rating_info">Recipe Rating</string>
+    <string name="avarage_rating">No ratings yet</string>
 </resources>

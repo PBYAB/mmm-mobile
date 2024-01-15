@@ -46,7 +46,6 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
@@ -103,13 +102,13 @@ fun AddRecipeScreen() {
     var recipeServings by remember { mutableStateOf("") }
     var recipeTime by remember { mutableStateOf("") }
     var recipeCaloriesPerServing by remember { mutableStateOf("") }
-    var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.g))) }
-    var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.g)) }
+    var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.G))) }
+    var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.G)) }
     var test by remember {
-        mutableStateOf(RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.g))
+        mutableStateOf(RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G))
     }
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
-    var recipeIngredientList= emptyList<RecipeIngredientForm>()
+    val recipeIngredientList= emptyList<RecipeIngredientForm>().toMutableList()
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -281,28 +280,32 @@ fun AddRecipeScreen() {
                 )
             }
 
-            IngredientRow(
-                ingredient = ingredient,
-                onIngredientChange = { newIngredient ->
-                    ingredient = newIngredient
-                },
-                onRemoveIngredient = {},
-                onIngredientSelected = {
-                        selectedIngredient -> test = selectedIngredient
+            ingredients.forEachIndexed { index, ingredient ->
+                IngredientRow(
+                    ingredient = ingredient,
+                    onIngredientChange = { newIngredient ->
+                        ingredients =
+                            ingredients.toMutableList().apply { this[index] = newIngredient }
+                    },
+                    onRemoveIngredient = {
+                        ingredients = ingredients.toMutableList().apply { recipeIngredientList.removeAt(index) }
+                    },
+                    onIngredientSelected = { selectedIngredient ->
+                        val newRecipeIngredient = RecipeIngredientForm(
+                            selectedIngredient.amount.toDouble(),
+                            selectedIngredient.ingredientId,
+                            selectedIngredient.unit ?: RecipeIngredientForm.Unit.G
+                        )
+                        recipeIngredientList += newRecipeIngredient
+                    }
+                )
+            }
 
-                }
-            )
             // Przycisk "Dodaj składnik"
             AddIngredientRow {
-                // Stwórz nowy obiekt RecipeIngredientForm i dodaj go do listy
-                val newRecipeIngredient = RecipeIngredientForm(
-                    test.amount.toDouble(),
-                    test.ingredientId,
-                    test.unit ?: RecipeIngredientForm.Unit.g
-                )
-                recipeIngredientList = recipeIngredientList + newRecipeIngredient
+                ingredients += Ingredient("", "", RecipeIngredientForm.Unit.G)
 
-                test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.g)
+                test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G)
             }
 
 
@@ -319,6 +322,7 @@ fun AddRecipeScreen() {
                         recipeServings.toInt()?:0,
                         recipeTime.toInt() ?:0
                     )
+                    Log.e("RECIPE", createRecipeRequest.toString())
                     viewModel.addRecipe(createRecipeRequest)
                 }
 
@@ -409,6 +413,7 @@ fun IngredientRow(
     val viewModel: AddRecipeViewModel = viewModel()
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
     var recipeIngredient = IngredientListItem(0, "")
+    var isDoneClicked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
 
@@ -447,7 +452,7 @@ fun IngredientRow(
             },
             onSearchTextFieldClicked = {
                 keyboardController?.show()
-            }
+            },
         )
         if (selectedIngredient != null) {
             recipeIngredient = selectedIngredient
@@ -490,24 +495,38 @@ fun IngredientRow(
             Demo_DropDownMenu()
         }
 
+
+
         IconButton(
             onClick = {
-                val selectedIngredientForm = RecipeIngredientForm(
-                    ingredient.quantity.toDouble(),
-                    recipeIngredient.id,
-                    ingredient.unit ?: RecipeIngredientForm.Unit.g
-                )
-                onIngredientSelected(selectedIngredientForm)
-                onRemoveIngredient()
-                keyboardController?.hide()
+                if (isDoneClicked) {
+                    onRemoveIngredient()
+                } else {
+                    val selectedIngredientForm = RecipeIngredientForm(
+                        ingredient.quantity.toDouble(),
+                        recipeIngredient.id,
+                        ingredient.unit ?: RecipeIngredientForm.Unit.G
+                    )
+                    onIngredientSelected(selectedIngredientForm)
+                    keyboardController?.hide()
+                }
+                isDoneClicked = !isDoneClicked
             },
             modifier = Modifier.weight(0.8f)
         ) {
-            Icon(
-                imageVector = Icons.Default.Done,
-                contentDescription = stringResource(R.string.delete),
-                modifier = Modifier.size(24.dp)
-            )
+            if (isDoneClicked) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.delete),
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(R.string.delete),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }
@@ -552,7 +571,6 @@ class AddRecipeViewModel(
             } catch (e: Exception) {
                 Log.e("AddRecipeViewModel", "Error fetching recipe ingredients", e)
             }
-
         }
     }
 

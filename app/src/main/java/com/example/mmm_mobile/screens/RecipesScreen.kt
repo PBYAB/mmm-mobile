@@ -275,10 +275,10 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             minLines = 2,
             maxLines = 2
         )
-        Row(modifier = Modifier.padding(4.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 8.dp)) {
 
             Text(
-                text = recipe.rating.toString(),
+                text = if(recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 20.sp
