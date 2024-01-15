@@ -117,7 +117,7 @@ fun RecipeDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
@@ -276,7 +276,7 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
             text = recipeDetails.rating.toString(),
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Normal,
-            fontSize = 20.sp
+            fontSize = 18.sp
         )
         val rating = recipeDetails.rating
         val fullStars = rating.toInt()
@@ -671,7 +671,7 @@ fun AddReviewInput(
             value = reviewText,
             onValueChange = { reviewText = it },
             label = { Text("Your Review") },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1.1f)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Slider(
@@ -683,6 +683,7 @@ fun AddReviewInput(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Button(
+            modifier = Modifier.weight(0.9f),
             onClick = {
                 if (rating > 0) {
 
