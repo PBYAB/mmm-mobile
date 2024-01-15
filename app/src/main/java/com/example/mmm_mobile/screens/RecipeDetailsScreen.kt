@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
@@ -26,9 +24,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,11 +44,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,7 +59,6 @@ import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
-import com.example.mmm_mobile.ui.theme.josefinSansFontFamily
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -73,8 +70,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.apis.RecipeReviewApi
+import org.openapitools.client.models.CreateRecipeReviewRequest
 import org.openapitools.client.models.RecipeDTO
-import org.openapitools.client.models.RecipeIngredient
 import org.openapitools.client.models.RecipeIngredientDTO
 import org.openapitools.client.models.RecipeReviewDTO
 
@@ -106,9 +103,11 @@ fun RecipeDetailScreen(
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
-
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
             recipeId?.let { id ->
+                item {
+                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+                }
                 recipe?.averageRating?.let {
                     item {
                         Row(
@@ -149,13 +148,14 @@ fun RecipeDetailScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(400.dp)
+                                .height(450.dp)
                         ) {
                             val reviewViewModel =
                                 viewModel { ReviewListViewModel(recipeId = id) }
                             ReviewList(viewModel = reviewViewModel)
 
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -611,6 +611,77 @@ fun ReviewListItem(review: RecipeReviewDTO) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
+        }
+    }
+}
+
+@Composable
+fun AddReviewInput(
+    recipeId: Long,
+    reviewViewModel: ReviewListViewModel,
+    recipeDetailsViewModel: RecipeDetailsViewModel,
+    snackbarHostState: SnackbarHostState
+) {
+    var reviewText by remember { mutableStateOf("") }
+    var rating by remember { mutableStateOf(0) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        TextField(
+            value = reviewText,
+            onValueChange = { reviewText = it },
+            label = { Text("Your Review") },
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Slider(
+            value = rating.toFloat(),
+            onValueChange = { rating = it.toInt() },
+            valueRange = 1f..5f,
+            steps = 10,
+            modifier = Modifier.width(120.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Button(
+            onClick = {
+                if (rating > 0) {
+
+                    val api = RecipeReviewApi()
+                    val review = CreateRecipeReviewRequest(
+                        rating = rating,
+                        comment = reviewText
+                    )
+
+                    reviewViewModel.viewModelScope.launch {
+                        try {
+                            api.addReview(recipeId, review)
+                            recipeDetailsViewModel.fetchRecipe(recipeId)
+                            snackbarHostState.showSnackbar(
+                                message = "Review submitted successfully",
+                                duration = SnackbarDuration.Long
+                            )
+                 // TODO: odświeżenie listy recenzji albo dodać po prostu do page
+                        } catch (e: Exception) {
+                            snackbarHostState.showSnackbar(
+                                message = "Error adding review",
+                                duration = SnackbarDuration.Long
+                            )
+
+                            Log.e("AddReviewInput", "Error adding review", e)
+                        }
+                    }
+
+                    reviewText = ""
+                    rating = 0
+                }
+            }
+        ) {
+            Text("Submit Review")
         }
     }
 }
