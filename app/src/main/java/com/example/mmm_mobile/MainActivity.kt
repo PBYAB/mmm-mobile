@@ -53,11 +53,15 @@ import com.example.mmm_mobile.screens.RegistrationScreen
 import com.example.mmm_mobile.screens.Screen
 import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
+import com.example.mmm_mobile.utils.NotificationReceiver
+import com.example.mmm_mobile.utils.NotificationScheduler
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NotificationScheduler.setReminder(this, NotificationReceiver::class.java, 1 * 60 * 1000)
+
         setContent {
             MmmmobileTheme {
                 MainActivityComposable()
