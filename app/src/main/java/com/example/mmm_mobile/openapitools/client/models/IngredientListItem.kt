@@ -26,6 +26,7 @@ import com.squareup.moshi.JsonClass
  * @param name 
  */
 
+
 data class IngredientListItem (
 
     @Json(name = "id")

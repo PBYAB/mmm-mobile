@@ -22,18 +22,22 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param rating 
- * @param comment 
+ * @param email 
+ * @param fullName 
+ * @param id 
  */
 
 
-data class CreateRecipeReviewRequest (
+data class UserDTO (
 
-    @Json(name = "rating")
-    val rating: kotlin.Int,
+    @Json(name = "email")
+    val email: kotlin.String,
 
-    @Json(name = "comment")
-    val comment: kotlin.String? = null
+    @Json(name = "fullName")
+    val fullName: kotlin.String,
+
+    @Json(name = "id")
+    val id: kotlin.Long
 
 )
 
