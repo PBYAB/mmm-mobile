@@ -31,6 +31,7 @@ class NotificationReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val shouldSendNotification = api.canShakeRecipe().canUserShakeRecipe
+                Log.d("NotificationReceiver", shouldSendNotification.toString())
                 if (shouldSendNotification) {
                     withContext(Dispatchers.Main) {
                         showNotification(context)
@@ -57,7 +58,7 @@ class NotificationReceiver : BroadcastReceiver() {
             .setContentText(context.getString(R.string.draw_recipe_text) + "\uD83D\uDE42")
             .setSmallIcon(R.mipmap.mmm_mobile_icon_round)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(false)
+            .setAutoCancel(true)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
