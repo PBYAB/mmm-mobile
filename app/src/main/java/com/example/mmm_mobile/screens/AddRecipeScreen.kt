@@ -121,7 +121,7 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
         mutableStateOf(RecipeIngredientForm(0.0, 0, RecipeIngredientForm.Unit.G))
     }
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
-    val recipeIngredientList= emptyList<RecipeIngredientForm>().toMutableList()
+    val recipeIngredientList = emptyList<RecipeIngredientForm>().toMutableList()
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -340,7 +340,7 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
             AddIngredientRow {
                 ingredients += Ingredient("", "", RecipeIngredientForm.Unit.G)
 
-                test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G)
+                test = RecipeIngredientForm(0.0, 0, RecipeIngredientForm.Unit.G)
             }
             val context = androidx.compose.ui.platform.LocalContext.current
 
@@ -367,10 +367,14 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
                             recipeTime.toInt()
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
-                        viewModel.addRecipe(createRecipeRequest,snackbarHostState)
+                        viewModel.addRecipe(createRecipeRequest, snackbarHostState, navController)
                         navController.navigate(Screen.RecipeList.route)
                     } else {
-                        Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            context,
+                            context.getText(R.string.valitation_error).toString(),
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                     }
                 }
@@ -386,21 +390,22 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
         }
     }
 }
+
 private fun isFormValid(
     recipeInstructions: String,
     recipeCaloriesPerServing: String,
     recipeName: String,
     recipeServings: String,
     recipeTime: String,
-    recipeIngredientList: MutableList<RecipeIngredientForm>, ): Boolean {
+    recipeIngredientList: MutableList<RecipeIngredientForm>,
+): Boolean {
     return recipeInstructions.isNotBlank() &&
             recipeName.isNotBlank() &&
             recipeIngredientList.isNotEmpty() &&
-            recipeCaloriesPerServing.toDouble()!=0.0 &&
-            recipeServings.toInt() !=0 &&
+            recipeCaloriesPerServing.toDouble() != 0.0 &&
+            recipeServings.toInt() != 0 &&
             recipeTime.toInt() != 0
 }
-
 
 
 data class Ingredient(
@@ -408,8 +413,6 @@ data class Ingredient(
     var quantity: String = "",
     var unit: RecipeIngredientForm.Unit
 )
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -599,9 +602,13 @@ fun IngredientRow(
                     }
                     isDoneClicked = !isDoneClicked
                 } else {
-                    Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        context.getText(R.string.valitation_error).toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                      },
+            },
             modifier = Modifier.weight(0.8f)
         ) {
             if (isDoneClicked) {
@@ -620,10 +627,12 @@ fun IngredientRow(
         }
     }
 }
+
 private fun isIngredientFormValid(
     quantity: String,
     id: Long,
-    unit: RecipeIngredientForm.Unit): Boolean {
+    unit: RecipeIngredientForm.Unit
+): Boolean {
     return quantity.isNotBlank() &&
             id.toInt() != 0 &&
             unit.value.isNotBlank()
@@ -644,7 +653,8 @@ fun AddIngredientRow(onAddIngredient: () -> Unit) {
         ) {
             Icon(
                 Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_ingredient))
+                contentDescription = stringResource(R.string.add_ingredient)
+            )
         }
     }
 }
@@ -672,19 +682,30 @@ class AddRecipeViewModel(
         }
     }
 
-    fun addRecipe(createRecipeRequest: CreateRecipeRequest, snackbarHostState: SnackbarHostState) {
+    fun addRecipe(
+        createRecipeRequest: CreateRecipeRequest,
+        snackbarHostState: SnackbarHostState,
+        navController: NavController
+    ) {
         viewModelScope.launch {
             try {
-                val response =
-                    recipeApi.createRecipeWithHttpInfo(createRecipeRequest).statusCode == 201
+                val response = recipeApi.createRecipeWithHttpInfo(createRecipeRequest)
 
-                if (response) {
+                if (response.statusCode == 201) {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(
                             message = "Recipe ${createRecipeRequest.name} added successfully",
                             actionLabel = "OK",
                             duration = SnackbarDuration.Short
                         )
+                    }
+
+                    val location = response.headers["Location"]?.firstOrNull()
+                    val recipeId = location?.substringAfterLast("/")?.toLongOrNull()
+                    Log.d("AddRecipeViewModel", "Headers: ${response.headers}")
+
+                    recipeId?.let {
+                        navController.navigate("Recipe/$recipeId")
                     }
                 } else {
                     viewModelScope.launch {
@@ -768,13 +789,14 @@ fun <T : IngredientListItem> SearchOneItemDropDownMenu(
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ) { if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
-            placeholder()
-        } else {
-            selectedOption?.let { selectedItem ->
-                dropdownItem(selectedItem)
+        ) {
+            if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
+                placeholder()
+            } else {
+                selectedOption?.let { selectedItem ->
+                    dropdownItem(selectedItem)
+                }
             }
-        }
         }
 
         OutlinedTextField(
