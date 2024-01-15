@@ -6,8 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,9 +37,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -188,7 +194,7 @@ fun ProductsScreen(navController: NavController, query : String?) {
                 .padding(8.dp)
                 .clickable(onClick = {})
                 .background(MaterialTheme.colorScheme.background)
-                .clickable { // Dodajemy logikę kliknięcia
+                .clickable {
                     navController.navigate("Product/${product.id}")
                 }
         ) {
@@ -201,11 +207,25 @@ fun ProductsScreen(navController: NavController, query : String?) {
                 contentScale = ContentScale.Crop
             )
 
-            Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Medium,
-                    modifier = Modifier.padding(8.dp),
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 18.sp,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(product.name)
+                }
+            },
+                modifier = Modifier.padding(8.dp),
                 maxLines = 1,
                 minLines = 1,
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
 
 
             Surface(shape = MaterialTheme.shapes.medium,
@@ -222,6 +242,8 @@ fun ProductsScreen(navController: NavController, query : String?) {
                     maxLines = 1,
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
 
             Row(modifier = Modifier
@@ -247,6 +269,7 @@ fun ProductsScreen(navController: NavController, query : String?) {
                         .weight(1f)
                 )
             }
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 
@@ -280,16 +303,6 @@ fun ProductsScreen(navController: NavController, query : String?) {
             }
         }
     }
-
-
-//    @Preview(showBackground = true, showSystemUi = true)
-//    @Composable
-//    fun GreetingPreview() {
-//
-//        MmmmobileTheme {
-//            ProductsScreen(navController = NavHostController(LocalContext.current))
-//        }
-//    }
 
 
 fun getNutriScoreImage(nutriScore: Int): Int {

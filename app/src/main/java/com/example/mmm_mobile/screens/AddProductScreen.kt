@@ -1,6 +1,7 @@
 package com.example.mmm_mobile.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -24,8 +24,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
@@ -68,7 +66,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -128,28 +125,28 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
 
     val novaGroupOptions = listOf("1", "2", "3", "4", "5")
     val nutriScoreOptions = listOf("A","B", "C", "D", "E")
-    var name by remember { mutableStateOf("") }
-    var barcode by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var barcode by rememberSaveable { mutableStateOf("") }
+    var quantity by rememberSaveable { mutableStateOf("") }
     var selectedCategories = emptySet<CategoryDTO>()
     var selectedCountries = emptySet<CountryDTO>()
     var selectedAllergens = emptySet<AllergenDTO>()
     var selectedBrands = emptySet<BrandDTO>()
     var selectedProductIngredients = emptySet<ProductIngredientDTO>()
-    val palmOil = remember { mutableStateOf(false) }
-    val vegan = remember { mutableStateOf(false) }
-    val vegetarian = remember { mutableStateOf(false) }
-    var productIngredients by remember { mutableStateOf("") }
+    val palmOil = rememberSaveable { mutableStateOf(false) }
+    val vegan = rememberSaveable { mutableStateOf(false) }
+    val vegetarian = rememberSaveable { mutableStateOf(false) }
+    var productIngredients by rememberSaveable { mutableStateOf("") }
     var novaGroup by remember { mutableStateOf("") }
     var nutriScore by remember { mutableStateOf("") }
     val nutriment by remember { mutableStateOf(Nutriment()) }
-    var fiberPer100g by remember { mutableStateOf(nutriment.fiberPer100g) }
-    var saltPer100g by remember { mutableStateOf(nutriment.saltPer100g) }
-    var sugarPer100g by remember { mutableStateOf(nutriment.sugarsPer100g) }
-    var proteinsPer100g by remember { mutableStateOf(nutriment.proteinsPer100g) }
-    var caloriesPer100g by remember { mutableStateOf(nutriment.energyKcalPer100g) }
-    var sodiumPer100g by remember { mutableStateOf(nutriment.sodiumPer100g) }
-    var fatPer100g by remember { mutableStateOf(nutriment.fatPer100g) }
+    var fiberPer100g by rememberSaveable { mutableStateOf(nutriment.fiberPer100g) }
+    var saltPer100g by rememberSaveable { mutableStateOf(nutriment.saltPer100g) }
+    var sugarPer100g by rememberSaveable { mutableStateOf(nutriment.sugarsPer100g) }
+    var proteinsPer100g by rememberSaveable { mutableStateOf(nutriment.proteinsPer100g) }
+    var caloriesPer100g by rememberSaveable { mutableStateOf(nutriment.energyKcalPer100g) }
+    var sodiumPer100g by rememberSaveable { mutableStateOf(nutriment.sodiumPer100g) }
+    var fatPer100g by rememberSaveable { mutableStateOf(nutriment.fatPer100g) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Card(
@@ -781,8 +778,9 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
 
             ElevatedButtonExample(
                 onClick = {
+                    if(isProductValid(selectedAllergens,barcode, selectedBrands, selectedCategories, selectedCountries, productIngredients, selectedProductIngredients,name, novaGroup, nutriScore, caloriesPer100g, fatPer100g,fiberPer100g,proteinsPer100g, saltPer100g, sodiumPer100g, sugarPer100g, quantity)){
                     val createProductRequest = CreateProductRequest(
-                        selectedAllergens.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(), // Analogicznie dla innych pól
+                        selectedAllergens.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         barcode,
                         selectedBrands.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         selectedCategories.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
@@ -791,15 +789,15 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         name ?: "",
                         novaGroup.toInt() ?: 1,
-                        nutriScore.toInt() ?: 1,
+                        nutriScore.toInt() ?:1,
                         CreateNutrimentRequest(
-                            energyKcalPer100g = caloriesPer100g.toDouble() ?: 0.0,
-                            fatPer100g = fatPer100g.toDouble() ?: 0.0,
-                            fiberPer100g = fiberPer100g.toDouble() ?: 0.0,
-                            proteinsPer100g = proteinsPer100g.toDouble() ?: 0.0,
-                            saltPer100g = saltPer100g.toDouble() ?: 0.0,
-                            sodiumPer100g = sodiumPer100g.toDouble() ?: 0.0,
-                            sugarsPer100g = sugarPer100g.toDouble() ?: 0.0
+                            caloriesPer100g.toDouble() ?: 0.0,
+                            fatPer100g.toDouble() ?: 0.0,
+                            fiberPer100g.toDouble() ?: 0.0,
+                            proteinsPer100g.toDouble() ?: 0.0,
+                            saltPer100g.toDouble() ?: 0.0,
+                            sodiumPer100g.toDouble() ?: 0.0,
+                            sugarPer100g.toDouble() ?: 0.0
                         ),
                         quantity ?: ""
                     )
@@ -807,13 +805,55 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     viewModel.addProduct(createProductRequest, snackbarHostState)
 
                     navController.navigate(Screen.ProductList.route)
+                    } else {
+                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                            .show()
+                    }
                 }
             )
         }
     }
 }
 
-
+private fun isProductValid(
+    selectedAllergens: Set<AllergenDTO>,
+    barcode: String,
+    selectedBrands: Set<BrandDTO>,
+    selectedCategories: Set<CategoryDTO>,
+    selectedCountries: Set<CountryDTO>,
+    productIngredients: String,
+    selectedProductIngredients: Set<ProductIngredientDTO>,
+    name: String,
+    novaGroup: String,
+    nutriScore: String,
+    caloriesPer100g: String,
+    fatPer100g: String,
+    fiberPer100g: String,
+    proteinsPer100g: String,
+    saltPer100g: String,
+    sodiumPer100g: String,
+    sugarPer100g: String,
+    quantity: String
+): Boolean {
+    return selectedAllergens.isNotEmpty() &&
+            barcode.isNotBlank() &&
+            selectedBrands.isNotEmpty() &&
+            selectedCountries.isNotEmpty() &&
+            selectedCategories.isNotEmpty() &&
+            selectedProductIngredients.isNotEmpty() &&
+            productIngredients.isNotBlank() &&
+            name.isNotBlank() &&
+            novaGroup.isNotBlank() &&
+            nutriScore.isNotBlank() &&
+            caloriesPer100g.isNotBlank() &&
+            fatPer100g.isNotBlank() &&
+            proteinsPer100g.isNotBlank() &&
+            saltPer100g.isNotBlank() &&
+            sodiumPer100g.isNotBlank() &&
+            sugarPer100g.isNotBlank() &&
+            quantity.isNotBlank() &&
+            fiberPer100g.isNotBlank()
+}
 @Composable
 fun CheckboxWithLabel(label: String, checked: MutableState<Boolean>, onCheckedChange: (Boolean) -> Unit) {
     Row(
@@ -850,11 +890,11 @@ fun Demo_DropDownMenu2(
     list: List<String>,
     onItemSelected: (String) -> Unit // Add a function to pass the selected item
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     val scoreList = list
     val firstScore = name
-    var selectedText by remember { mutableStateOf(firstScore) }
+    var selectedText by rememberSaveable { mutableStateOf(firstScore) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

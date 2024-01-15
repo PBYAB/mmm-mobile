@@ -58,7 +58,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.example.mmm_mobile.models.Nutriment
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -139,13 +142,18 @@ fun ProductDetails(productDetails: ProductDTO) {
         item {
             productDetails.name?.let {
                 Text(
-                    text = it,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth()
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                fontSize = 30.sp,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Black
+                            )
+                        ) {
+                            append(productDetails.name)
+                        }
+                    },
+                    modifier = Modifier.padding(10.dp)
                 )
             }
         }
