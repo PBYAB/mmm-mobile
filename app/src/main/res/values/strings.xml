@@ -106,4 +106,5 @@
     <string name="palm_oil">"Palm Oil: "</string>
     <string name="vegan">"Vegan: "</string>
     <string name="vegetarian">"Vegetarian: "</string>
+    <string name="reviews_delete_button_label">Delete</string>
 </resources>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +72,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.apis.RecipeReviewApi
+import org.openapitools.client.apis.UserApi
 import org.openapitools.client.models.CreateRecipeReviewRequest
 import org.openapitools.client.models.RecipeDTO
 import org.openapitools.client.models.RecipeIngredientDTO
@@ -94,9 +96,18 @@ fun RecipeDetailScreen(
         }
     } else {
         val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+        var canReview by remember { mutableStateOf(false) }
+        val reviewsApi = RecipeReviewApi()
 
         LaunchedEffect(recipeId) {
-            recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+            try {
+                recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+                canReview = withContext(Dispatchers.IO) {
+                    reviewsApi.checkIfUserReviewed(recipeId ?: 0).canUserCreateReview
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeDetailScreen", "Error fetching recipe", e)
+            }
         }
 
         val recipe by recipeDetailsViewModel.recipe.collectAsState()
@@ -105,9 +116,18 @@ fun RecipeDetailScreen(
             item { AddRecipeButton(favouriteRecipeViewModel, recipe, snackbarHostState) }
             item { recipe?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
             recipeId?.let { id ->
-                item {
-                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+
+                if (canReview) {
+                    item {
+                        AddReviewInput(
+                            id,
+                            ReviewListViewModel(recipeId),
+                            recipeDetailsViewModel,
+                            snackbarHostState
+                        )
+                    }
                 }
+
                 recipe?.averageRating?.let {
                     item {
                         Row(
@@ -552,9 +572,11 @@ class RecipeDetailsViewModel(private val recipeApi: RecipeApi = RecipeApi()) : V
 }
 
 
-class ReviewListViewModel(private val recipeId: Long) : ViewModel() {
-    private val reviewApi = RecipeReviewApi()
+class ReviewListViewModel(val recipeId: Long) : ViewModel() {
+    val reviewApi = RecipeReviewApi()
+    private val userApi = UserApi()
     var state by mutableStateOf(ScreenState<RecipeReviewDTO>())
+    var loggedInId by mutableStateOf(0L)
 
     private val paginator = DefaultPaginator(
         initialKey = state.page,
@@ -592,6 +614,12 @@ class ReviewListViewModel(private val recipeId: Long) : ViewModel() {
     init {
         viewModelScope.launch {
             paginator.loadNextItems()
+
+            try {
+                loggedInId = userApi.getProfile().id
+            } catch (e: Exception) {
+                Log.e("ReviewListViewModel", "Error fetching logged in user", e)
+            }
         }
     }
 
@@ -605,14 +633,32 @@ class ReviewListViewModel(private val recipeId: Long) : ViewModel() {
 @Composable
 fun ReviewList(viewModel: ReviewListViewModel) {
     val state = viewModel.state
-
+    val context = LocalContext.current
     LazyColumn {
         items(state.items.size) { i ->
             val item = state.items[i]
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
             }
-            ReviewListItem(review = item)
+            ReviewListItem(
+                review = item,
+                loggedInId = viewModel.loggedInId,
+                onDeleteClick = {
+                    viewModel.viewModelScope.launch {
+                        try {
+                            val response = viewModel.reviewApi.deleteReviewWithHttpInfo(
+                                viewModel.recipeId,
+                                item.id
+                            )
+                            if (response.statusCode == 204) {
+                                Toast.makeText(context, "Review deleted", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Log.e("ReviewListViewModel", "Error deleting review", e)
+                        }
+                    }
+                }
+            )
         }
         item {
             if (state.isLoading) {
@@ -623,7 +669,7 @@ fun ReviewList(viewModel: ReviewListViewModel) {
 }
 
 @Composable
-fun ReviewListItem(review: RecipeReviewDTO) {
+fun ReviewListItem(review: RecipeReviewDTO, loggedInId: Long, onDeleteClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -646,6 +692,16 @@ fun ReviewListItem(review: RecipeReviewDTO) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
+
+            if (review.userId == loggedInId) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = { onDeleteClick() },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(text = stringResource(id = R.string.reviews_delete_button_label))
+                }
+            }
         }
     }
 }
@@ -701,7 +757,7 @@ fun AddReviewInput(
                                 message = "Review submitted successfully",
                                 duration = SnackbarDuration.Long
                             )
-                 // TODO: odświeżenie listy recenzji albo dodać po prostu do page
+                            // TODO: odświeżenie listy recenzji albo dodać po prostu do page
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar(
                                 message = "Error adding review",
