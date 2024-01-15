@@ -89,7 +89,6 @@ import org.openapitools.client.apis.IngredientApi
 import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.models.CreateRecipeRequest
 import org.openapitools.client.models.IngredientListItem
-import org.openapitools.client.models.RecipeIngredient
 import org.openapitools.client.models.RecipeIngredientForm
 
 
@@ -97,11 +96,11 @@ import org.openapitools.client.models.RecipeIngredientForm
 fun AddRecipeScreen() {
 
     val viewModel: AddRecipeViewModel = viewModel()
-    var recipeName by remember { mutableStateOf("") }
-    var recipeInstructions by remember { mutableStateOf("") }
-    var recipeServings by remember { mutableStateOf("") }
-    var recipeTime by remember { mutableStateOf("") }
-    var recipeCaloriesPerServing by remember { mutableStateOf("") }
+    var recipeName by rememberSaveable { mutableStateOf("") }
+    var recipeInstructions by rememberSaveable { mutableStateOf("") }
+    var recipeServings by rememberSaveable { mutableStateOf("") }
+    var recipeTime by rememberSaveable { mutableStateOf("") }
+    var recipeCaloriesPerServing by rememberSaveable { mutableStateOf("") }
     var ingredients by remember { mutableStateOf(listOf(Ingredient("","",RecipeIngredientForm.Unit.G))) }
     var ingredient by remember { mutableStateOf(Ingredient("","",RecipeIngredientForm.Unit.G)) }
     var test by remember {
@@ -307,25 +306,36 @@ fun AddRecipeScreen() {
 
                 test = RecipeIngredientForm(0.0,0,RecipeIngredientForm.Unit.G)
             }
-
+            val context = androidx.compose.ui.platform.LocalContext.current
 
             Button(
                 modifier = Modifier
                     .padding(top = mediumPadding),
                 onClick = {
-                    val createRecipeRequest = CreateRecipeRequest(
-                        recipeInstructions,
-                        null,
-                        recipeIngredientList,
-                        recipeCaloriesPerServing.toDouble() ?: 0.0,
-                        recipeName?:"",
-                        recipeServings.toInt()?:0,
-                        recipeTime.toInt() ?:0
-                    )
-                    Log.e("RECIPE", createRecipeRequest.toString())
-                    viewModel.addRecipe(createRecipeRequest)
+                    if (isFormValid(
+                            recipeInstructions,
+                            recipeCaloriesPerServing,
+                            recipeName,
+                            recipeServings,
+                            recipeTime,
+                            recipeIngredientList
+                        )
+                    ) {
+                        val createRecipeRequest = CreateRecipeRequest(
+                            recipeInstructions,
+                            null,
+                            recipeIngredientList,
+                            recipeCaloriesPerServing.toDouble() ?: 0.0,
+                            recipeName ?: "",
+                            recipeServings.toInt() ?: 0,
+                            recipeTime.toInt() ?: 0
+                        )
+                        Log.e("RECIPE", createRecipeRequest.toString())
+                    } else {
+                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                            .show()
+                    }
                 }
-
             ) {
                 Text(
                     text = stringResource(R.string.add_recipe_button),
@@ -338,6 +348,21 @@ fun AddRecipeScreen() {
         }
     }
 }
+private fun isFormValid(
+    recipeInstructions: String,
+    recipeCaloriesPerServing: String,
+    recipeName: String,
+    recipeServings: String,
+    recipeTime: String,
+    recipeIngredientList: MutableList<RecipeIngredientForm>, ): Boolean {
+    return recipeInstructions.isNotBlank() &&
+            recipeName.isNotBlank() &&
+            recipeIngredientList.isNullOrEmpty() &&
+            recipeCaloriesPerServing.toDouble()!=0.0 &&
+            recipeServings.toInt() !=0 &&
+            recipeTime.toInt() != 0
+}
+
 
 
 data class Ingredient(
@@ -346,14 +371,6 @@ data class Ingredient(
     var unit: RecipeIngredientForm.Unit
 )
 
-fun getRecipeIngredientUnit(unitString: String): RecipeIngredientForm.Unit? {
-    return try {
-        RecipeIngredientForm.Unit.valueOf(unitString.uppercase())
-    } catch (e: IllegalArgumentException) {
-        // Tutaj możesz obsłużyć przypadek, gdy jednostka nie istnieje
-        null
-    }
-}
 
 
 
@@ -365,7 +382,7 @@ fun Demo_DropDownMenu() {
 
     val unitList = IngredientUnit.entries.map { it.name }
     val firstUnit = unitList[0]
-    var selectedText by remember { mutableStateOf(firstUnit) }
+    var selectedText by rememberSaveable { mutableStateOf(firstUnit) }
 
 
     ExposedDropdownMenuBox(
@@ -414,6 +431,7 @@ fun IngredientRow(
     val recipeIngredientState by viewModel.recipeIngredients.collectAsState(initial = emptyList())
     var recipeIngredient = IngredientListItem(0, "")
     var isDoneClicked by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(Unit) {
 
@@ -499,19 +517,23 @@ fun IngredientRow(
 
         IconButton(
             onClick = {
-                if (isDoneClicked) {
-                    onRemoveIngredient()
+                if (isIngredientFormValid(ingredient.quantity,recipeIngredient.id,ingredient.unit)) {
+                    if (isDoneClicked) {
+                        onRemoveIngredient()
+                    } else {
+                        val selectedIngredientForm = RecipeIngredientForm(
+                            ingredient.quantity.toDouble(),
+                            recipeIngredient.id,
+                            ingredient.unit ?: RecipeIngredientForm.Unit.G
+                        )
+                        onIngredientSelected(selectedIngredientForm)
+                        keyboardController?.hide()
+                    }
+                    isDoneClicked = !isDoneClicked
                 } else {
-                    val selectedIngredientForm = RecipeIngredientForm(
-                        ingredient.quantity.toDouble(),
-                        recipeIngredient.id,
-                        ingredient.unit ?: RecipeIngredientForm.Unit.G
-                    )
-                    onIngredientSelected(selectedIngredientForm)
-                    keyboardController?.hide()
+                    Toast.makeText(context, "UZUPELNIJ WSZYSTKIE DANE SKLADNIKA!!!", Toast.LENGTH_LONG).show()
                 }
-                isDoneClicked = !isDoneClicked
-            },
+                      },
             modifier = Modifier.weight(0.8f)
         ) {
             if (isDoneClicked) {
@@ -529,6 +551,14 @@ fun IngredientRow(
             }
         }
     }
+}
+private fun isIngredientFormValid(
+    quantity: String,
+    id: Long,
+    unit: RecipeIngredientForm.Unit): Boolean {
+    return quantity.isNotBlank() &&
+            id.toInt() != 0 &&
+            unit.value.isNotBlank()
 }
 
 @Composable
@@ -612,8 +642,8 @@ fun <T: IngredientListItem> SearchOneItemDropDownMenu(
     onSearchTextFieldClicked: () -> Unit,
 ): IngredientListItem? {
 
-    var selectedOption by rememberSaveable { mutableStateOf<IngredientListItem?>(null) }
-    var searchedOption by rememberSaveable { mutableStateOf("") }
+    var selectedOption by remember { mutableStateOf<IngredientListItem?>(null) }
+    var searchedOption by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(expanded) }
     var filteredItems by remember { mutableStateOf(setOfItems) }
