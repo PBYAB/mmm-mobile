@@ -2,6 +2,7 @@ package com.example.mmm_mobile.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -315,7 +316,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -380,7 +381,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Allergens", allergen.name)
                         }
                     },
-                    dropdownItem = { allergen ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_allergen)),
                             fontFamily = poppinsFontFamily,
@@ -431,7 +432,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Categories", category.name)
                         }
                     },
-                    dropdownItem = { category ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_category)),
                             fontFamily = poppinsFontFamily,
@@ -466,7 +467,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -482,7 +483,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             Log.d("Selected Country", country.name)
                         }
                     },
-                    dropdownItem = { country ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_country)),
                             fontFamily = poppinsFontFamily,
@@ -498,9 +499,9 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 )
             }
 
-            CheckboxWithLabel("Palm Oil: ", palmOil) { isChecked -> palmOil.value = isChecked }
-            CheckboxWithLabel("Vegan: ", vegan) { isChecked -> vegan.value = isChecked }
-            CheckboxWithLabel("Vegetarian: ", vegetarian) { isChecked ->
+            CheckboxWithLabel(stringResource(R.string.palm_oil),palmOil) { isChecked -> palmOil.value = isChecked }
+            CheckboxWithLabel(stringResource(R.string.vegan), vegan) { isChecked -> vegan.value = isChecked }
+            CheckboxWithLabel(stringResource(R.string.vegetarian), vegetarian) { isChecked ->
                 vegetarian.value = isChecked
             }
 
@@ -806,7 +807,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     modifier = Modifier.weight(1f)
                 ) {
                     Demo_DropDownMenu2(
-                        "Nutri score",
+                        stringResource(R.string.nutri_score),
                         nutriScoreOptions,
                         onItemSelected = { nutriScore = it }
                     )
@@ -816,7 +817,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                     modifier = Modifier.weight(1f)
                 ) {
                     Demo_DropDownMenu2(
-                        "Nova Group",
+                        stringResource(R.string.nova_group),
                         novaGroupOptions,
                         onItemSelected = { novaGroup = it }
                     )
@@ -843,7 +844,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                             it.name.contains(
                                 searchText,
                                 true
-                            ) == true
+                            )
                         }
                     },
                     placeholder = {
@@ -854,12 +855,12 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         )
                     },
 
-                    onDropDownItemSelected = { selectedProductIngredients ->
+                    onDropDownItemSelected = { _ ->
                         for (country in selectedCountries) {
                             Log.d("Selected Country", country.name)
                         }
                     },
-                    dropdownItem = { country ->
+                    dropdownItem = { _ ->
                         Text(
                             text = (stringResource(R.string.enter_product_ingredients)),
                             fontFamily = poppinsFontFamily,
@@ -878,62 +879,36 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
 
             ElevatedButtonExample(
                 onClick = {
-                    if (isProductValid(
-                            selectedAllergens,
-                            barcode,
-                            selectedBrands,
-                            selectedCategories,
-                            selectedCountries,
-                            productIngredients,
-                            selectedProductIngredients,
-                            name,
-                            novaGroup,
-                            nutriScore,
-                            caloriesPer100g,
-                            fatPer100g,
-                            fiberPer100g,
-                            proteinsPer100g,
-                            saltPer100g,
-                            sodiumPer100g,
-                            sugarPer100g,
-                            quantity
-                        )
-                    ) {
-                        val createProductRequest = CreateProductRequest(
-                            selectedAllergens.map { it.id }.toSet(),
-                            barcode,
-                            selectedBrands.map { it.id }.toSet(),
-                            selectedCategories.map { it.id }.toSet(),
-                            selectedCountries.map { it.id }.toSet(),
-                            CreateProductIngredientAnalysisRequest(
-                                palmOil.value,
-                                productIngredients,
-                                vegan.value,
-                                vegetarian.value
-                            ),
-                            selectedProductIngredients.map { it.id }.toSet(),
-                            name,
-                            novaGroup.toInt(),
-                            nutriScore.toInt(),
-                            CreateNutrimentRequest(
-                                caloriesPer100g.toDouble(),
-                                fatPer100g.toDouble(),
-                                fiberPer100g.toDouble(),
-                                proteinsPer100g.toDouble(),
-                                saltPer100g.toDouble(),
-                                sodiumPer100g.toDouble(),
-                                sugarPer100g.toDouble()
-                            ),
-                            quantity
-                        )
+                    if(isProductValid(selectedAllergens,barcode, selectedBrands, selectedCategories, selectedCountries, productIngredients, selectedProductIngredients,name, novaGroup, nutriScore, caloriesPer100g, fatPer100g,fiberPer100g,proteinsPer100g, saltPer100g, sodiumPer100g, sugarPer100g, quantity)){
+                    val createProductRequest = CreateProductRequest(
+                        selectedAllergens.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                        barcode,
+                        selectedBrands.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                        selectedCategories.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                        selectedCountries.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                        CreateProductIngredientAnalysisRequest(palmOil.value, productIngredients ?: "", vegan.value, vegetarian.value),
+                        selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                        name ?: "",
+                        novaGroup.toInt() ?: 1,
+                        nutriScore.toInt() ?: 1,
+                        CreateNutrimentRequest(
+                            caloriesPer100g.toDouble() ?: 0.0,
+                            fatPer100g.toDouble() ?: 0.0,
+                            fiberPer100g.toDouble() ?: 0.0,
+                            proteinsPer100g.toDouble() ?: 0.0,
+                            saltPer100g.toDouble() ?: 0.0,
+                            sodiumPer100g.toDouble() ?: 0.0,
+                            sugarPer100g.toDouble() ?: 0.0
+                        ),
+                        quantity ?: ""
+                    )
 
-                        viewModel.addProduct(createProductRequest, snackbarHostState)
-
-                        navController.navigate(Screen.ProductList.route)
+                    viewModel.addProduct(createProductRequest, snackbarHostState, navController)
                     } else {
-                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                        Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
                             .show()
                     }
+
                 }
             )
         }
@@ -1020,7 +995,7 @@ fun <T> DropDownItem(item: T, content: @Composable (T) -> Unit) {
 fun Demo_DropDownMenu2(
     name: String,
     list: List<String>,
-    onItemSelected: (String) -> Unit // Add a function to pass the selected item
+    onItemSelected: (String) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -1065,8 +1040,8 @@ fun Demo_DropDownMenu2(
                             selectedText = item
                             onItemSelected(item)
                             expanded = false
-                        } catch (e: NumberFormatException) {
-
+                        } catch (_: NumberFormatException) {
+                            Log.e("DropdownMenu", "Unable to parse $item to number")
                         }
                     }
                 )
@@ -1225,7 +1200,6 @@ fun <T> SearchableExpandedDropDownMenu(
                         value = searchedOption,
                         onValueChange = { selectedSport ->
                             searchedOption = selectedSport
-                            // Update filteredItems when search text changes
                             filteredItems = setOfItems.filter {
                                 displayText(it).contains(
                                     searchedOption,
@@ -1270,7 +1244,7 @@ fun <T> SearchableExpandedDropDownMenu(
                                         selectedOptions = selectedOptions + selectedItem
                                     }
                                 }
-                                .padding(10.dp), // Add padding for better spacing
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
@@ -1279,12 +1253,11 @@ fun <T> SearchableExpandedDropDownMenu(
                                 modifier = Modifier.weight(0.2f)
                             )
 
-                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+                            Spacer(modifier = Modifier.width(100.dp))
 
                             DropdownMenuItem(
                                 modifier = Modifier.weight(0.5f),
                                 text = {
-                                    // Add your text content here
                                     Text(
                                         displayText(selectedItem),
                                         fontFamily = poppinsFontFamily,
@@ -1416,15 +1389,15 @@ class AddProductViewModel(
 
     fun addProduct(
         createProductRequest: CreateProductRequest,
-        snackbarHostState: SnackbarHostState
+        snackbarHostState: SnackbarHostState,
+        navController: NavController
     ) {
         viewModelScope.launch {
 
             try {
-                val response =
-                    productApi.createProductWithHttpInfo(createProductRequest).statusCode == 201
+                val response = productApi.createProductWithHttpInfo(createProductRequest)
 
-                if (response) {
+                if (response.statusCode == 201) {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(
                             message = "Product ${createProductRequest.name} added",
@@ -1432,6 +1405,15 @@ class AddProductViewModel(
                             duration = SnackbarDuration.Short
                         )
                     }
+
+                    val location = response.headers["Location"]?.firstOrNull()
+                    val productId = location?.substringAfterLast("/")?.toLongOrNull()
+                    Log.d("AddRecipeViewModel", "Headers: ${response.headers}")
+
+                    productId?.let {
+                        navController.navigate("Product/$productId")
+                    }
+
                 } else {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(

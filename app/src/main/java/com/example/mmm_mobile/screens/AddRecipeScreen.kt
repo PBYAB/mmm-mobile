@@ -79,6 +79,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -95,13 +96,14 @@ import org.openapitools.client.models.RecipeIngredientForm
 
 
 @Composable
-fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
+fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHostState) {
 
     val viewModel: AddRecipeViewModel = viewModel()
     var recipeName by rememberSaveable { mutableStateOf("") }
     var recipeInstructions by rememberSaveable { mutableStateOf("") }
     var recipeServings by rememberSaveable { mutableStateOf("") }
     var recipeTime by rememberSaveable { mutableStateOf("") }
+    var isVisible by rememberSaveable { mutableStateOf(true) }
     var recipeCaloriesPerServing by rememberSaveable { mutableStateOf("") }
     var ingredients by remember {
         mutableStateOf(
@@ -184,7 +186,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
 
             OutlinedTextField(
                 value = recipeInstructions,
-                singleLine = false, // Ustaw singleLine na false, aby pozwolić na wieloliniowy tekst
+                singleLine = false,
                 shape = shapes.large,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -273,7 +275,7 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number // Ustawienie inputType na liczbowy
+                        keyboardType = KeyboardType.Number
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {}
@@ -335,13 +337,12 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                 )
             }
 
-            // Przycisk "Dodaj składnik"
             AddIngredientRow {
                 ingredients += Ingredient("", "", RecipeIngredientForm.Unit.G)
 
                 test = RecipeIngredientForm(0.0, 0, RecipeIngredientForm.Unit.G)
             }
-            val context = LocalContext.current
+            val context = androidx.compose.ui.platform.LocalContext.current
 
             Button(
                 modifier = Modifier
@@ -366,8 +367,13 @@ fun AddRecipeScreen(snackbarHostState: SnackbarHostState) {
                             recipeTime.toInt()
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
+                        viewModel.addRecipe(createRecipeRequest, snackbarHostState, navController)
                     } else {
-                        Toast.makeText(context, "UZUPELNIJ WSZYSTKIE POLA!!!", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            context,
+                            context.getText(R.string.valitation_error).toString(),
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                     }
                 }
@@ -394,7 +400,7 @@ private fun isFormValid(
 ): Boolean {
     return recipeInstructions.isNotBlank() &&
             recipeName.isNotBlank() &&
-            recipeIngredientList.isNullOrEmpty() &&
+            recipeIngredientList.isNotEmpty() &&
             recipeCaloriesPerServing.toDouble() != 0.0 &&
             recipeServings.toInt() != 0 &&
             recipeTime.toInt() != 0
@@ -597,7 +603,7 @@ fun IngredientRow(
                 } else {
                     Toast.makeText(
                         context,
-                        "UZUPELNIJ WSZYSTKIE DANE SKLADNIKA!!!",
+                        context.getText(R.string.valitation_error).toString(),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -675,19 +681,30 @@ class AddRecipeViewModel(
         }
     }
 
-    fun addRecipe(createRecipeRequest: CreateRecipeRequest, snackbarHostState: SnackbarHostState) {
+    fun addRecipe(
+        createRecipeRequest: CreateRecipeRequest,
+        snackbarHostState: SnackbarHostState,
+        navController: NavController
+    ) {
         viewModelScope.launch {
             try {
-                val response =
-                    recipeApi.createRecipeWithHttpInfo(createRecipeRequest).statusCode == 201
+                val response = recipeApi.createRecipeWithHttpInfo(createRecipeRequest)
 
-                if (response) {
+                if (response.statusCode == 201) {
                     viewModelScope.launch {
                         snackbarHostState.showSnackbar(
                             message = "Recipe ${createRecipeRequest.name} added successfully",
                             actionLabel = "OK",
                             duration = SnackbarDuration.Short
                         )
+                    }
+
+                    val location = response.headers["Location"]?.firstOrNull()
+                    val recipeId = location?.substringAfterLast("/")?.toLongOrNull()
+                    Log.d("AddRecipeViewModel", "Headers: ${response.headers}")
+
+                    recipeId?.let {
+                        navController.navigate("Recipe/$recipeId")
                     }
                 } else {
                     viewModelScope.launch {
@@ -775,7 +792,6 @@ fun <T : IngredientListItem> SearchOneItemDropDownMenu(
             if (expanded || (selectedOption == null && !showDefaultSelectedItem)) {
                 placeholder()
             } else {
-                // Display selected item
                 selectedOption?.let { selectedItem ->
                     dropdownItem(selectedItem)
                 }
@@ -860,7 +876,7 @@ fun <T : IngredientListItem> SearchOneItemDropDownMenu(
                         },
                         placeholder = {
                             Text(
-                                text = "Search",
+                                text = stringResource(R.string.search),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium
                             )
@@ -891,7 +907,7 @@ fun <T : IngredientListItem> SearchOneItemDropDownMenu(
                                         selectedItem
                                     }
                                 }
-                                .padding(10.dp), // Add padding for better spacing
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
@@ -900,12 +916,11 @@ fun <T : IngredientListItem> SearchOneItemDropDownMenu(
                                 modifier = Modifier.weight(0.2f)
                             )
 
-                            Spacer(modifier = Modifier.width(100.dp)) // Add space between Checkbox and DropdownMenuItem
+                            Spacer(modifier = Modifier.width(100.dp))
 
                             DropdownMenuItem(
                                 modifier = Modifier.weight(0.5f),
                                 text = {
-                                    // Add your text content here
                                     Text(
                                         displayText(selectedItem),
                                         fontFamily = poppinsFontFamily,
