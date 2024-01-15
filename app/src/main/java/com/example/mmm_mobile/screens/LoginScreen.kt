@@ -107,10 +107,8 @@ fun LoginScreen(navController: NavController) {
                         try {
                             val apiInstance = Class1AuthenticationApi()
                             val loginRequest = AuthenticationRequest(
-                                "patrycja@ddd.pl",
-                                "pati2137"
-//                                email.value,
-//                                password.value
+                                email.value,
+                                password.value
                             )
                             val result = apiInstance.authenticate(loginRequest)
                             tokenManager.accessToken = result.accessToken
