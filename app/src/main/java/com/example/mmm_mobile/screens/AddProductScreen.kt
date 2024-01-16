@@ -890,7 +890,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                         selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
                         name ?: "",
                         novaGroup.toInt() ?: 1,
-                        nutriScore.toInt() ?: 1,
+                        mapNutriScoreToNumber(nutriScore) ?: 1,
                         CreateNutrimentRequest(
                             caloriesPer100g.toDouble() ?: 0.0,
                             fatPer100g.toDouble() ?: 0.0,
@@ -912,6 +912,15 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
                 }
             )
         }
+    }
+}
+
+fun mapNutriScoreToNumber(nutriScore: String): Int {
+    val upperCaseScore = nutriScore.toUpperCase()
+    if (upperCaseScore.length == 1 && upperCaseScore in "ABCDE") {
+        return upperCaseScore[0] - 'A' + 1
+    } else {
+        throw IllegalArgumentException("Invalid Nutri-Score: $nutriScore")
     }
 }
 
