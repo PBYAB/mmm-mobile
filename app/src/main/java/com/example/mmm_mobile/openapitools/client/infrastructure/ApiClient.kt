@@ -56,7 +56,7 @@ open class ApiClient(val baseUrl: String, val client: OkHttpClient = defaultClie
 
         @JvmStatic
         val defaultClient: OkHttpClient by lazy {
-            builder.callTimeout(30, java.util.concurrent.TimeUnit.SECONDS).build()
+            builder.callTimeout(30, java.util.concurrent.TimeUnit.MINUTES).build()
         }
 
         @JvmStatic
