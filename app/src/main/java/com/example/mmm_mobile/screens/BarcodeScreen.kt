@@ -40,7 +40,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun BarcodeScreen(navController: NavController) {
+fun BarcodeScreen(navController: NavController, barcode : String? = null) {
     val cameraPermission = rememberPermissionState(
         Manifest.permission.CAMERA
     )
@@ -51,7 +51,7 @@ fun BarcodeScreen(navController: NavController) {
     }
 
     val camera = remember {
-        BarcodeCamera(navController, navController.context)
+        BarcodeCamera(navController)
     }
 
     var lastScannedBarcode by remember {

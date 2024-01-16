@@ -40,7 +40,7 @@ import org.openapitools.client.infrastructure.ClientException
 import java.util.concurrent.Executors
 
 @ExperimentalGetImage
-class BarcodeCamera(private val navController: NavController, private val context: Context) {
+class BarcodeCamera(private val navController: NavController) {
     private var camera: Camera? = null
     private var isScanning = false
     private var lastBarcode = ""
@@ -182,7 +182,7 @@ class BarcodeCamera(private val navController: NavController, private val contex
                                             lastBarcode = barcode
                                             val id = productApi.getProductByBarcode(barcode).id
                                             withContext(Dispatchers.Main) {
-                                                id?.let {
+                                                id.let {
                                                     navController.navigate("Product/$id")
                                                 }
                                             }
@@ -191,7 +191,7 @@ class BarcodeCamera(private val navController: NavController, private val contex
                                         Log.e(TAG, e.message.orEmpty())
                                         withContext(Dispatchers.Main) {
                                             if (e is ClientException && e.statusCode == 404) {
-                                                Toast.makeText(context, "Product not found", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(navController.context, "Product not found", Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     }

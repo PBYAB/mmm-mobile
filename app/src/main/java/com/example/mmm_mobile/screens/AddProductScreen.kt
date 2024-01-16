@@ -236,35 +236,7 @@ fun AddProductScreen(navController: NavController, snackbarHostState: SnackbarHo
             Spacer(modifier = Modifier.height(8.dp))
 
             val context = androidx.compose.ui.platform.LocalContext.current
-            IconButton(
-                onClick = {
-                    navController.navigate(Screen.Barcode.route)
-                },
-                modifier = Modifier
-                    .background(colorScheme.primary, shape = RoundedCornerShape(30))
-                    .fillMaxWidth(),
-                content = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(R.string.scan_qr_code),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                        Icon(
-                            painter = painterResource(id = R.mipmap.barcode_scanner_icon),
-                            contentDescription = context.getText(R.string.barcode_scanner_icon_info)
-                                .toString(),
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
+
 
             OutlinedTextField(
                 value = quantity,
