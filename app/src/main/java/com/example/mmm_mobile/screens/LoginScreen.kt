@@ -68,7 +68,7 @@ fun LoginScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                text = context.getText(R.string.login).toString(),
+                text = stringResource(id =R.string.login),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
@@ -78,7 +78,7 @@ fun LoginScreen(navController: NavController) {
                 onValueChange = { email.value = it },
                 label = {
                     Text(
-                        context.getText(R.string.email).toString(),
+                        stringResource(R.string.email),
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
