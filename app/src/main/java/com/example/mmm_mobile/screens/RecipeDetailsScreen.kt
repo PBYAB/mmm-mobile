@@ -3,6 +3,7 @@ package com.example.mmm_mobile.screens
 import android.app.Application
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -336,11 +337,20 @@ fun OpenYoutubeButton(
 ) {
     val context = LocalContext.current
     Button(onClick = {
-        val intent = Intent(Intent.ACTION_SEARCH)
-        intent.setPackage("com.google.android.youtube")
-        intent.putExtra("query", recipeTitle)
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
+        val intentApp = Intent(Intent.ACTION_SEARCH)
+        intentApp.setPackage("com.google.android.youtube")
+        intentApp.putExtra("query", recipeTitle)
+
+        val intentBrowser = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/results?search_query=$recipeTitle"))
+
+        try {
+            if (intentApp.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intentApp)
+            } else {
+                context.startActivity(intentBrowser)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error opening YouTube", Toast.LENGTH_SHORT).show()
         }
     },
         modifier = modifier,
@@ -962,35 +972,4 @@ fun AddReviewInput(
             Text("Submit Review")
         }
     }
-}
-
-@Composable
-@Preview(
-    apiLevel = 30,
-)
-fun RecipeDetailsPreview() {
-    val recipeDetails = RecipeDetails(
-        id = 1,
-        name = "Pasta",
-        servings = 4,
-        totalTime = 30,
-        kcalPerServing = 1000.0,
-        instructions = "Cook pasta",
-        image = "",
-        ingredients = listOf(
-            RecipeIngredientDTO(
-                id = 1,
-                name = "Pasta",
-                amount = 100.0,
-                unit = RecipeIngredientDTO.Unit.G
-            ),
-            RecipeIngredientDTO(
-                id = 2,
-                name = "Tomato",
-                amount = 100.0,
-                unit = RecipeIngredientDTO.Unit.G
-            )
-        )
-    )
-    RecipeDetails(recipeDetails, FavouriteRecipeViewModel(Application()), SnackbarHostState())
 }
