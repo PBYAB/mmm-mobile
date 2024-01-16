@@ -2,6 +2,7 @@ package com.example.mmm_mobile
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import org.openapitools.client.infrastructure.ApiClient
 
 class TokenManager private constructor(context: Context) {
@@ -33,6 +34,6 @@ class TokenManager private constructor(context: Context) {
 
     fun clear() {
         ApiClient.accessToken = null
-        sharedPreferences.edit().remove("tokenKey").apply()
+        accessToken = null
     }
 }

@@ -7,16 +7,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
@@ -29,9 +34,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -191,7 +199,7 @@ class MainActivity : ComponentActivity() {
         FloatingActionButton(
             onClick = { navController.navigate(route) },
             modifier = Modifier.padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.secondary
         ) {
             Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
@@ -203,6 +211,8 @@ class MainActivity : ComponentActivity() {
     fun TopBar(navController: NavController){
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         Log.d("TopBar", "currentRoute: $currentRoute")
+        var dropdownMenuExpanded by remember { mutableStateOf(false) }
+
 
         when (currentRoute) {
             Screen.Login.route -> {}
@@ -245,7 +255,41 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Icon(
                                 Icons.Filled.Search,
-                                contentDescription = "Search",
+                                contentDescription = stringResource(id = R.string.search_icon_info),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = dropdownMenuExpanded,
+                            onDismissRequest = { dropdownMenuExpanded = false }
+                        ) {
+                            DropdownMenuItem(onClick = {
+                                dropdownMenuExpanded = false
+                                TokenManager.getInstance(this@MainActivity).clear()
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(navController.graph.startDestinationId)
+                                    launchSingleTop = true
+                                }
+                            },
+                                text = {
+                                    Row {
+                                        Text(
+                                            text = stringResource(R.string.sign_out),
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        )
+                                        Icon(
+                                            Icons.Filled.ExitToApp,
+                                            contentDescription = stringResource(R.string.sign_out),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                        IconButton(onClick = { dropdownMenuExpanded = true }) {
+                            Icon(Icons.Filled.MoreVert,
+                                contentDescription = stringResource(R.string.more),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }

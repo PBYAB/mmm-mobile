@@ -7,20 +7,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -81,28 +93,13 @@ fun LoginScreen(navController: NavController) {
                     disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                 ),
             )
-            OutlinedTextField(
-                value = password.value,
-                onValueChange = { password.value = it },
-                label = {
-                    Text(
-                        context.getText(R.string.password).toString(),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                ),
 
-                )
+            password.value = passwordInput(
+                password,
+                stringResource(R.string.password)
+            )
+
+
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
@@ -156,6 +153,49 @@ fun LoginScreen(navController: NavController) {
             }
         }
     }
+}
+
+@Composable
+fun passwordInput(
+    password : MutableState<String> = remember { mutableStateOf("") },
+    type : String = stringResource(R.string.password)
+) : String {
+    var passwordVisibility by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = password.value,
+        onValueChange = { password.value = it },
+        label = {
+            Text(
+                type,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        singleLine = true,
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                Icon(
+                    imageVector = if (passwordVisibility) Icons.Filled.Lock else Icons.Filled.Info,
+                    contentDescription = if (passwordVisibility) stringResource(R.string.hide_password) else stringResource(
+                        R.string.show_password
+                    ),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+    )
+    return password.value
 }
 
 @Preview(

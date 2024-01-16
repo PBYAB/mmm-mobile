@@ -104,4 +104,10 @@
     <string name="submit_review">Submit Review</string>
     <string name="review_added">Review submitted successfully</string>
     <string name="review_not_added">Error adding review</string>
+    <string name="open_in_youtube">Open in YouTube</string>
+    <string name="more">More</string>
+    <string name="sign_out">Sign out</string>
+    <string name="hide_password">Hide Password</string>
+    <string name="show_password">Show Password</string>
+    <string name="confirmPassword">Confirm Password</string>
 </resources>
