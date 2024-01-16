@@ -1,6 +1,6 @@
 package com.example.mmm_mobile.screens
 
-import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -18,20 +18,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,6 +55,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -98,12 +103,29 @@ fun RecipeDetailScreen(
     val recipeFromApi by recipeDetailsViewModel.recipe.collectAsState()
 
     if (recipeFromDB != null) {
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { DeleteRecipeButton(favouriteRecipeViewModel, recipeId, snackbarHostState) }
-            item { recipeFromDB?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
+        Box {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                item { recipeFromDB?.let {
+                    RecipeDetails(
+                        recipeDetails = mapToRecipeDetails(it),
+                        favouriteRecipeViewModel = favouriteRecipeViewModel,
+                        snackbarHostState = snackbarHostState,
+                        isFavourite = true
+                    )
+                } }
             recipeId?.let { id ->
                 item {
-                    AddReviewInput(id, ReviewListViewModel(recipeId), recipeDetailsViewModel, snackbarHostState)
+                    Column {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Divider(thickness = 5.dp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        AddReviewInput(
+                            id,
+                            ReviewListViewModel(recipeId),
+                            recipeDetailsViewModel,
+                            snackbarHostState
+                        )
+                    }
                 }
                 recipeFromApi?.averageRating?.let {
                     item {
@@ -114,13 +136,15 @@ fun RecipeDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Text(
                                 text = stringResource(id = R.string.reviews_label),
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
@@ -131,12 +155,14 @@ fun RecipeDetailScreen(
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.recipe_average_rating_label),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = String.format("%.2f", it),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
@@ -157,6 +183,7 @@ fun RecipeDetailScreen(
                 }
             }
         }
+    }
     } else {
         val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
         var canReview by remember { mutableStateOf(false) }
@@ -173,11 +200,19 @@ fun RecipeDetailScreen(
             }
         }
 
-        val recipe by recipeDetailsViewModel.recipe.collectAsState()
-
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { AddRecipeButton(favouriteRecipeViewModel, recipeFromApi, snackbarHostState) }
-            item { recipeFromApi?.let { RecipeDetails(recipeDetails = mapToRecipeDetails(it)) } }
+            item { recipeFromApi?.let { RecipeDetails(
+                recipeDetails = mapToRecipeDetails(it),
+                favouriteRecipeViewModel = favouriteRecipeViewModel,
+                snackbarHostState = snackbarHostState
+            ) } }
+            item {
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Divider(thickness = 5.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
             recipeId?.let { id ->
 
                 if (canReview) {
@@ -199,13 +234,15 @@ fun RecipeDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Text(
                                 text = stringResource(id = R.string.reviews_label),
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
@@ -246,60 +283,57 @@ fun RecipeDetailScreen(
 }
 
 @Composable
-fun DeleteRecipeButton(
-    favouriteRecipeViewModel: FavouriteRecipeViewModel,
-    recipeId: Long?,
-    snackbarHostState: SnackbarHostState
-) {
-    Button(onClick = {
-        favouriteRecipeViewModel.viewModelScope.launch {
-            favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipeId ?: 0)
-            snackbarHostState.showSnackbar(
-                message = "Recipe deleted from favourites",
-                duration = SnackbarDuration.Short
-            )
-        }
-    }) {
-        Icon(Icons.Filled.Delete, contentDescription = null)
-    }
-}
-
-@Composable
-fun AddRecipeButton(
+fun AddDeleteFavoriteButton(
     favouriteRecipeViewModel: FavouriteRecipeViewModel,
     recipe: RecipeDTO?,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    isFavourite: Boolean,
+    modifier: Modifier = Modifier
 ) {
-    Button(
+    var isFavourite by remember { mutableStateOf(isFavourite) }
+
+    IconButton(
         onClick = {
+            isFavourite = !isFavourite
             favouriteRecipeViewModel.viewModelScope.launch {
-                favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
-                    RecipeDTO(
-                        id = recipe?.id ?: 0,
-                        name = recipe?.name ?: "",
-                        servings = recipe?.servings ?: 0,
-                        totalTime = recipe?.totalTime ?: 0,
-                        kcalPerServing = recipe?.kcalPerServing ?: 0.0,
-                        instructions = recipe?.instructions ?: "",
-                        coverImageUrl = recipe?.coverImageUrl ?: "",
-                        ingredients = recipe?.ingredients ?: emptyList(),
-                        averageRating = recipe?.averageRating ?: 0.0
+                if (isFavourite) {
+                    recipe?.let {
+                        favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
+                            recipe = it
+                        )
+                    }
+                    snackbarHostState.showSnackbar(
+                        message = "Recipe ${recipe?.name} added to favourites",
+                        duration = SnackbarDuration.Short
                     )
-                )
-                snackbarHostState.showSnackbar(
-                    message = "Recipe ${recipe?.name} added to favourites",
-                    duration = SnackbarDuration.Short
-                )
+                } else {
+                    favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipe?.id ?: 0)
+                    snackbarHostState.showSnackbar(
+                        message = "Recipe ${recipe?.name} removed from favourites",
+                        duration = SnackbarDuration.Short
+                    )
+                }
             }
         }
     ) {
-        Icon(Icons.Filled.Add, contentDescription = null)
+        if (isFavourite) {
+            Icon(Icons.Filled.Favorite, contentDescription = null, tint = Color.Red, modifier = modifier
+                .size(44.dp)
+                .padding(4.dp))
+        } else {
+            Icon(Icons.Filled.FavoriteBorder, contentDescription = null, tint = Color.Red, modifier = modifier
+                .size(44.dp)
+                .padding(4.dp))
+        }
     }
 }
 
 
 @Composable
-fun OpenYoutubeButton(recipeTitle: String) {
+fun OpenYoutubeButton(
+    recipeTitle: String,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     Button(onClick = {
         val intent = Intent(Intent.ACTION_SEARCH)
@@ -308,31 +342,80 @@ fun OpenYoutubeButton(recipeTitle: String) {
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         }
-    }) {
-        Text(text = "Open in YouTube")
+    },
+        modifier = modifier,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFFff0000)
+        )
+    ) {
+        Text(text = stringResource(R.string.open_in_youtube))
     }
 }
 
-@SuppressLint("RestrictedApi")
 @Composable
-fun RecipeDetails(recipeDetails: RecipeDetails) {
+fun RecipeDetails(
+    recipeDetails: RecipeDetails,
+    favouriteRecipeViewModel: FavouriteRecipeViewModel,
+    snackbarHostState: SnackbarHostState,
+    isFavourite: Boolean = false
+) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
-    when (recipeDetails.image) {
-        is ByteArray -> DisplayImage(
-            imageBytes = recipeDetails.image,
-            modifier = Modifier.fillMaxWidth()
-        )
+    Box {
+        when (recipeDetails.image) {
+            is ByteArray -> {
+                DisplayImage(
+                    imageBytes = recipeDetails.image,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        is String -> DisplayImage(
-            imageUrl = recipeDetails.image,
-            modifier = Modifier.fillMaxWidth()
-        )
+                AddDeleteFavoriteButton(
+                    favouriteRecipeViewModel = favouriteRecipeViewModel,
+                    recipe = RecipeDTO(
+                        id = recipeDetails.id,
+                        name = recipeDetails.name,
+                        servings = recipeDetails.servings,
+                        totalTime = recipeDetails.totalTime,
+                        kcalPerServing = recipeDetails.kcalPerServing,
+                        instructions = recipeDetails.instructions,
+                        coverImageUrl = recipeDetails.image.toString(),
+                        ingredients = recipeDetails.ingredients,
+                        averageRating = recipeDetails.rating,
+                        reviews = recipeDetails.reviews.toSet()
+                    ),
+                    snackbarHostState = snackbarHostState,
+                    isFavourite = isFavourite
+                )
+            }
+            is String -> {
+                DisplayImage(
+                    imageUrl = recipeDetails.image,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        else -> Text(text = "Loading...")
+                AddDeleteFavoriteButton(
+                    favouriteRecipeViewModel = favouriteRecipeViewModel,
+                    recipe = RecipeDTO(
+                        id = recipeDetails.id,
+                        name = recipeDetails.name,
+                        servings = recipeDetails.servings,
+                        totalTime = recipeDetails.totalTime,
+                        kcalPerServing = recipeDetails.kcalPerServing,
+                        instructions = recipeDetails.instructions,
+                        coverImageUrl = recipeDetails.image.toString(),
+                        ingredients = recipeDetails.ingredients,
+                        averageRating = recipeDetails.rating,
+                        reviews = recipeDetails.reviews.toSet()
+                    ),
+                    snackbarHostState = snackbarHostState,
+                    isFavourite = isFavourite
+                )
+            }
+            else -> Text(text = "Loading...")
+        }
     }
-
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
@@ -347,7 +430,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 append(recipeDetails.name)
             }
         },
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp),
+        color = MaterialTheme.colorScheme.onSurface
     )
 
     if(recipeDetails.reviews.size != 0)
@@ -359,7 +443,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
             text = recipeDetails.rating.toString(),
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Normal,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onSurface
         )
         val rating = recipeDetails.rating
         val fullStars = rating.toInt()
@@ -384,15 +469,17 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 append(context.getText(R.string.instructions_title).toString())
             }
         },
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp),
+        color = MaterialTheme.colorScheme.onSurface
     )
     val instructionsText = buildAnnotatedString {
         withStyle(
             style = SpanStyle(
                 fontSize = 16.sp,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal
+                fontWeight = FontWeight.Normal,
+
             )
         ) {
             val visibleText =
@@ -418,9 +505,16 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
             if (annotations.isNotEmpty()) {
                 expanded = true
             }
-        }
+        },
     )
 
+    OpenYoutubeButton(
+        recipeTitle = recipeDetails.name,
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+
+    )
     Spacer(modifier = Modifier.height(8.dp))
 
     Text(
@@ -429,7 +523,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 style = SpanStyle(
                     fontSize = 16.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 append(
@@ -449,7 +544,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 style = SpanStyle(
                     fontSize = 16.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 append(
@@ -471,7 +567,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 style = SpanStyle(
                     fontSize = 16.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 append(
@@ -492,7 +589,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                 style = SpanStyle(
                     fontSize = 22.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 append(context.getText(R.string.ingredients_title).toString())
@@ -512,7 +610,8 @@ fun RecipeDetails(recipeDetails: RecipeDetails) {
                     .lowercase() + " " + it.name.toString(),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(10.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -750,7 +849,7 @@ fun ReviewListItem(review: RecipeReviewDTO, loggedInId: Long, onDeleteClick: () 
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
             Text(
                 text = review.fullName,
                 style = MaterialTheme.typography.headlineLarge,
@@ -792,9 +891,7 @@ fun AddReviewInput(
     var rating by remember { mutableStateOf(0) }
     val context = LocalContext.current
 
-    Spacer(modifier = Modifier.height(8.dp))
-    Divider(thickness = 5.dp)
-    Spacer(modifier = Modifier.height(8.dp))
+
     TextField(
         value = reviewText,
         onValueChange = { reviewText = it },
@@ -811,13 +908,6 @@ fun AddReviewInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        TextField(
-            value = reviewText,
-            onValueChange = { reviewText = it },
-            label = { Text("Your Review") },
-            modifier = Modifier.weight(1.1f)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
         Slider(
             value = rating.toFloat(),
             onValueChange = { rating = it.toInt() },
@@ -832,7 +922,7 @@ fun AddReviewInput(
                 .weight(0.5f),
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Medium,
-
+            color = MaterialTheme.colorScheme.onSurface
         )
         Button(
             modifier = Modifier.weight(0.9f),
@@ -869,7 +959,38 @@ fun AddReviewInput(
                 }
             }
         ) {
-            Text(stringResource(id = R.string.submit_review))
+            Text("Submit Review")
         }
     }
+}
+
+@Composable
+@Preview(
+    apiLevel = 30,
+)
+fun RecipeDetailsPreview() {
+    val recipeDetails = RecipeDetails(
+        id = 1,
+        name = "Pasta",
+        servings = 4,
+        totalTime = 30,
+        kcalPerServing = 1000.0,
+        instructions = "Cook pasta",
+        image = "",
+        ingredients = listOf(
+            RecipeIngredientDTO(
+                id = 1,
+                name = "Pasta",
+                amount = 100.0,
+                unit = RecipeIngredientDTO.Unit.G
+            ),
+            RecipeIngredientDTO(
+                id = 2,
+                name = "Tomato",
+                amount = 100.0,
+                unit = RecipeIngredientDTO.Unit.G
+            )
+        )
+    )
+    RecipeDetails(recipeDetails, FavouriteRecipeViewModel(Application()), SnackbarHostState())
 }

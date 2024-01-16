@@ -44,9 +44,9 @@ data class ProductImageDTO (
      */
     @JsonClass(generateAdapter = false)
     enum class PropertySize(val value: kotlin.String) {
-        @Json(name = "BIG") bIG("BIG"),
-        @Json(name = "SMALL") sMALL("SMALL"),
-        @Json(name = "THUMBNAIL") tHUMBNAIL("THUMBNAIL");
+        @Json(name = "BIG") BIG("BIG"),
+        @Json(name = "SMALL") SMALL("SMALL"),
+        @Json(name = "THUMBNAIL") THUMBNAIL("THUMBNAIL");
     }
 }
 

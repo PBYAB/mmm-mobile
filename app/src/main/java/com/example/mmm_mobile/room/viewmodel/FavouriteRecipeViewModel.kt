@@ -116,42 +116,4 @@ class FavouriteRecipeViewModel(
             }
         }
     }
-
-//    private suspend fun updateFavouriteRecipeWithIngredients(recipe: RecipeDTO) {
-//        viewModelScope.launch {
-//            val ingredients = recipe.ingredients?.map { ingredient ->
-//                Ingredient(
-//                    id = ingredient.id,
-//                    name = ingredient.name,
-//                    amount = ingredient.amount ?: 0.0,
-//                    unit = IngredientUnit.valueOf(ingredient.unit?.name ?: "")
-//                )
-//            } ?: listOf()
-//
-//            val ingredientIds = ingredients.map { ingredient ->
-//                recipeIngredientRepository.insertIngredientIfNotExists(ingredient)
-//            }
-//
-//            val ingredientsWithIds = ingredients.zip(ingredientIds) { ingredient, id ->
-//                ingredient.copy(id = id)
-//            }
-//
-//            favouriteRecipeRepository.updateFavouriteRecipe(
-//                FavouriteRecipe(
-//                    id = recipe.id,
-//                    name = recipe.name,
-//                    servings = recipe.servings ?: 0,
-//                    image = downloadImage(
-//                        getApplication(),
-//                        recipe.coverImageUrl ?: ""
-//                    ) ?: byteArrayOf(),
-//                    instructions = recipe.instructions ?: "",
-//                    kcalPerServing = recipe.kcalPerServing ?: 0.0,
-//                    totalTime = recipe.totalTime ?: 0,
-//                    rating = recipe.averageRating ?: 0.0
-//                ),
-//                ingredientsWithIds
-//            )
-//        }
-//    }
 }

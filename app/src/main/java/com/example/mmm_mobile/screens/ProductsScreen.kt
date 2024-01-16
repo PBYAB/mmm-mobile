@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -44,6 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Product
+import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -189,11 +194,12 @@ fun ProductListItem(product: Product, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
+            .clip(RoundedCornerShape(16.dp)) // Dodajemy zaokrąglenie rogów
             .clickable(onClick = {})
             .background(MaterialTheme.colorScheme.background)
             .clickable {
                 navController.navigate("Product/${product.id}")
-            }
+            },
     ) {
         Image(
             painter = painter,
@@ -204,24 +210,11 @@ fun ProductListItem(product: Product, navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        fontSize = 18.sp,
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(product.name)
-                }
-            },
+        Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Bold,
             modifier = Modifier.padding(8.dp),
             maxLines = 1,
             minLines = 1,
-        )
+            )
 
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -326,5 +319,25 @@ fun getNovaGroupImage(novaGroup: Int): Int {
         3 -> R.drawable.nova_group_3
         4 -> R.drawable.nova_group_4
         else -> R.drawable.nova_group_4
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+)
+@Composable
+fun ProductListItemPreview() {
+    MmmmobileTheme {
+        val product = Product(
+            id = 1,
+            name = "Product name",
+            quantity = "Product quantity",
+            barcode = "Product barcode",
+            image = "Product image",
+            nutriScore = 1,
+            novaGroup = 1
+        )
+        ProductListItem(product = product, navController = NavController(LocalContext.current))
     }
 }

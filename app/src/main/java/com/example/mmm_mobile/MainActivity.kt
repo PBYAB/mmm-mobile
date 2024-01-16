@@ -83,7 +83,8 @@ class MainActivity : ComponentActivity() {
             topBar = { TopBar(navController) },
             floatingActionButton = { FAB(navController) },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = { BottomNavBar(navController) }
+            bottomBar = { BottomNavBar(navController) },
+            containerColor = MaterialTheme.colorScheme.onPrimary,
         ) { padding ->
             NavHost(
                 navController,
@@ -101,11 +102,11 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(Screen.Search.route + "/products") { SearchScreen(navController) }
                 composable(Screen.Search.route + "/recipes") { SearchScreen(navController) }
-                composable("Product/{productId}") { backStackEntry ->
+                composable(Screen.ProductDetails.route + "/{productId}") { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId")?.toLongOrNull()
                     ProductDetailScreen(productId) // Przekazujemy productId do ProductDetailScreen
                 }
-                composable("Recipe/{recipeId}") { backStackEntry ->
+                composable(Screen.RecipeDetails.route + "/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
                     RecipeDetailScreen(navController, recipeId, snackbarHostState) // Przekazujemy recipeId do RecipeDetailScreen
                 }
@@ -190,7 +191,7 @@ class MainActivity : ComponentActivity() {
         FloatingActionButton(
             onClick = { navController.navigate(route) },
             modifier = Modifier.padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.secondary
         ) {
             Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
@@ -209,6 +210,7 @@ class MainActivity : ComponentActivity() {
             Screen.AddProduct.route -> {}
             Screen.AddRecipe.route -> {}
             Screen.Registration.route -> {}
+            Screen.Barcode.route -> {}
             else -> TopAppBar(
                     title = {
                         Text(
@@ -224,20 +226,28 @@ class MainActivity : ComponentActivity() {
                         IconButton(onClick = { navController.navigate(Screen.Barcode.route) }) {
                             Icon(
                                 painter = painterResource(id = R.mipmap.barcode_scanner_icon),
-                                contentDescription = getText(R.string.barcode_scanner_icon_info).toString()
+                                contentDescription = getText(R.string.barcode_scanner_icon_info).toString(),
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         IconButton(onClick = {
                             if (currentRoute != null) {
                                 when {
                                     currentRoute.startsWith(Screen.ProductList.route) -> navController.navigate(Screen.Search.route + "/products")
+                                    currentRoute.startsWith(Screen.ProductDetails.route) -> navController.navigate(Screen.Search.route + "/products")
                                     currentRoute.startsWith(Screen.RecipeList.route) -> navController.navigate(Screen.Search.route + "/recipes")
+                                    currentRoute.startsWith(Screen.RecipeDetails.route) -> navController.navigate(Screen.Search.route + "/recipes")
+                                    currentRoute.startsWith(Screen.FavouriteRecipes.route) -> navController.navigate(Screen.Search.route + "/recipes")
                                     else -> {}
                                 }
                             }
                         }
                         ) {
-                            Icon(Icons.Filled.Search, contentDescription = "Search")
+                            Icon(
+                                Icons.Filled.Search,
+                                contentDescription = "Search",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 )

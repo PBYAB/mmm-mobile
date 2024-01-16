@@ -29,6 +29,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -149,6 +150,7 @@ class BarcodeCamera(private val navController: NavController, private val contex
     }
 
 
+    @kotlin.OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RestrictedApi")
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(

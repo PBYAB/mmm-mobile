@@ -50,7 +50,8 @@ fun RegistrationScreen(navController: NavController) {
                 text = context.getText(R.string.register).toString(),
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSurface
             )
             OutlinedTextField(
                 value = firstName.value,
@@ -59,7 +60,8 @@ fun RegistrationScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.firstName).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -78,7 +80,8 @@ fun RegistrationScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.lastName).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -97,7 +100,8 @@ fun RegistrationScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.email).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -116,7 +120,8 @@ fun RegistrationScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.password).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -136,7 +141,8 @@ fun RegistrationScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.confirm_password).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -188,7 +194,7 @@ fun RegistrationScreen(navController: NavController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Register", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium)
+                Text("Register", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }

@@ -145,7 +145,8 @@ fun ProductDetails(productDetails: ProductDTO) {
                             style = SpanStyle(
                                 fontSize = 30.sp,
                                 fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Black
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         ) {
                             append(productDetails.name)
@@ -164,8 +165,9 @@ fun ProductDetails(productDetails: ProductDTO) {
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -177,8 +179,9 @@ fun ProductDetails(productDetails: ProductDTO) {
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -208,20 +211,21 @@ fun ProductDetails(productDetails: ProductDTO) {
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = Color.Black.copy(alpha = 0.5f),
-                modifier = Modifier.padding(10.dp)
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(10.dp),
             )
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Text(
                     text = productDetails.ingredientAnalysis?.ingredientsDescription.toString(),
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(10.dp)
+                    modifier = Modifier.padding(10.dp),
                 )
             }
         }
@@ -231,7 +235,7 @@ fun ProductDetails(productDetails: ProductDTO) {
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = Color.Black.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(10.dp)
             )
             Text(
@@ -239,7 +243,8 @@ fun ProductDetails(productDetails: ProductDTO) {
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(10.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Column {
@@ -302,22 +307,34 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
                         append(stringResource(R.string.nutriment))
                     }
                 }.toString(),
-                weight = column1Weight
+                weight = column1Weight,
             )
-            TableCell(
-                text = "Score",
-                weight = column2Weight
-            )
-        }
-
-        Row(Modifier.fillMaxWidth()) {
             TableCell(
                 text = buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
                             fontSize = 14.sp,
                             fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Normal
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    ) {
+                        append(stringResource(R.string.per100g))
+                    }
+                }.toString(),
+                weight = column2Weight
+            )
+        }
+
+        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+            TableCell(
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
                         append(stringResource(R.string.energyKcalPer100G))
@@ -331,7 +348,7 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             )
         }
 
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text =buildAnnotatedString {
                     withStyle(
@@ -351,7 +368,7 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
                 weight = column2Weight
             )
         }
-    Row(Modifier.fillMaxWidth()) {
+    Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
         TableCell(
             text =buildAnnotatedString {
                 withStyle(
@@ -371,7 +388,7 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             weight = column2Weight
         )
     }
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text = buildAnnotatedString {
                     withStyle(
@@ -391,7 +408,7 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
                 weight = column2Weight
             )
         }
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text =buildAnnotatedString {
                     withStyle(
@@ -424,7 +441,8 @@ fun RowScope.TableCell(
         Modifier
             .border(1.dp, Color.Black.copy(alpha = 0.5f))
             .weight(weight)
-            .padding(8.dp)
+            .padding(8.dp),
+        color = MaterialTheme.colorScheme.onSurface
     )
 }
 
@@ -437,14 +455,15 @@ fun AllergensList(allergens: Set<AllergenDTO>) {
         fontSize = 18.sp,
         modifier = Modifier.padding(10.dp),
         style = MaterialTheme.typography.bodySmall,
-        color = Color.Black.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.onSurface
     )
     LazyRow {
         items(allergens.toList()) { allergen ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Row {
                     Image(
@@ -478,14 +497,15 @@ fun CategoryList(category: Set<CategoryDTO>) {
         fontSize = 18.sp,
         modifier = Modifier.padding(10.dp),
         style = MaterialTheme.typography.bodySmall,
-        color = Color.Black.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.onSurface
     )
     LazyRow {
         items(category.toList()) { category ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Row {
                     Text(
@@ -511,14 +531,15 @@ fun CountryList(country: Set<CountryDTO>) {
         fontSize = 18.sp,
         modifier = Modifier.padding(10.dp),
         style = MaterialTheme.typography.bodySmall,
-        color = Color.Black.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.onSurface
     )
     LazyRow {
         items(country.toList()) { country ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Row {
                     Text(
@@ -544,14 +565,15 @@ fun IngredientList(ingredient: Set<ProductIngredientDTO>) {
         fontSize = 18.sp,
         modifier = Modifier.padding(10.dp),
         style = MaterialTheme.typography.bodySmall,
-        color = Color.Black.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.onSurface
     )
     LazyRow {
         items(ingredient.toList()) { ingredient ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Row {
                     Text(
@@ -577,14 +599,15 @@ fun BrandsList(brands: Set<BrandDTO>) {
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         modifier = Modifier.padding(10.dp),
-        color = Color.Black.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.onSurface
     )
     LazyRow {
         items(brands.toList()) { brand ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 shadowElevation = 1.dp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Text(
                     text = brand.name,
@@ -606,14 +629,11 @@ fun SwipeableImages(images: List<ProductImageDTO>) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedImage by remember { mutableStateOf("") }
 
-    val smallImages = images.filter {
-        it.propertySize == ProductImageDTO.PropertySize.sMALL
-    }.map { it.url }.toList()
-
-    val bigImages = images.filter {
-        it.propertySize == ProductImageDTO.PropertySize.bIG
-    }.map { it.url }.toList()
-
+    val smallImages = images
+        .filter { it.propertySize == ProductImageDTO.PropertySize.SMALL }
+        .sortedBy { it.url }
+        .map { it.url }
+        .toList()
 
     if (smallImages.isEmpty()) {
         Image(

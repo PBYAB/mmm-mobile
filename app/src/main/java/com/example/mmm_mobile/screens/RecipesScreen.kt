@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -231,7 +233,6 @@ fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
 
 @Composable
 fun RecipeListItem(recipe: Recipe, navController: NavController) {
-    val context = LocalContext.current
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(data = recipe.image)
@@ -244,6 +245,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.background)
             .clickable { // Dodajemy logikę kliknięcia
                 navController.navigate("Recipe/${recipe.id}")
@@ -271,7 +273,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             Text(
                 text = if (recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
                 fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 fontSize = 15.sp
             )
             val rating = recipe.rating ?: 0.0
@@ -289,7 +291,8 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             Text(
                 text = recipe.servings.toString(),
                 fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal
+                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
@@ -299,7 +302,9 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             Text(
                 text = recipe.time.toString() + " min",
                 fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal
+                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp
+
             )
         }
     }

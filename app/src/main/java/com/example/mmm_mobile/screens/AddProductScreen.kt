@@ -2,7 +2,6 @@ package com.example.mmm_mobile.screens
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -1439,6 +1438,4 @@ class AddProductViewModel(
     }
 }
 
-
 val DropdownMenuVerticalPadding = 5.dp
-

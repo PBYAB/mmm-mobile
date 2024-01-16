@@ -68,7 +68,8 @@ fun LoginScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.email).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
@@ -87,7 +88,8 @@ fun LoginScreen(navController: NavController) {
                     Text(
                         context.getText(R.string.password).toString(),
                         fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 singleLine = true,
