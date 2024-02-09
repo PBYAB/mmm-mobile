@@ -205,9 +205,9 @@ fun ProductListItem(product: Product, navController: NavController) {
             painter = painter,
             contentDescription = product.image,
             modifier = Modifier
-                .size(200.dp, 150.dp)
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop
+                .fillMaxWidth()
+                .size(200.dp, 150.dp),
+            contentScale = ContentScale.FillBounds
         )
 
         Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Bold,

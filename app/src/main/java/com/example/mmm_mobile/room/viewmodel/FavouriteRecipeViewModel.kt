@@ -9,11 +9,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.bumptech.glide.Glide
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
 import com.example.mmm_mobile.room.entity.Ingredient
 import com.example.mmm_mobile.room.entity.IngredientUnit
+import com.example.mmm_mobile.room.entity.RecipeIngredientCrossRef
 import com.example.mmm_mobile.room.entity.RecipeWithIngredients
+import com.example.mmm_mobile.services.RecipeDownloadWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,19 +48,21 @@ class FavouriteRecipeViewModel(
             val ingredients = recipe.ingredients?.map { ingredient ->
                 Ingredient(
                     id = ingredient.id,
-                    name = ingredient.name,
-                    amount = ingredient.amount ?: 0.0,
-                    unit = IngredientUnit.valueOf(ingredient.unit?.name ?: "")
+                    name = ingredient.name
                 )
             } ?: listOf()
-
             val ingredientIds = ingredients.map { ingredient ->
                 recipeIngredientRepository.insertIngredientIfNotExists(ingredient)
             }
 
-            val ingredientsWithIds = ingredients.zip(ingredientIds) { ingredient, id ->
-                ingredient.copy(id = id)
-            }
+            val crossRefs = recipe.ingredients?.map { ingredient ->
+                RecipeIngredientCrossRef(
+                    recipeId = recipe.id,
+                    ingredientId = ingredient.id,
+                    amount = ingredient.amount ?: 0.0,
+                    unit = IngredientUnit.valueOf(ingredient.unit?.name ?: "")
+                )
+            } ?: listOf()
 
             recipeId = favouriteRecipeRepository.insertFavouriteRecipe(
                 FavouriteRecipe(
@@ -71,7 +78,7 @@ class FavouriteRecipeViewModel(
                     totalTime = recipe.totalTime ?: 0,
                     rating = recipe.averageRating ?: 0.0
                 ),
-                ingredientsWithIds
+                crossRefs
             )
         }
         return recipeId
@@ -97,6 +104,19 @@ class FavouriteRecipeViewModel(
             favouriteRecipeRepository.deleteFavouriteRecipe(recipeId)
             recipeIngredientRepository.deleteOrphanRecipeIngredients()
         }
+    }
+
+
+    fun fetchAndSaveRecipeInBackground(recipeId: Long, context: Context) {
+        val data = Data.Builder()
+            .putLong("recipe_id", recipeId)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<RecipeDownloadWorker>()
+            .setInputData(data)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(request)
     }
 
     private suspend fun downloadImage(context: Context, url: String): ByteArray? {

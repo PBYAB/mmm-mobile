@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                                 popUpTo(navController.graph.startDestinationId)
                                 launchSingleTop = true
                             }
-                        }
+                        },
                     )
                 }
             }

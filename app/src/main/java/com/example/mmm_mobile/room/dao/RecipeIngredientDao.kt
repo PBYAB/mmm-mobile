@@ -6,12 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.mmm_mobile.room.entity.Ingredient
+import com.example.mmm_mobile.room.entity.IngredientWithAmountAndUnit
 
 @Dao
 interface RecipeIngredientDao {
 
     @Query("SELECT * FROM recipe_ingredient INNER JOIN RecipeIngredientCrossRef ON recipe_ingredient.id = RecipeIngredientCrossRef.ingredientId WHERE RecipeIngredientCrossRef.recipeId = :recipeId")
-    suspend fun getIngredientsForRecipe(recipeId: Long): List<Ingredient>
+    suspend fun getIngredientsForRecipe(recipeId: Long): List<IngredientWithAmountAndUnit>
 
     @Insert
     suspend fun insertAll(vararg ingredient: Ingredient): List<Long>
@@ -25,8 +26,8 @@ interface RecipeIngredientDao {
     @Query("DELETE FROM recipe_ingredient WHERE id NOT IN (SELECT ingredientId FROM RecipeIngredientCrossRef)")
     suspend fun deleteOrphanRecipeIngredients()
 
-    @Query("SELECT * FROM recipe_ingredient WHERE id = :ingredientId")
-    suspend fun getIngredientById(ingredientId: Long): Ingredient?
+    @Query("SELECT * FROM recipe_ingredient WHERE name = :name")
+    suspend fun getIngredientByName(name: String): Ingredient?
 
     @Query("SELECT * FROM recipe_ingredient")
     fun getIngredients(): List<Ingredient>

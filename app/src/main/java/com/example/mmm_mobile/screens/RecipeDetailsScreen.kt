@@ -1,6 +1,7 @@
 package com.example.mmm_mobile.screens
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -63,11 +65,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
+import com.example.mmm_mobile.services.RecipeDownloadWorker
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -254,12 +261,14 @@ fun RecipeDetailScreen(
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.recipe_average_rating_label),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = String.format("%.2f", it),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
@@ -292,6 +301,8 @@ fun AddDeleteFavoriteButton(
     modifier: Modifier = Modifier
 ) {
     var isFavourite by remember { mutableStateOf(isFavourite) }
+    val context = LocalContext.current
+
 
     IconButton(
         onClick = {
@@ -299,9 +310,8 @@ fun AddDeleteFavoriteButton(
             favouriteRecipeViewModel.viewModelScope.launch {
                 if (isFavourite) {
                     recipe?.let {
-                        favouriteRecipeViewModel.insertFavouriteRecipeWithIngredients(
-                            recipe = it
-                        )
+                        // Wywołanie Workera do pobrania i zapisania przepisu
+                        favouriteRecipeViewModel.fetchAndSaveRecipeInBackground(recipe.id, context)
                     }
                     snackbarHostState.showSnackbar(
                         message = "Recipe ${recipe?.name} added to favourites",
@@ -444,7 +454,7 @@ fun RecipeDetails(
         color = MaterialTheme.colorScheme.onSurface
     )
 
-    if(recipeDetails.reviews.size != 0)
+    if(recipeDetails.reviews.isNotEmpty())
     {
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -459,7 +469,11 @@ fun RecipeDetails(
         val rating = recipeDetails.rating
         val fullStars = rating.toInt()
         for (i in 1..fullStars) {
-            Icon(Icons.Filled.Star, stringResource(R.string.rating_info))
+            Icon(
+                Icons.Filled.Star,
+                stringResource(R.string.rating_info),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
     }
@@ -635,17 +649,36 @@ fun DisplayImage(
     contentScale: ContentScale = ContentScale.Crop,
 ) {
     val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    val imageBitmap = bitmap?.asImageBitmap() ?: return
+    val imageBitmap = bitmap?.asImageBitmap()
 
-    Log.d("DisplayImage", "DisplayImage: ${imageBytes.size / 1024}KB")
+    Box {
+        if (imageBitmap != null) {
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = contentDescription,
+                modifier = modifier,
+                contentScale = contentScale
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.mipmap.ic_article_icon_foreground),
+                contentDescription = contentDescription,
+                modifier = modifier,
+                contentScale = contentScale
+            )
+        }
 
-    Image(
-        bitmap = imageBitmap,
-        contentDescription = contentDescription,
-        modifier = modifier,
-        contentScale = contentScale
-    )
+        if (bitmap == null) {
+            Image(
+                painter = painterResource(id = R.mipmap.ic_article_icon_foreground),
+                contentDescription = contentDescription,
+                modifier = modifier,
+                contentScale = contentScale
+            )
+        }
+    }
 }
+
 
 @Composable
 fun DisplayImage(
@@ -713,10 +746,10 @@ fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
         rating = recipe.recipe.rating,
         ingredients = recipe.ingredients.map { ingredient ->
             RecipeIngredientDTO(
-                id = ingredient.id,
-                name = ingredient.name,
-                amount = ingredient.amount,
-                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.unit.name.uppercase()),
+                id = ingredient.ingredient.id,
+                name = ingredient.ingredient.name,
+                amount = ingredient.crossRef.amount,
+                unit = RecipeIngredientDTO.Unit.valueOf(ingredient.crossRef.unit.name.uppercase()),
             )
         }
     )
@@ -753,6 +786,7 @@ class RecipeDetailsViewModel(private val recipeApi: RecipeApi = RecipeApi()) : V
             }
         }
     }
+
 }
 
 

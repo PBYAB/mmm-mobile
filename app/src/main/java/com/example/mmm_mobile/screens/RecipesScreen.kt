@@ -255,8 +255,8 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             painter = painter,
             contentDescription = stringResource(R.string.recipe_image_info),
             modifier = Modifier
-                .size(200.dp, 150.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .size(200.dp, 150.dp),
             contentScale = ContentScale.FillBounds
         )
 

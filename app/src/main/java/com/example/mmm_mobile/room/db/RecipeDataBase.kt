@@ -2,9 +2,11 @@ package com.example.mmm_mobile.room.db
 
 import android.content.Context
 import android.util.Log
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.dao.RecipeIngredientDao
@@ -18,7 +20,11 @@ import java.util.concurrent.Executors
 
 @Database(
     entities = [FavouriteRecipe::class, Ingredient::class, RecipeIngredientCrossRef::class],
-    version = 8
+    version = 1,
+    exportSchema = true,
+//    autoMigrations = [
+//        AutoMigration(from = 1, to = 2)
+//    ]
 )
 abstract class RecipeDataBase : RoomDatabase() {
 
@@ -26,9 +32,11 @@ abstract class RecipeDataBase : RoomDatabase() {
     abstract fun recipeIngredientDao(): RecipeIngredientDao
 
 
+
     companion object {
         @Volatile
         private var INSTANCE: RecipeDataBase? = null
+
 
         @OptIn(DelicateCoroutinesApi::class)
         fun getDatabase(context: Context): RecipeDataBase {
@@ -58,7 +66,6 @@ abstract class RecipeDataBase : RoomDatabase() {
                         Log.d("Room", "With bindArgs: $bindArgs")
                     }, Executors.newSingleThreadExecutor())
                     .addCallback(roomDatabaseCallback)
-                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance

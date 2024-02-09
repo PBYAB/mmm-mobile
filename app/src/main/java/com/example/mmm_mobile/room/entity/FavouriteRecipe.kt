@@ -58,5 +58,5 @@ data class RecipeWithIngredients(
             entityColumn = "ingredientId"
         )
     )
-    val ingredients: List<Ingredient>
+    val ingredients: List<IngredientWithAmountAndUnit>
 )

@@ -4,39 +4,6 @@ plugins {
     kotlin("kapt")
 }
 
-val composeVersion = "2023.08.00"
-val roomVersion = "2.6.1"
-val navigationVersion = "2.7.6"
-val glideVersion = "4.12.0"
-val accompanistVersion = "0.20.2"
-val runtimeLiveDataVersion = "1.5.4"
-val lifecycleExtensionsVersion = "2.2.0"
-val pagingRuntimeVersion = "3.2.1"
-val pagingComposeVersion = "3.2.1"
-val lifecycleCommonJava8Version = "2.6.2"
-val navigationComposeVersion = "2.7.6"
-val coilComposeVersion = "2.5.0"
-val composeUiVersion = "1.5.4"
-val composeMaterialVersion = "1.5.4"
-val retrofitVersion = "2.9.0"
-val converterGsonVersion = "2.9.0"
-val cameraCoreVersion = "1.3.1"
-val cameraxVersion = "1.4.0-alpha03"
-val accompanistPermissionsVersion = "0.33.2-alpha"
-val coreKtxVersion = "1.12.0"
-val barcodeScanningVersion = "17.2.0"
-val lifecycleRuntimeKtxVersion = "2.6.2"
-val activityComposeVersion = "1.8.2"
-val junitVersion = "4.13.2"
-val testExtJUnitVersion = "1.1.5"
-val espressoCoreVersion = "3.5.1"
-val kotlinStdlibJdk8Version = "1.9.10"
-val kotlinReflectVersion = "1.8.22"
-val moshiKotlinVersion = "1.14.0"
-val moshiAdaptersVersion = "1.14.0"
-val okhttpVersion = "4.12.0"
-val kotlintestRunnerJUnit5Version = "3.4.2"
-
 android {
     namespace = "com.example.mmm_mobile"
     compileSdk = 34
@@ -51,6 +18,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
         }
     }
 
@@ -83,16 +56,22 @@ android {
     }
 }
 
+val glideVersion = "4.12.0"
+
 // Glide - Biblioteka do ładowania i wyświetlania obrazów
 dependencies {
     implementation("com.github.bumptech.glide:glide:$glideVersion")
     annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
 }
 
+val accompanistVersion = "0.20.2"
+
 // Accompanist - Dodatkowe narzędzia dla Jetpack Compose
 dependencies {
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
 }
+
+val roomVersion = "2.6.1"
 
 // Room - Biblioteka do obsługi bazy danych
 dependencies {
@@ -102,12 +81,23 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 }
 
+val composeVersion = "2023.08.00"
+val runtimeLiveDataVersion = "1.5.4"
+val lifecycleExtensionsVersion = "2.2.0"
+val pagingVersion = "3.2.1"
+val lifecycleCommonJava8Version = "2.6.2"
+val navigationComposeVersion = "2.7.6"
+val coilComposeVersion = "2.5.0"
+val composeUiVersion = "1.5.4"
+val composeMaterialVersion = "1.5.4"
+val cameraCoreVersion = "1.3.1"
+
 // Jetpack Compose i powiązane biblioteki
 dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:$runtimeLiveDataVersion")
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
-    implementation("androidx.paging:paging-runtime-ktx:$pagingRuntimeVersion")
-    implementation("androidx.paging:paging-compose:$pagingComposeVersion")
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation("androidx.paging:paging-compose:$pagingVersion")
     kapt("androidx.lifecycle:lifecycle-common-java8:$lifecycleCommonJava8Version")
     implementation("androidx.navigation:navigation-compose:$navigationComposeVersion")
     implementation("io.coil-kt:coil-compose:$coilComposeVersion")
@@ -135,6 +125,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
+val cameraxVersion = "1.4.0-alpha03"
+
 // CameraX - Biblioteka do obsługi aparatu
 dependencies {
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
@@ -142,10 +134,17 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraxVersion")
 }
 
+
+val accompanistPermissionsVersion = "0.33.2-alpha"
 // Accompanist Permissions - Narzędzia do obsługi uprawnień
 dependencies {
     implementation("com.google.accompanist:accompanist-permissions:$accompanistPermissionsVersion")
 }
+
+val kotlinStdlibJdk8Version = "1.9.10"
+val kotlinReflectVersion = "1.8.22"
+val moshiKotlinVersion = "1.14.0"
+val moshiAdaptersVersion = "1.14.0"
 
 // Kotlin i Moshi - Obsługa języka Kotlin i konwersji JSON
 dependencies {
@@ -155,6 +154,10 @@ dependencies {
     implementation("com.squareup.moshi:moshi-adapters:$moshiAdaptersVersion")
 }
 
+val retrofitVersion = "2.9.0"
+val converterGsonVersion = "2.9.0"
+val okhttpVersion = "4.12.0"
+
 // Retrofit - Biblioteka do komunikacji sieciowej
 dependencies {
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
@@ -162,21 +165,34 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttpVersion")
 }
 
+val barcodeScanningVersion = "17.2.0"
 // Google ML Kit - Biblioteka do przetwarzania obrazów
 dependencies {
     implementation ("com.google.mlkit:barcode-scanning:$barcodeScanningVersion")
 }
 
+val lifecycleRuntimeKtxVersion = "2.6.2"
+val activityComposeVersion = "1.8.2"
+val junitVersion = "4.13.2"
+val testExtJUnitVersion = "1.1.5"
+val espressoCoreVersion = "3.5.1"
+val kotlintestRunnerJUnit5Version = "3.4.2"
+
 // Inne biblioteki ogólne
 dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtxVersion")
     implementation("androidx.activity:activity-compose:$activityComposeVersion")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinStdlibJdk8Version")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     testImplementation("junit:junit:$junitVersion")
     androidTestImplementation("androidx.test.ext:junit:$testExtJUnitVersion")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espressoCoreVersion")
     testImplementation("io.kotlintest:kotlintest-runner-junit5:$kotlintestRunnerJUnit5Version")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+val workVersion = "2.9.0"
+
+//WorkManager
+dependencies {
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
 }

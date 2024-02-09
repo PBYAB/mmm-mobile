@@ -33,13 +33,17 @@ class FavouriteRecipeRepository(
 
     suspend fun insertFavouriteRecipe(
         recipe: FavouriteRecipe,
-        ingredients: List<Ingredient>
+        ingredients: List<RecipeIngredientCrossRef>,
     ): Long {
         return withContext(defaultDispatcher) {
             val recipeId = favouriteRecipeDao.insertFavouriteRecipe(recipe)
             ingredients.forEach { ingredient ->
                 val crossRef =
-                    RecipeIngredientCrossRef(recipeId = recipeId, ingredientId = ingredient.id)
+                    RecipeIngredientCrossRef(recipeId = recipeId,
+                        ingredientId = ingredient.ingredientId,
+                        amount = ingredient.amount,
+                        unit = ingredient.unit
+                        )
                 favouriteRecipeDao.insertRecipeIngredientCrossRef(crossRef)
             }
             recipeId

@@ -73,8 +73,8 @@ fun FavouriteRecipeListItem(favouriteRecipe: FavouriteRecipe, navController: Nav
             imageBytes = favouriteRecipe.image,
             contentDescription = context.getText(R.string.recipe_image_info).toString(),
             modifier = Modifier
-                .size(200.dp, 150.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .size(200.dp, 150.dp),
             contentScale = ContentScale.FillBounds
         )
 
