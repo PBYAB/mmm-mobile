@@ -3,6 +3,7 @@ package com.example.mmm_mobile.screens
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
@@ -164,13 +164,15 @@ class RecipeListViewModel : ViewModel() {
 }
 
 @Composable
-fun RecipesScreen(navController: NavController, query: String?) {
-
+fun RecipesScreen(
+    onRecipeClick: (Long) -> Unit,
+    query: String? = null
+) {
     val viewModel = viewModel<RecipeListViewModel>()
     viewModel.filterRecipes(query, null, null, null, null, null)
 
     val context = LocalContext.current
-    val shakeEventListener = onShakeEvent(viewModel, navController)
+    val shakeEventListener = onShakeEvent(onRecipeClick, viewModel, )
     val shakeDetector = remember { ShakeDetector(shakeEventListener) }
     val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -187,21 +189,27 @@ fun RecipesScreen(navController: NavController, query: String?) {
     }
 
 
-    RecipeList(navController = navController, viewModel = viewModel)
+    RecipeList(onRecipeClick, viewModel = viewModel)
 }
 
 @Composable
-fun onShakeEvent(viewModel: RecipeListViewModel, navController: NavController): ShakeEventListener {
+fun onShakeEvent(
+    onRecipeSelected: (Long) -> Unit,
+    viewModel: RecipeListViewModel
+): ShakeEventListener {
     return {
         viewModel.viewModelScope.launch {
             val recipeOfTheDay = viewModel.recipesApi.getUserRecipeOfTheDay()
-            navController.navigate("Recipe/${recipeOfTheDay.id}")
+            onRecipeSelected(recipeOfTheDay.id)
         }
     }
 }
 
 @Composable
-fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
+fun RecipeList(
+    onRecipeSelected: (Long) -> Unit,
+    viewModel: RecipeListViewModel
+) {
 
     val state = viewModel.state
     val columnCount = 2
@@ -219,7 +227,7 @@ fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
             }
-            RecipeListItem(recipe = item, navController = navController)
+            RecipeListItem(recipe = item, onRecipeSelected = onRecipeSelected)
         }
         item(span = span) {
             if (state.isLoading) {
@@ -235,7 +243,10 @@ fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
 }
 
 @Composable
-fun RecipeListItem(recipe: Recipe, navController: NavController) {
+fun RecipeListItem(
+    onRecipeSelected: (Long) -> Unit,
+    recipe: Recipe
+) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(data = recipe.image)
@@ -251,7 +262,7 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.background)
             .clickable { // Dodajemy logikę kliknięcia
-                navController.navigate("Recipe/${recipe.id}")
+                onRecipeSelected(recipe.id)
             }
     ) {
         Image(

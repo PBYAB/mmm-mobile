@@ -95,7 +95,6 @@ import org.openapitools.client.models.RecipeReviewDTO
 
 @Composable
 fun RecipeDetailScreen(
-    navController: NavController,
     recipeId: Long?,
     snackbarHostState: SnackbarHostState
 ) {

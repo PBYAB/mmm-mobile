@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -40,10 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,7 +61,6 @@ import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.utils.NotificationReceiver
 import com.example.mmm_mobile.utils.NotificationScheduler
-import com.google.mlkit.vision.barcode.BarcodeScanner
 
 
 private const val NOTIFICATION_MINUTES_INTERVAL = 1L
@@ -94,7 +89,7 @@ class MainActivity : ComponentActivity() {
             topBar = {
                 TopBar(
                     currentRoute = navBackStackEntry?.destination?.route ?: "",
-                    onSearch = { currentRoute ->
+                    onSearchClick = { currentRoute ->
                         when {
                             currentRoute.startsWith(Screen.ProductList.route)
                                 .or(currentRoute.startsWith(Screen.ProductDetails.route))
@@ -111,13 +106,24 @@ class MainActivity : ComponentActivity() {
                             else -> {}
                         }
                     },
-                    onBarcodeScanner = { navController.navigate(Screen.Barcode.route)},
-                    onLogOut = { navController.navigate(Screen.Login.route) }
+                    onBarcodeScannerClick = { navController.navigate(Screen.Barcode.route)},
+                    onLogOutClick = { navController.navigate(Screen.Login.route) }
                 )
             },
-            floatingActionButton = { FAB(navController) },
+            floatingActionButton = {
+                FAB(
+                    currentRoute = navBackStackEntry?.destination?.route ?: "",
+                    onNavigateToProductAddClick = { navController.navigate(Screen.AddProduct.route) },
+                    onNavigateToRecipeAddClick = { navController.navigate(Screen.AddRecipe.route) }
+                )
+                                   },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = { BottomNavBar(navController) },
+            bottomBar = {
+                BottomNavBar(
+                    onNavigateToDestinationClick = { route -> navController.navigate(route) },
+                    currentRoute = navBackStackEntry?.destination?.route ?: ""
+                )
+                        },
             containerColor = MaterialTheme.colorScheme.onPrimary,
         ) { padding ->
             NavHost(
@@ -125,15 +131,54 @@ class MainActivity : ComponentActivity() {
                 startDestination = Screen.Login.route,
                 modifier = Modifier.padding(padding)
             ) {
-                composable(Screen.Login.route) { LoginScreen(navController) }
-                composable(Screen.Registration.route) { RegistrationScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
-                composable(Screen.AddProduct.route) { AddProductScreen(navController, snackbarHostState) }
-                composable(Screen.AddRecipe.route) { AddRecipeScreen(navController, snackbarHostState) }
+                composable(Screen.Login.route) {
+                    LoginScreen(
+                        onLoginClick = { navController.navigate(Screen.ProductList.route) },
+                        onMoveToRegistrationClick = { navController.navigate(Screen.Registration.route) }
+                    )
+                }
+                composable(Screen.Registration.route) {
+                    RegistrationScreen(
+                        onRegistrationClick = { navController.navigate(Screen.ProductList.route) }
+                    )
+                }
+                composable(
+                    Screen.RecipeList.route + "?query={query}",
+                    arguments = listOf(navArgument("query") { defaultValue = ""; type = NavType.StringType})
+                ){ backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    RecipesScreen(
+                        onRecipeClick = { recipeId ->
+                            navController.navigate(Screen.RecipeDetails.route + "/$recipeId")
+                        },
+                        query = if(query.isNullOrEmpty()) null else query
+                    )
+                }
+                composable(
+                    Screen.ProductList.route + "?query={query}",
+                    arguments = listOf(navArgument("query") { defaultValue = ""; type = NavType.StringType})
+                ) { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
+                    ProductsScreen(
+                        onProductClick = { productId ->
+                            navController.navigate(Screen.ProductDetails.route + "/$productId")
+                        },
+                        query = if(query.isNullOrEmpty()) null else query
+                    )
+                }
+                composable(Screen.AddProduct.route) {
+                    AddProductScreen(
+                        onAddProductClick = { navController.navigate("Product/${it}") },
+                        snackbarHostState = snackbarHostState
+                    )
+                }
+                composable(Screen.AddRecipe.route) {
+                    AddRecipeScreen(
+                        onAddRecipeClick = { navController.navigate("Recipe/${it}") },
+                        snackbarHostState = snackbarHostState
+                    )
+                }
                 composable(Screen.Barcode.route) { BarcodeScreen(navController) }
-                composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
-                composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
                 composable(
                     route = Screen.Search.route + "/{previousRoute}",
                     arguments = listOf(navArgument("previousRoute") { type = NavType.StringType })
@@ -141,10 +186,10 @@ class MainActivity : ComponentActivity() {
                     val previousRoute = backStackEntry.arguments?.getString("previousRoute") ?: ""
                     SearchScreen(
                         onProductSearch = { productQuery ->
-                            navController.navigate(Screen.ProductList.route + if (productQuery.isNotEmpty()) "/$productQuery" else "")
+                            navController.navigate(Screen.ProductList.route + if (productQuery.isNotEmpty()) "?query=$productQuery" else "")
                         },
                         onRecipeSearch = { recipeQuery ->
-                            navController.navigate(Screen.RecipeList.route + if (recipeQuery.isNotEmpty()) "/$recipeQuery" else "")
+                            navController.navigate(Screen.RecipeList.route + if (recipeQuery.isNotEmpty()) "?query=$recipeQuery" else "")
                         },
                         previousRoute = previousRoute
                     )
@@ -155,33 +200,37 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(Screen.RecipeDetails.route + "/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(navController, recipeId, snackbarHostState) // Przekazujemy recipeId do RecipeDetailScreen
+                    RecipeDetailScreen(
+                        recipeId,
+                        snackbarHostState
+                    )
                 }
-                composable(Screen.FavouriteRecipes.route) { FavouriteRecipesScreen(navController) }
+                composable(Screen.FavouriteRecipes.route) {
+                    FavouriteRecipesScreen(
+                        onRecipeClick = { recipeId ->
+                            navController.navigate(Screen.RecipeDetails.route + "/$recipeId")
+                        }
+                    )
+                }
                 composable("Favorite/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
-                    RecipeDetailScreen(navController, recipeId = recipeId, snackbarHostState) // Przekazujemy recipeId do FavouriteRecipeDetailScreen
-                }
-                composable(Screen.RecipeList.route + "/{query}"){ backStackEntry ->
-                    val query = backStackEntry.arguments?.getString("query")
-                    RecipesScreen(navController, query)
-
-                }
-                composable(Screen.ProductList.route + "/{query}") { backStackEntry ->
-                    val query = backStackEntry.arguments?.getString("query")
-                    ProductsScreen(navController, query)
+                    RecipeDetailScreen(
+                        recipeId = recipeId,
+                        snackbarHostState
+                    )
                 }
             }
         }
     }
 
     @Composable
-    fun BottomNavBar(navController: NavController) {
+    fun BottomNavBar(
+        onNavigateToDestinationClick: (String) -> Unit,
+        currentRoute: String
+    ) {
         val items = listOf(Screen.ProductList, Screen.RecipeList, Screen.FavouriteRecipes)
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
 
-        when (currentDestination?.route) {
+        when (currentRoute) {
             Screen.Login.route -> {}
             Screen.Search.route -> {}
             Screen.AddProduct.route -> {}
@@ -204,18 +253,12 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         label = { Text(text = screen.route) },
-                        selected = currentDestination?.hierarchy?.any { it.route?.startsWith(screen.route) ?: false } == true,
+                        selected = currentRoute.startsWith(screen.route),
                         onClick = {
-                            if (currentDestination?.route != screen.route) {
-                                navController.navigate(screen.route) {
-                                    launchSingleTop = true
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        inclusive = false
-                                    }
-                                }
+                            if (currentRoute != screen.route) {
+                                onNavigateToDestinationClick(screen.route)
                             }
-                        }
-
+                        },
                     )
                 }
             }
@@ -223,30 +266,33 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun FAB(navController: NavController) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-        // Don't show FAB if the current screen is Login
-        when (currentDestination?.route) {
-            Screen.Login.route -> {}
-            Screen.Search.route -> {}
-
-            Screen.ProductList.route -> CreateFAB(navController, Screen.AddProduct.route)
-            Screen.RecipeList.route -> CreateFAB(navController, Screen.AddRecipe.route)
-
+    fun FAB(
+        currentRoute: String,
+        onNavigateToProductAddClick: () -> Unit,
+        onNavigateToRecipeAddClick: () -> Unit
+    ) {
+        when (true) {
+            currentRoute.startsWith(Screen.ProductList.route) -> {
+                FloatingActionButton(
+                    onClick = onNavigateToProductAddClick,
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
+                }
+            }
+            currentRoute.startsWith(Screen.RecipeList.route) -> {
+                FloatingActionButton(
+                    onClick = onNavigateToRecipeAddClick,
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
+                }
+            }
             else -> {}
-        }
-    }
-
-    @Composable
-    fun CreateFAB(navController: NavController, route: String) {
-        FloatingActionButton(
-            onClick = { navController.navigate(route) },
-            modifier = Modifier.padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
         }
     }
 
@@ -254,9 +300,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TopBar(
         currentRoute: String,
-        onSearch: (String) -> Unit,
-        onBarcodeScanner: (String) -> Unit,
-        onLogOut: () -> Unit
+        onSearchClick: (String) -> Unit,
+        onBarcodeScannerClick: (String) -> Unit,
+        onLogOutClick: () -> Unit
     ) {
         var dropdownMenuExpanded by remember { mutableStateOf(false) }
 
@@ -279,14 +325,14 @@ class MainActivity : ComponentActivity() {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
-                    IconButton(onClick = { onBarcodeScanner(Screen.Barcode.route) }) {
+                    IconButton(onClick = { onBarcodeScannerClick(Screen.Barcode.route) }) {
                         Icon(
                             painter = painterResource(id = R.mipmap.barcode_scanner_icon),
                             contentDescription = getText(R.string.barcode_scanner_icon_info).toString(),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    IconButton(onClick = { onSearch(currentRoute) }) {
+                    IconButton(onClick = { onSearchClick(currentRoute) }) {
                         Icon(
                             Icons.Filled.Search,
                             contentDescription = stringResource(id = R.string.search_icon_info),
@@ -300,7 +346,7 @@ class MainActivity : ComponentActivity() {
                         DropdownMenuItem(onClick = {
                             dropdownMenuExpanded = false
                             TokenManager.getInstance(this@MainActivity).clear()
-                            onLogOut()
+                            onLogOutClick()
                         },
                             text = {
                                 Row {

@@ -1,8 +1,6 @@
 package com.example.mmm_mobile.screens
 
-import android.content.res.Configuration
 import androidx.annotation.DrawableRes
-import androidx.annotation.IntRange
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,22 +33,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Product
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -173,17 +164,23 @@ class ProductsListViewModel : ViewModel() {
 
 
 @Composable
-fun ProductsScreen(navController: NavController, query: String?) {
+fun ProductsScreen(
+    onProductClick: (Long) -> Unit = {},
+    query: String? = null
+) {
     val viewModel: ProductsListViewModel = viewModel()
     viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
 
     Box(modifier = Modifier) {
-        ProductList(navController = navController, viewModel = viewModel)
+        ProductList(onProductSelected = onProductClick ,viewModel = viewModel)
     }
 }
 
 @Composable
-fun ProductListItem(product: Product, navController: NavController) {
+fun ProductListItem(
+    onProductSelected: (Long) -> Unit = {},
+    product: Product
+) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(data = product.image)
@@ -200,7 +197,7 @@ fun ProductListItem(product: Product, navController: NavController) {
             .clickable(onClick = {})
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                navController.navigate("Product/${product.id}")
+                onProductSelected(product.id)
             },
     ) {
         Image(
@@ -273,7 +270,10 @@ fun ProductListItem(product: Product, navController: NavController) {
 
 
 @Composable
-fun ProductList(navController: NavController, viewModel: ProductsListViewModel) {
+fun ProductList(
+    onProductSelected: (Long) -> Unit = {},
+    viewModel: ProductsListViewModel
+) {
     val state = viewModel.state
     val columnCount = 2
     val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
@@ -290,7 +290,7 @@ fun ProductList(navController: NavController, viewModel: ProductsListViewModel) 
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
             }
-            ProductListItem(product = item, navController = navController)
+            ProductListItem(product = item, onProductSelected = onProductSelected)
         }
         item(span = span) {
             if (state.isLoading) {
@@ -326,25 +326,5 @@ fun getNovaGroupImage(novaGroup: Int): Int {
         3 -> R.drawable.nova_group_3
         4 -> R.drawable.nova_group_4
         else -> R.drawable.nova_group_4
-    }
-}
-
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-)
-@Composable
-fun ProductListItemPreview() {
-    MmmmobileTheme {
-        val product = Product(
-            id = 1,
-            name = "Product name",
-            quantity = "Product quantity",
-            barcode = "Product barcode",
-            image = "Product image",
-            nutriScore = 1,
-            novaGroup = 1
-        )
-        ProductListItem(product = product, navController = NavController(LocalContext.current))
     }
 }

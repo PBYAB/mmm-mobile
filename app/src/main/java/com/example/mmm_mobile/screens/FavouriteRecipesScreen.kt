@@ -34,17 +34,22 @@ import com.example.mmm_mobile.room.entity.FavouriteRecipe
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 
 @Composable
-fun FavouriteRecipesScreen(navController: NavController) {
+fun FavouriteRecipesScreen(
+    onRecipeClick: (Long) -> Unit,
+) {
     val recipeViewModel: FavouriteRecipeViewModel = viewModel()
     val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipesWithoutIngredients().observeAsState(initial = emptyList())
 
 
-    FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, navController = navController)
+    FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, onRecipeClick = onRecipeClick)
 }
 
 
 @Composable
-fun FavouriteRecipeList(recipes: List<FavouriteRecipe>, navController: NavController) {
+fun FavouriteRecipeList(
+    recipes: List<FavouriteRecipe>,
+    onRecipeClick: (Long) -> Unit,
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         Modifier.padding(8.dp)
@@ -53,13 +58,16 @@ fun FavouriteRecipeList(recipes: List<FavouriteRecipe>, navController: NavContro
             recipes,
             key = { recipe -> recipe.id }
         ) { recipe ->
-            FavouriteRecipeListItem(favouriteRecipe = recipe, navController = navController)
+            FavouriteRecipeListItem(favouriteRecipe = recipe, onRecipeClick = onRecipeClick)
         }
     }
 }
 
 @Composable
-fun FavouriteRecipeListItem(favouriteRecipe: FavouriteRecipe, navController: NavController) {
+fun FavouriteRecipeListItem(
+    favouriteRecipe: FavouriteRecipe,
+    onRecipeClick: (Long) -> Unit,
+) {
     val context = LocalContext.current
 
     Card(
@@ -69,7 +77,7 @@ fun FavouriteRecipeListItem(favouriteRecipe: FavouriteRecipe, navController: Nav
             .clip(RoundedCornerShape(16.dp)) // Dodajemy zaokrąglenie rogów
             .background(MaterialTheme.colorScheme.background)
             .clickable { // Dodajemy logikę kliknięcia
-                navController.navigate("Favorite/${favouriteRecipe.id}")
+                onRecipeClick(favouriteRecipe.id)
             }
     ) {
         DisplayImage(

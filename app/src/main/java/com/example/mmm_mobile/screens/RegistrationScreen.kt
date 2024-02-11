@@ -5,33 +5,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -44,7 +32,9 @@ import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.RegisterRequest
 
 @Composable
-fun RegistrationScreen(navController: NavController) {
+fun RegistrationScreen(
+    onRegistrationClick: () -> Unit = {},
+) {
     val context = LocalContext.current
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -151,7 +141,7 @@ fun RegistrationScreen(navController: NavController) {
                                 TokenManager.getInstance(context).accessToken = result.accessToken
                                 println(ApiClient.accessToken)
                                 withContext(Dispatchers.Main) {
-                                    navController.navigate(Screen.ProductList.route)
+                                    onRegistrationClick()
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
@@ -178,14 +168,3 @@ fun RegistrationScreen(navController: NavController) {
         }
     }
 }
-
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//)
-//@Composable
-//fun DefaultPreview() {
-//    MmmmobileTheme {
-//        RegistrationScreen(navController = NavController(LocalContext.current))
-//    }
-//}

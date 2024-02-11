@@ -33,12 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +47,10 @@ import org.openapitools.client.models.AuthenticationRequest
 
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    onLoginClick: () -> Unit = {},
+    onMoveToRegistrationClick: () -> Unit = {},
+) {
     val context = LocalContext.current
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -58,7 +58,7 @@ fun LoginScreen(navController: NavController) {
     println("LoginScreen: ${tokenManager.accessToken}")
     if (tokenManager.accessToken != null) {
         ApiClient.accessToken = tokenManager.accessToken
-        navController.navigate(Screen.ProductList.route)
+        onLoginClick()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -113,7 +113,7 @@ fun LoginScreen(navController: NavController) {
                             tokenManager.accessToken = result.accessToken
                             println(ApiClient.accessToken) // TODO: remove
                             withContext(Dispatchers.Main) {
-                                navController.navigate(Screen.ProductList.route)
+                                onLoginClick()
                             }
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
@@ -137,7 +137,7 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.padding(top = 16.dp))
             Button(
                 onClick = {
-                    navController.navigate(Screen.Registration.route)
+                    onMoveToRegistrationClick()
                 },
                 modifier = Modifier.padding(top = 16.dp),
                 colors = ButtonDefaults.textButtonColors(
@@ -196,15 +196,4 @@ fun passwordInput(
         ),
     )
     return password.value
-}
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-)
-@Composable
-fun DefaultPreview() {
-    MmmmobileTheme {
-        LoginScreen(navController = NavController(LocalContext.current))
-    }
 }

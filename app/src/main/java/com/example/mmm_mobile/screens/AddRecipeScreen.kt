@@ -79,7 +79,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.IngredientUnit
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
@@ -96,7 +95,10 @@ import org.openapitools.client.models.RecipeIngredientForm
 
 
 @Composable
-fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHostState) {
+fun AddRecipeScreen(
+    onAddRecipeClick: (Long) -> Unit,
+    snackbarHostState: SnackbarHostState
+) {
 
     val viewModel: AddRecipeViewModel = viewModel()
     var recipeName by rememberSaveable { mutableStateOf("") }
@@ -367,7 +369,11 @@ fun AddRecipeScreen(navController: NavController, snackbarHostState: SnackbarHos
                             recipeTime.toInt()
                         )
                         Log.e("RECIPE", createRecipeRequest.toString())
-                        viewModel.addRecipe(createRecipeRequest, snackbarHostState, navController)
+                        viewModel.addRecipe(
+                            createRecipeRequest,
+                            snackbarHostState,
+                            onAddRecipeClick
+                        )
                     } else {
                         Toast.makeText(
                             context,
@@ -684,7 +690,7 @@ class AddRecipeViewModel(
     fun addRecipe(
         createRecipeRequest: CreateRecipeRequest,
         snackbarHostState: SnackbarHostState,
-        navController: NavController
+        onAddRecipe: (Long) -> Unit
     ) {
         viewModelScope.launch {
             try {
@@ -704,7 +710,7 @@ class AddRecipeViewModel(
                     Log.d("AddRecipeViewModel", "Headers: ${response.headers}")
 
                     recipeId?.let {
-                        navController.navigate("Recipe/$recipeId")
+                        onAddRecipe(recipeId)
                     }
                 } else {
                     viewModelScope.launch {
