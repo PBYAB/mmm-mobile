@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -18,12 +18,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
-        }
-
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
         }
     }
 
@@ -61,7 +55,7 @@ val glideVersion = "4.12.0"
 // Glide - Biblioteka do ładowania i wyświetlania obrazów
 dependencies {
     implementation("com.github.bumptech.glide:glide:$glideVersion")
-    annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
+    ksp("com.github.bumptech.glide:compiler:$glideVersion")
 }
 
 val accompanistVersion = "0.20.2"
@@ -76,7 +70,7 @@ val roomVersion = "2.6.1"
 // Room - Biblioteka do obsługi bazy danych
 dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 }
@@ -98,7 +92,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
     implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
     implementation("androidx.paging:paging-compose:$pagingVersion")
-    kapt("androidx.lifecycle:lifecycle-common-java8:$lifecycleCommonJava8Version")
+    ksp("androidx.lifecycle:lifecycle-common-java8:$lifecycleCommonJava8Version")
     implementation("androidx.navigation:navigation-compose:$navigationComposeVersion")
     implementation("io.coil-kt:coil-compose:$coilComposeVersion")
     implementation("androidx.compose.ui:ui:$composeUiVersion")
@@ -195,4 +189,10 @@ val workVersion = "2.9.0"
 //WorkManager
 dependencies {
     implementation("androidx.work:work-runtime-ktx:$workVersion")
+}
+
+// Kotlinx Collections Immutable
+val kotlinxCollectionsImmutableVersion = "0.3.7"
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion")
 }

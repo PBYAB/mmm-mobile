@@ -49,7 +49,10 @@ fun FavouriteRecipeList(recipes: List<FavouriteRecipe>, navController: NavContro
         columns = GridCells.Fixed(2),
         Modifier.padding(8.dp)
     ) {
-        items(recipes) { recipe ->
+        items(
+            recipes,
+            key = { recipe -> recipe.id }
+        ) { recipe ->
             FavouriteRecipeListItem(favouriteRecipe = recipe, navController = navController)
         }
     }

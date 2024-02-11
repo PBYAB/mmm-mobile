@@ -2,6 +2,7 @@ package com.example.mmm_mobile.room.db
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.CallSuper
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
@@ -38,9 +39,11 @@ abstract class RecipeDataBase : RoomDatabase() {
         private var INSTANCE: RecipeDataBase? = null
 
 
+
         @OptIn(DelicateCoroutinesApi::class)
         fun getDatabase(context: Context): RecipeDataBase {
             val roomDatabaseCallback = object : Callback() {
+                @CallSuper
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     INSTANCE?.let { database ->

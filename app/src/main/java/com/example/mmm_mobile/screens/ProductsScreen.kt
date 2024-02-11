@@ -1,6 +1,8 @@
 package com.example.mmm_mobile.screens
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
+import androidx.annotation.IntRange
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -280,7 +282,10 @@ fun ProductList(navController: NavController, viewModel: ProductsListViewModel) 
         columns = GridCells.Fixed(columnCount),
         Modifier.padding(8.dp)
     ) {
-        items(state.items.size) { i ->
+        items(
+            state.items.size,
+            key = { state.items[it].id }
+        ) { i ->
             val item = state.items[i]
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
@@ -300,7 +305,7 @@ fun ProductList(navController: NavController, viewModel: ProductsListViewModel) 
     }
 }
 
-
+@DrawableRes
 fun getNutriScoreImage(nutriScore: Int): Int {
     return when (nutriScore) {
         in -15..-2 -> R.drawable.nutri_score_a
@@ -312,6 +317,8 @@ fun getNutriScoreImage(nutriScore: Int): Int {
     }
 }
 
+
+@DrawableRes
 fun getNovaGroupImage(novaGroup: Int): Int {
     return when (novaGroup) {
         1 -> R.drawable.nova_group_1

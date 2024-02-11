@@ -1,4 +1,5 @@
 import android.app.Application
+import androidx.annotation.WorkerThread
 import com.example.mmm_mobile.room.dao.RecipeIngredientDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
 import com.example.mmm_mobile.room.entity.Ingredient
@@ -21,12 +22,14 @@ class RecipeIngredientRepository(
 
     fun findAllIngredients() = recipeIngredientDao.getIngredients()
 
+    @WorkerThread
     suspend fun getIngredientsForRecipe(recipeId: Long): List<IngredientWithAmountAndUnit> {
         return withContext(defaultDispatcher) {
             recipeIngredientDao.getIngredientsForRecipe(recipeId)
         }
     }
 
+    @WorkerThread
     suspend fun insertIngredientIfNotExists(ingredient: Ingredient): Long {
         return withContext(defaultDispatcher) {
             val existingIngredient = recipeIngredientDao.getIngredientByName(ingredient.name)
@@ -36,6 +39,7 @@ class RecipeIngredientRepository(
         }
     }
 
+    @WorkerThread
     suspend fun deleteOrphanRecipeIngredients() {
         withContext(defaultDispatcher) {
             recipeIngredientDao.deleteOrphanRecipeIngredients()

@@ -211,7 +211,10 @@ fun RecipeList(navController: NavController, viewModel: RecipeListViewModel) {
         columns = GridCells.Fixed(columnCount),
         Modifier.padding(8.dp)
     ) {
-        items(state.items.size) { i ->
+        items(
+            state.items.size,
+            key = { index -> state.items[index].id }
+        ) { i ->
             val item = state.items[i]
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
@@ -309,11 +312,3 @@ fun RecipeListItem(recipe: Recipe, navController: NavController) {
         }
     }
 }
-
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun RecipeListPreview() {
-//    MmmmobileTheme {
-//        RecipesScreen(navController = NavHostController(LocalContext.current))
-//    }
-//}

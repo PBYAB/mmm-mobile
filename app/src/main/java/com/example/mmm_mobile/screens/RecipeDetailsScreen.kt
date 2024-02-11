@@ -893,7 +893,9 @@ fun ReviewListItem(review: RecipeReviewDTO, loggedInId: Long, onDeleteClick: () 
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()) {
             Text(
                 text = review.fullName,
                 style = MaterialTheme.typography.headlineLarge,

@@ -5,6 +5,8 @@ import RecipeIngredientRepository
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.annotation.RequiresPermission
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -119,6 +121,8 @@ class FavouriteRecipeViewModel(
         WorkManager.getInstance(context).enqueue(request)
     }
 
+    @RequiresPermission(android.Manifest.permission.INTERNET)
+    @WorkerThread
     private suspend fun downloadImage(context: Context, url: String): ByteArray? {
         return withContext(Dispatchers.IO) {
             try {

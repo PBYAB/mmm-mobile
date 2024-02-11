@@ -2,6 +2,7 @@ package com.example.mmm_mobile.services
 
 import android.app.Application
 import android.content.Context
+import androidx.annotation.WorkerThread
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.Data
@@ -16,6 +17,7 @@ import org.openapitools.client.models.RecipeDTO
 class RecipeDownloadWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
 
+    @WorkerThread
     override suspend fun doWork(): Result {
         val recipeId = inputData.getLong("recipe_id", 0L)
         if (recipeId != 0L) {
@@ -29,6 +31,7 @@ class RecipeDownloadWorker(appContext: Context, workerParams: WorkerParameters) 
         return Result.failure()
     }
 
+    @WorkerThread
     private suspend fun fetchRecipeById(id: Long): RecipeDTO? {
         val recipeApi = RecipeApi()
         return withContext(Dispatchers.IO) {

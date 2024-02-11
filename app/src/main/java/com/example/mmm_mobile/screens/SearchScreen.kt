@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,15 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavController) {
+fun SearchScreen(
+    onProductSearch: (String) -> Unit,
+    onRecipeSearch: (String) -> Unit,
+    previousRoute: String
+) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     val recipesSuggestions = listOf(
@@ -53,26 +54,25 @@ fun SearchScreen(navController: NavController) {
         "cebula",
         "ziemniaki",
     )
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    var nextRoute = ""
-    var suggestions = emptyList<String>()
-    when (currentRoute) {
-        Screen.Search.route + "/recipes" -> {
-            suggestions = recipesSuggestions
-            nextRoute = Screen.RecipeList.route
-        }
 
-        Screen.Search.route + "/products" -> {
-            suggestions = productsSuggestions
-            nextRoute = Screen.ProductList.route
-        }
+    val suggestions = when(previousRoute){
+        Screen.RecipeList.route -> recipesSuggestions
+        Screen.ProductList.route -> productsSuggestions
+        else -> listOf()
     }
 
     SearchBar(
         query = query,
-        onQueryChange = { newQuery -> query = newQuery },
+        onQueryChange = { newQuery ->
+            query = newQuery
+            active = newQuery.isNotEmpty() // Set active to true if query is not empty
+        },
         onSearch = {
-            navController.navigate(nextRoute + if (query.isNotEmpty()) "/$query" else "")
+            if (previousRoute == Screen.RecipeList.route) {
+                onRecipeSearch(query)
+            } else if (previousRoute == Screen.ProductList.route) {
+                onProductSearch(query)
+            }
         },
         active = active,
         onActiveChange = { newActiveState -> active = newActiveState },
@@ -84,7 +84,6 @@ fun SearchScreen(navController: NavController) {
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        // Show suggestions when the search bar is active
         if (active && query.isNotEmpty()) {
             LazyColumn {
                 items(suggestions.filter { it.contains(query, ignoreCase = true) }) { suggestion ->
@@ -94,115 +93,11 @@ fun SearchScreen(navController: NavController) {
                             .fillMaxWidth()
                             .clickable {
                                 query = suggestion
-                                active = false
                             }
                             .padding(16.dp)
                     )
                 }
             }
         }
-    }
-}
-
-//@Composable
-//fun SearchRecipesList(navController: NavController, state: ScreenState<Recipe>) {
-//    val viewModel: SearchViewModel = viewModel()
-//
-//    LazyColumn(content = {
-//        itemsIndexed(state.items) { index, recipe ->
-//            if (index >= state.items.size - 1 && !viewModel.state.endReached && !viewModel.state.isLoading) {
-//                viewModel.loadNextItems()
-//            }
-//            SearchRecipesListItem(recipe = recipe, navController = navController)
-//        }
-//        item {
-//            if (viewModel.state.isLoading) {
-//                Box(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//        }
-//    })
-//}
-//
-//@Composable
-//fun SearchRecipesListItem(recipe: Recipe, navController: NavController) {
-//    val context = LocalContext.current
-//    val painter = rememberAsyncImagePainter(
-//        ImageRequest.Builder(LocalContext.current)
-//            .data(data = recipe.image)
-//            .apply(block = fun ImageRequest.Builder.() {
-//                placeholder(R.mipmap.ic_article_icon_foreground)
-//                error(R.mipmap.ic_article_icon_foreground)
-//            }).build()
-//    )
-//    Card(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(8.dp)
-//            .clickable {
-//                navController.navigate("recipe/${recipe.id}")
-//            },
-//        shape = RoundedCornerShape(8.dp),
-//    ) {
-//        Row(modifier = Modifier
-//            .fillMaxSize()
-//        ) {
-//            Image(
-//                painter = painter,
-//                contentDescription = recipe.name,
-//                modifier = Modifier
-//                    .size(100.dp, 100.dp)
-//                    .weight(1f)
-//                    .clip(
-//                        RoundedCornerShape(
-//                            topStart = 8.dp,
-//                            bottomStart = 8.dp,
-//                            topEnd = 0.dp,
-//                            bottomEnd = 0.dp
-//                        )
-//                    ),
-//                contentScale = ContentScale.FillBounds
-//            )
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .weight(2f)
-//            ) {
-//                Text(
-//                    text = recipe.name,
-//                    modifier = Modifier
-//                        .padding(8.dp)
-//                    ,
-//                    maxLines = 2,
-//                    minLines = 2,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                )
-//                Row(modifier = Modifier.padding(8.dp)) {
-//                    Icon(Icons.Filled.Person, context.getText(R.string.servings_count_info).toString())
-//                    Text(
-//                        text = recipe.servings.toString()
-//                    )
-//                    Spacer(modifier = Modifier.padding(8.dp))
-//                    Icon(painter = painterResource(id = R.drawable.timer_fill0_wght400_grad0_opsz24) , contentDescription = context.getText(R.string.time_info).toString())
-//                    Text(
-//                        text = recipe.time.toString() + " min"
-//                    )
-//                }
-//            }
-//
-//        }
-//    }
-//}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun SearchScreenPreview() {
-    MmmmobileTheme {
-        SearchScreen(navController = NavController(LocalContext.current))
     }
 }

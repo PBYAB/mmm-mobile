@@ -1,4 +1,5 @@
 import android.app.Application
+import androidx.annotation.WorkerThread
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
@@ -25,12 +26,14 @@ class FavouriteRecipeRepository(
     fun findAllFavouriteRecipesWithoutIngredients() =
         favouriteRecipeDao.getFavouriteRecipesWithoutIngredients()
 
+    @WorkerThread
     suspend fun findRecipeById(recipeId: Long): FavouriteRecipe {
         return withContext(defaultDispatcher) {
             favouriteRecipeDao.getRecipeById(recipeId)
         }
     }
 
+    @WorkerThread
     suspend fun insertFavouriteRecipe(
         recipe: FavouriteRecipe,
         ingredients: List<RecipeIngredientCrossRef>,
@@ -50,6 +53,7 @@ class FavouriteRecipeRepository(
         }
     }
 
+    @WorkerThread
     suspend fun deleteFavouriteRecipe(recipeId: Long) {
         withContext(defaultDispatcher) {
             favouriteRecipeDao.deleteRecipeIngredientCrossRefs(recipeId)
@@ -57,18 +61,21 @@ class FavouriteRecipeRepository(
         }
     }
 
+    @WorkerThread
     suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeIngredientCrossRef): Long {
         return withContext(defaultDispatcher) {
             favouriteRecipeDao.insertRecipeIngredientCrossRef(crossRef)
         }
     }
 
+    @WorkerThread
     suspend fun deleteRecipeIngredientCrossRefs(recipeId: Long) {
         withContext(defaultDispatcher) {
             favouriteRecipeDao.deleteRecipeIngredientCrossRefs(recipeId)
         }
     }
 
+    @WorkerThread
     suspend fun updateFavouriteRecipe(recipe: FavouriteRecipe) {
         withContext(defaultDispatcher) {
             favouriteRecipeDao.updateFavouriteRecipe(recipe)

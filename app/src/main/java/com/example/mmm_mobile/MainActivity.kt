@@ -44,10 +44,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mmm_mobile.screens.AddProductScreen
 import com.example.mmm_mobile.screens.AddRecipeScreen
 import com.example.mmm_mobile.screens.BarcodeScreen
@@ -63,6 +65,7 @@ import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.utils.NotificationReceiver
 import com.example.mmm_mobile.utils.NotificationScheduler
+import com.google.mlkit.vision.barcode.BarcodeScanner
 
 
 private const val NOTIFICATION_MINUTES_INTERVAL = 1L
@@ -88,7 +91,30 @@ class MainActivity : ComponentActivity() {
 
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
-            topBar = { TopBar(navController) },
+            topBar = {
+                TopBar(
+                    currentRoute = navBackStackEntry?.destination?.route ?: "",
+                    onSearch = { currentRoute ->
+                        when {
+                            currentRoute.startsWith(Screen.ProductList.route)
+                                .or(currentRoute.startsWith(Screen.ProductDetails.route))
+                            -> navController.navigate(
+                                route = Screen.Search.route + "/${Screen.ProductList.route}"
+                            )
+
+                            currentRoute.startsWith(Screen.RecipeList.route)
+                                .or(currentRoute.startsWith(Screen.RecipeDetails.route))
+                                .or(currentRoute.startsWith(Screen.FavouriteRecipes.route))
+                            -> navController.navigate(
+                                route = Screen.Search.route + "/${Screen.RecipeList.route}"
+                            )
+                            else -> {}
+                        }
+                    },
+                    onBarcodeScanner = { navController.navigate(Screen.Barcode.route)},
+                    onLogOut = { navController.navigate(Screen.Login.route) }
+                )
+            },
             floatingActionButton = { FAB(navController) },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = { BottomNavBar(navController) },
@@ -108,8 +134,21 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Barcode.route) { BarcodeScreen(navController) }
                 composable(Screen.ProductList.route) { ProductsScreen(navController, null) }
                 composable(Screen.RecipeList.route) { RecipesScreen(navController, null) }
-                composable(Screen.Search.route + "/products") { SearchScreen(navController) }
-                composable(Screen.Search.route + "/recipes") { SearchScreen(navController) }
+                composable(
+                    route = Screen.Search.route + "/{previousRoute}",
+                    arguments = listOf(navArgument("previousRoute") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val previousRoute = backStackEntry.arguments?.getString("previousRoute") ?: ""
+                    SearchScreen(
+                        onProductSearch = { productQuery ->
+                            navController.navigate(Screen.ProductList.route + if (productQuery.isNotEmpty()) "/$productQuery" else "")
+                        },
+                        onRecipeSearch = { recipeQuery ->
+                            navController.navigate(Screen.RecipeList.route + if (recipeQuery.isNotEmpty()) "/$recipeQuery" else "")
+                        },
+                        previousRoute = previousRoute
+                    )
+                }
                 composable(Screen.ProductDetails.route + "/{productId}") { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId")?.toLongOrNull()
                     ProductDetailScreen(productId) // Przekazujemy productId do ProductDetailScreen
@@ -167,11 +206,16 @@ class MainActivity : ComponentActivity() {
                         label = { Text(text = screen.route) },
                         selected = currentDestination?.hierarchy?.any { it.route?.startsWith(screen.route) ?: false } == true,
                         onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
+                            if (currentDestination?.route != screen.route) {
+                                navController.navigate(screen.route) {
+                                    launchSingleTop = true
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        inclusive = false
+                                    }
+                                }
                             }
-                        },
+                        }
+
                     )
                 }
             }
@@ -208,109 +252,80 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TopBar(navController: NavController){
-        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        Log.d("TopBar", "currentRoute: $currentRoute")
+    fun TopBar(
+        currentRoute: String,
+        onSearch: (String) -> Unit,
+        onBarcodeScanner: (String) -> Unit,
+        onLogOut: () -> Unit
+    ) {
         var dropdownMenuExpanded by remember { mutableStateOf(false) }
-
 
         when (currentRoute) {
             Screen.Login.route -> {}
-            Screen.Search.route -> {}
+            Screen.Search.route + "/{previousRoute}" -> {}
             Screen.AddProduct.route -> {}
             Screen.AddRecipe.route -> {}
             Screen.Registration.route -> {}
             Screen.Barcode.route -> {}
             else -> TopAppBar(
-                    title = {
-                        Text(
-                            text = getText(R.string.app_name).toString(),
-                            style = MaterialTheme.typography.headlineMedium
+                title = {
+                    Text(
+                        text = getText(R.string.app_name).toString(),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                actions = {
+                    IconButton(onClick = { onBarcodeScanner(Screen.Barcode.route) }) {
+                        Icon(
+                            painter = painterResource(id = R.mipmap.barcode_scanner_icon),
+                            contentDescription = getText(R.string.barcode_scanner_icon_info).toString(),
+                            tint = MaterialTheme.colorScheme.primary
                         )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    actions = {
-                        IconButton(onClick = { navController.navigate(Screen.Barcode.route) }) {
-                            Icon(
-                                painter = painterResource(id = R.mipmap.barcode_scanner_icon),
-                                contentDescription = getText(R.string.barcode_scanner_icon_info).toString(),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        IconButton(onClick = {
-                            if (currentRoute != null) {
-                                when {
-                                    currentRoute.startsWith(Screen.ProductList.route) -> navController.navigate(Screen.Search.route + "/products")
-                                    currentRoute.startsWith(Screen.ProductDetails.route) -> navController.navigate(Screen.Search.route + "/products")
-                                    currentRoute.startsWith(Screen.RecipeList.route) -> navController.navigate(Screen.Search.route + "/recipes")
-                                    currentRoute.startsWith(Screen.RecipeDetails.route) -> navController.navigate(Screen.Search.route + "/recipes")
-                                    currentRoute.startsWith(Screen.FavouriteRecipes.route) -> navController.navigate(Screen.Search.route + "/recipes")
-                                    else -> {}
+                    }
+                    IconButton(onClick = { onSearch(currentRoute) }) {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = stringResource(id = R.string.search_icon_info),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = dropdownMenuExpanded,
+                        onDismissRequest = { dropdownMenuExpanded = false }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            dropdownMenuExpanded = false
+                            TokenManager.getInstance(this@MainActivity).clear()
+                            onLogOut()
+                        },
+                            text = {
+                                Row {
+                                    Text(
+                                        text = stringResource(R.string.sign_out),
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Icon(
+                                        Icons.Filled.ExitToApp,
+                                        contentDescription = stringResource(R.string.sign_out),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
                                 }
                             }
-                        }
-                        ) {
-                            Icon(
-                                Icons.Filled.Search,
-                                contentDescription = stringResource(id = R.string.search_icon_info),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = dropdownMenuExpanded,
-                            onDismissRequest = { dropdownMenuExpanded = false }
-                        ) {
-                            DropdownMenuItem(onClick = {
-                                dropdownMenuExpanded = false
-                                TokenManager.getInstance(this@MainActivity).clear()
-                                navController.navigate(Screen.Login.route) {
-                                    popUpTo(navController.graph.startDestinationId)
-                                    launchSingleTop = true
-                                }
-                            },
-                                text = {
-                                    Row {
-                                        Text(
-                                            text = stringResource(R.string.sign_out),
-                                            modifier = Modifier.padding(end = 8.dp)
-                                        )
-                                        Icon(
-                                            Icons.Filled.ExitToApp,
-                                            contentDescription = stringResource(R.string.sign_out),
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.padding(end = 8.dp)
-                                        )
-                                    }
-                                }
-                            )
-                        }
-                        IconButton(onClick = { dropdownMenuExpanded = true }) {
-                            Icon(Icons.Filled.MoreVert,
-                                contentDescription = stringResource(R.string.more),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                        )
                     }
-                )
-        }
-    }
-
-    @Preview(showBackground = true, showSystemUi = true)
-    @Composable
-    fun BottomNavigationPreview() {
-        MmmmobileTheme {
-            Scaffold(
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                topBar = { TopBar(rememberNavController()) },
-                floatingActionButton = { FAB(navController = rememberNavController()) },
-                bottomBar = { BottomNavBar(rememberNavController()) }
-            ) { padding ->
-                Column(modifier = Modifier.padding(padding)) {
+                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                        Icon(Icons.Filled.MoreVert,
+                            contentDescription = stringResource(R.string.more),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-            }
+            )
         }
     }
 }
