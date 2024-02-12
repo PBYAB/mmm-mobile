@@ -168,14 +168,20 @@ fun RecipesScreen(
     onRecipeClick: (Long) -> Unit,
     query: String? = null
 ) {
-    val viewModel = viewModel<RecipeListViewModel>()
+    val viewModel: RecipeListViewModel = viewModel(
+        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
+    )
     viewModel.filterRecipes(query, null, null, null, null, null)
 
     val context = LocalContext.current
     val shakeEventListener = onShakeEvent(onRecipeClick, viewModel, )
     val shakeDetector = remember { ShakeDetector(shakeEventListener) }
-    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    val sensorManager = remember {
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+    val accelerometer = remember {
+        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    }
 
     DisposableEffect(Unit) {
         sensorManager.registerListener(

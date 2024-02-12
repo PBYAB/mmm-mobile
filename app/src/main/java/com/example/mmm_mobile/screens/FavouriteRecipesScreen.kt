@@ -37,19 +37,21 @@ import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
 fun FavouriteRecipesScreen(
     onRecipeClick: (Long) -> Unit,
 ) {
-    val recipeViewModel: FavouriteRecipeViewModel = viewModel()
-    val favouriteRecipesWithIngredients by recipeViewModel.findAllFavouriteRecipesWithoutIngredients().observeAsState(initial = emptyList())
+    val recipeViewModel: FavouriteRecipeViewModel = viewModel(
+        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
+    )
 
-
-    FavouriteRecipeList(recipes = favouriteRecipesWithIngredients, onRecipeClick = onRecipeClick)
+    FavouriteRecipeList(viewModel = recipeViewModel, onRecipeClick = onRecipeClick)
 }
 
 
 @Composable
 fun FavouriteRecipeList(
-    recipes: List<FavouriteRecipe>,
+    viewModel: FavouriteRecipeViewModel,
     onRecipeClick: (Long) -> Unit,
 ) {
+    val recipes by viewModel.findAllFavouriteRecipesWithoutIngredients().observeAsState(initial = emptyList())
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         Modifier.padding(8.dp)

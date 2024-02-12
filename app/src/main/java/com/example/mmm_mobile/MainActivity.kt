@@ -5,6 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -32,6 +40,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,14 +91,20 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainActivityComposable() {
         val navController = rememberNavController()
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
         val snackbarHostState = remember { SnackbarHostState() }
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        var currentRoute by remember { mutableStateOf("") }
 
+        LaunchedEffect(navBackStackEntry) {
+            navBackStackEntry?.destination?.route?.let {
+                currentRoute = it
+            }
+        }
         Scaffold(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             topBar = {
                 TopBar(
-                    currentRoute = navBackStackEntry?.destination?.route ?: "",
+                    currentRoute = currentRoute,
                     onSearchClick = { currentRoute ->
                         when {
                             currentRoute.startsWith(Screen.ProductList.route)
@@ -112,7 +128,7 @@ class MainActivity : ComponentActivity() {
             },
             floatingActionButton = {
                 FAB(
-                    currentRoute = navBackStackEntry?.destination?.route ?: "",
+                    currentRoute = currentRoute,
                     onNavigateToProductAddClick = { navController.navigate(Screen.AddProduct.route) },
                     onNavigateToRecipeAddClick = { navController.navigate(Screen.AddRecipe.route) }
                 )
@@ -120,16 +136,39 @@ class MainActivity : ComponentActivity() {
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 BottomNavBar(
-                    onNavigateToDestinationClick = { route -> navController.navigate(route) },
-                    currentRoute = navBackStackEntry?.destination?.route ?: ""
+                    onNavigateToDestinationClick = {
+                        if (!currentRoute.startsWith(it) ) navController.navigate(it)
+                                                   },
+                    currentRoute = currentRoute
                 )
                         },
             containerColor = MaterialTheme.colorScheme.onPrimary,
         ) { padding ->
             NavHost(
-                navController,
+                navController = navController,
                 startDestination = Screen.Login.route,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
+                enterTransition = {
+                    expandVertically(
+                        animationSpec = tween(1000, easing = LinearOutSlowInEasing)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    shrinkVertically(
+                        animationSpec = tween(1000, easing = LinearOutSlowInEasing)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    expandVertically(
+                        animationSpec = tween(1000, easing = LinearOutSlowInEasing)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    shrinkVertically(
+                        animationSpec = tween(1000, easing = LinearOutSlowInEasing)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+
             ) {
                 composable(Screen.Login.route) {
                     LoginScreen(

@@ -168,7 +168,9 @@ fun ProductsScreen(
     onProductClick: (Long) -> Unit = {},
     query: String? = null
 ) {
-    val viewModel: ProductsListViewModel = viewModel()
+    val viewModel: ProductsListViewModel = viewModel(
+        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
+    )
     viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
 
     Box(modifier = Modifier) {
@@ -209,7 +211,9 @@ fun ProductListItem(
             contentScale = ContentScale.FillBounds
         )
 
-        Text(text = product.name, fontFamily = poppinsFontFamily, fontWeight= FontWeight.Bold,
+        Text(text = product.name,
+            fontFamily = poppinsFontFamily,
+            fontWeight= FontWeight.Bold,
             modifier = Modifier.padding(8.dp),
             maxLines = 1,
             minLines = 1,
