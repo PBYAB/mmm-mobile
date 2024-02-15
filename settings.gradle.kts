@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "mmm-mobile"
 include(":app")
- 
+include(":benchmark")

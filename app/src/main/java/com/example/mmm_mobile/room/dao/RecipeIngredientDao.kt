@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.mmm_mobile.room.entity.Ingredient
 import com.example.mmm_mobile.room.entity.IngredientWithAmountAndUnit
@@ -12,6 +13,7 @@ import com.example.mmm_mobile.room.entity.IngredientWithAmountAndUnit
 @Dao
 interface RecipeIngredientDao {
 
+    @Transaction
     @WorkerThread
     @Query("SELECT * FROM recipe_ingredient INNER JOIN RecipeIngredientCrossRef ON recipe_ingredient.id = RecipeIngredientCrossRef.ingredientId WHERE RecipeIngredientCrossRef.recipeId = :recipeId")
     suspend fun getIngredientsForRecipe(recipeId: Long): List<IngredientWithAmountAndUnit>

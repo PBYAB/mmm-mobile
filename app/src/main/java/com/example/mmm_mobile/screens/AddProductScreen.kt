@@ -64,6 +64,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -159,6 +160,7 @@ fun AddProductScreen(
                 .padding(mediumPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .testTag("add_product_screen")
         ) {
             Text(
                 text = stringResource(R.string.add_product_title),
@@ -273,7 +275,8 @@ fun AddProductScreen(
             ) {
                 selectedBrands = SearchableExpandedDropDownMenu(
                     setOfItems = brandsState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("product_brand_dropdown"),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
@@ -323,7 +326,8 @@ fun AddProductScreen(
             ) {
                 selectedAllergens = SearchableExpandedDropDownMenu(
                     setOfItems = allergensState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("product_allergen_dropdown"),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
@@ -374,7 +378,8 @@ fun AddProductScreen(
             ) {
                 selectedCategories = SearchableExpandedDropDownMenu(
                     setOfItems = categoriesState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("product_category_dropdown"),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
@@ -424,7 +429,8 @@ fun AddProductScreen(
             ) {
                 selectedCountries = SearchableExpandedDropDownMenu(
                     setOfItems = countriesState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("product_country_dropdown"),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
@@ -801,7 +807,8 @@ fun AddProductScreen(
             ) {
                 selectedProductIngredients = SearchableExpandedDropDownMenu(
                     setOfItems = productIngredientState,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("product_ingredients"),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,

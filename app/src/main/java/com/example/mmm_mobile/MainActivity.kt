@@ -46,9 +46,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -88,6 +93,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun MainActivityComposable() {
         val navController = rememberNavController()
@@ -147,7 +153,11 @@ class MainActivity : ComponentActivity() {
             NavHost(
                 navController = navController,
                 startDestination = Screen.Login.route,
-                modifier = Modifier.padding(padding),
+                modifier = Modifier
+                    .padding(padding)
+                    .semantics {
+                        testTagsAsResourceId = true
+                    },
                 enterTransition = {
                     expandVertically(
                         animationSpec = tween(1000, easing = LinearOutSlowInEasing)
@@ -167,7 +177,7 @@ class MainActivity : ComponentActivity() {
                     shrinkVertically(
                         animationSpec = tween(1000, easing = LinearOutSlowInEasing)
                     ) + fadeOut(animationSpec = tween(700))
-                }
+                },
 
             ) {
                 composable(Screen.Login.route) {
@@ -316,7 +326,7 @@ class MainActivity : ComponentActivity() {
                     onClick = onNavigateToProductAddClick,
                     modifier = Modifier.padding(16.dp),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    contentColor = MaterialTheme.colorScheme.secondary,
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = getText(R.string.add_icon_info).toString())
                 }
@@ -341,7 +351,7 @@ class MainActivity : ComponentActivity() {
         currentRoute: String,
         onSearchClick: (String) -> Unit,
         onBarcodeScannerClick: (String) -> Unit,
-        onLogOutClick: () -> Unit
+        onLogOutClick: () -> Unit,
     ) {
         var dropdownMenuExpanded by remember { mutableStateOf(false) }
 
@@ -353,10 +363,11 @@ class MainActivity : ComponentActivity() {
             Screen.Registration.route -> {}
             Screen.Barcode.route -> {}
             else -> TopAppBar(
+                modifier = Modifier.testTag("top_app_bar"),
                 title = {
                     Text(
                         text = getText(R.string.app_name).toString(),
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineMedium,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -380,7 +391,7 @@ class MainActivity : ComponentActivity() {
                     }
                     DropdownMenu(
                         expanded = dropdownMenuExpanded,
-                        onDismissRequest = { dropdownMenuExpanded = false }
+                        onDismissRequest = { dropdownMenuExpanded = false },
                     ) {
                         DropdownMenuItem(onClick = {
                             dropdownMenuExpanded = false
@@ -403,10 +414,13 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
-                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                    IconButton(
+                        onClick = { dropdownMenuExpanded = true },
+                        modifier = Modifier.testTag("more_button_dropdown")
+                    ) {
                         Icon(Icons.Filled.MoreVert,
                             contentDescription = stringResource(R.string.more),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -200,7 +201,8 @@ fun ProductListItem(
             .background(MaterialTheme.colorScheme.background)
             .clickable {
                 onProductSelected(product.id)
-            },
+            }
+            .testTag("product_${product.id}"),
     ) {
         Image(
             painter = painter,
@@ -285,6 +287,7 @@ fun ProductList(
     LazyVerticalGrid(
         columns = GridCells.Fixed(columnCount),
         Modifier.padding(8.dp)
+            .testTag("product_list")
     ) {
         items(
             state.items.size,

@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -75,7 +76,10 @@ import org.openapitools.client.models.ProductIngredientDTO
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun ProductDetailScreen(productId: Long?) {
+fun ProductDetailScreen(
+    productId: Long?,
+    modifier: Modifier = Modifier.testTag("product_detail_screen")
+) {
     val productDetailsViewModel: ProductDetailsViewModel = viewModel()
 
     LaunchedEffect(productId) {
@@ -124,7 +128,10 @@ fun ProductDetails(productDetails: ProductDTO) {
     val context = LocalContext.current
     val images = productDetails.images?.toList() ?: emptyList()
 
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+            .testTag("product_detail_lazy_column")
+    ) {
         item {
             Box(
                 modifier = Modifier

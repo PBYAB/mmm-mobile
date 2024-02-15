@@ -68,6 +68,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -138,6 +139,7 @@ fun AddRecipeScreen(
                 .fillMaxSize()
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
+                .testTag("add_recipe_screen")
         ) {
             Text(
                 text = stringResource(R.string.add_recipe_title),
@@ -495,7 +497,8 @@ fun IngredientRow(
     ) {
         val selectedIngredient = SearchOneItemDropDownMenu(
             setOfItems = recipeIngredientState,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .testTag("search_ingredient"),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,

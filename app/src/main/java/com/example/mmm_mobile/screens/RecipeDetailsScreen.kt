@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -96,7 +97,8 @@ import org.openapitools.client.models.RecipeReviewDTO
 @Composable
 fun RecipeDetailScreen(
     recipeId: Long?,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier.testTag("recipe_detail_screen")
 ) {
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
     val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
@@ -111,7 +113,10 @@ fun RecipeDetailScreen(
 
     if (recipeFromDB != null) {
         Box {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+                    .testTag("recipe_detail_lazy_column")
+            ) {
                 item { recipeFromDB?.let {
                     RecipeDetails(
                         recipeDetails = mapToRecipeDetails(it),
@@ -324,16 +329,28 @@ fun AddDeleteFavoriteButton(
                     )
                 }
             }
-        }
+        },
+        modifier = modifier.testTag("favourite_button")
     ) {
         if (isFavourite) {
-            Icon(Icons.Filled.Favorite, contentDescription = null, tint = Color.Red, modifier = modifier
-                .size(44.dp)
-                .padding(4.dp))
+            Icon(Icons.Filled.Favorite,
+                contentDescription = null,
+                tint = Color.Red,
+                modifier = modifier
+                    .size(44.dp)
+                    .padding(4.dp)
+                    .testTag("remove_favourite_button")
+            )
         } else {
-            Icon(Icons.Filled.FavoriteBorder, contentDescription = null, tint = Color.Red, modifier = modifier
-                .size(44.dp)
-                .padding(4.dp))
+            Icon(
+                Icons.Filled.FavoriteBorder,
+                contentDescription = null,
+                tint = Color.Red,
+                modifier = modifier
+                    .size(44.dp)
+                    .padding(4.dp)
+                    .testTag("add_favourite_button")
+            )
         }
     }
 }
@@ -382,7 +399,7 @@ fun RecipeDetails(
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    Box{
         when (recipeDetails.image) {
             is ByteArray -> {
                 DisplayImage(
