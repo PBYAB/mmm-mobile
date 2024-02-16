@@ -208,6 +208,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("query") { defaultValue = ""; type = NavType.StringType})
                 ) { backStackEntry ->
                     val query = backStackEntry.arguments?.getString("query")
+                    Log.d("MainActivity", "currentRoute: $currentRoute")
                     ProductsScreen(
                         onProductClick = { productId ->
                             navController.navigate(Screen.ProductDetails.route + "/$productId")

@@ -1,7 +1,5 @@
 package com.example.mmm_mobile.screens
 
-import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -835,15 +833,14 @@ class ReviewListViewModel(val recipeId: Long) : ViewModel() {
         },
         onError = {
             state = state.copy(error = it?.localizedMessage)
-        },
-        onSuccess = { items, newKey ->
-            state = state.copy(
-                items = state.items + items,
-                page = newKey,
-                endReached = items.isEmpty()
-            )
         }
-    )
+    ) { items, newKey ->
+        state = state.copy(
+            items = state.items + items,
+            page = newKey,
+            endReached = items.isEmpty()
+        )
+    }
 
     init {
         viewModelScope.launch {

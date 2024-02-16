@@ -69,8 +69,10 @@ fun SearchScreen(
         },
         onSearch = {
             if (previousRoute == Screen.RecipeList.route) {
+                Log.d("SearchScreen", "Searching for recipes with query: $query")
                 onRecipeSearch(query)
             } else if (previousRoute == Screen.ProductList.route) {
+                Log.d("SearchScreen", "Searching for products with query: $query")
                 onProductSearch(query)
             }
         },

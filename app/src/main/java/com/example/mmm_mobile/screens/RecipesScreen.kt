@@ -177,12 +177,8 @@ fun RecipesScreen(
     val context = LocalContext.current
     val shakeEventListener = onShakeEvent(onRecipeClick, viewModel, )
     val shakeDetector = remember { ShakeDetector(shakeEventListener) }
-    val sensorManager = remember {
-        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    }
-    val accelerometer = remember {
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    }
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     DisposableEffect(Unit) {
         sensorManager.registerListener(
@@ -235,7 +231,7 @@ fun RecipeList(
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
             }
-            RecipeListItem(recipe = item, onRecipeSelected = onRecipeSelected)
+            RecipeListItem(recipe = item, onRecipeClick = onRecipeSelected)
         }
         item(span = span) {
             if (state.isLoading) {
@@ -252,7 +248,7 @@ fun RecipeList(
 
 @Composable
 fun RecipeListItem(
-    onRecipeSelected: (Long) -> Unit,
+    onRecipeClick: (Long) -> Unit,
     recipe: Recipe
 ) {
     val painter = rememberAsyncImagePainter(
@@ -270,7 +266,7 @@ fun RecipeListItem(
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.background)
             .clickable { // Dodajemy logikę kliknięcia
-                onRecipeSelected(recipe.id)
+                onRecipeClick(recipe.id)
             }
             .testTag("recipe_${recipe.id}"),
     ) {

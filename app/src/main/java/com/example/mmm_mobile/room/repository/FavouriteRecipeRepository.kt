@@ -8,6 +8,7 @@ import com.example.mmm_mobile.room.entity.RecipeIngredientCrossRef
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 
 class FavouriteRecipeRepository(
     application: Application,
@@ -79,6 +80,31 @@ class FavouriteRecipeRepository(
     suspend fun updateFavouriteRecipe(recipe: FavouriteRecipe) {
         withContext(defaultDispatcher) {
             favouriteRecipeDao.updateFavouriteRecipe(recipe)
+        }
+    }
+
+    @WorkerThread
+    suspend fun getFavouriteRecipesWithPaginationAndFilters(
+        name: String?,
+        servings: List<Int>?,
+        minKcalPerServing: Double?,
+        maxKcalPerServing: Double?,
+        sortBy: String?,
+        sortDirection: String?,
+        limit: Int,
+        offset: Int
+    ): List<FavouriteRecipe> {
+        return withContext(defaultDispatcher) {
+            favouriteRecipeDao.getFavouriteRecipesWithPaginationAndFilters(
+                name,
+                servings,
+                minKcalPerServing,
+                maxKcalPerServing,
+                sortBy,
+                sortDirection,
+                limit,
+                offset
+            )
         }
     }
 }

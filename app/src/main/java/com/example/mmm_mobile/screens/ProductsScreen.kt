@@ -1,5 +1,6 @@
 package com.example.mmm_mobile.screens
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -169,6 +170,7 @@ fun ProductsScreen(
     onProductClick: (Long) -> Unit = {},
     query: String? = null
 ) {
+    Log.d("ProductsScreen", "query: $query")
     val viewModel: ProductsListViewModel = viewModel(
         viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
     )

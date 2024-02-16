@@ -25,6 +25,34 @@ interface FavouriteRecipeDao {
     fun getFavouriteRecipesWithoutIngredients(): LiveData<List<FavouriteRecipe>>
 
     @WorkerThread
+    @Query("""
+    SELECT * FROM favourite_recipe 
+    WHERE (:name IS NULL OR name LIKE :name)
+    AND (servings IN (:servings) OR :servings IS NULL)
+    AND (:minKcalPerServing IS NULL OR kcalPerServing >= :minKcalPerServing)
+    AND (:maxKcalPerServing IS NULL OR kcalPerServing <= :maxKcalPerServing)
+    ORDER BY CASE WHEN :sortBy = 'name' THEN name END ASC,
+             CASE WHEN :sortBy = 'name' AND :sortDirection = 'DESC' THEN name END DESC,
+             CASE WHEN :sortBy = 'servings' THEN servings END ASC,
+             CASE WHEN :sortBy = 'servings' AND :sortDirection = 'DESC' THEN servings END DESC,
+             CASE WHEN :sortBy = 'kcalPerServing' THEN kcalPerServing END ASC,
+             CASE WHEN :sortBy = 'kcalPerServing' AND :sortDirection = 'DESC' THEN kcalPerServing END DESC
+    LIMIT :limit OFFSET :offset
+""")
+    suspend fun getFavouriteRecipesWithPaginationAndFilters(
+        name: String?,
+        servings: List<Int>?,
+        minKcalPerServing: Double?,
+        maxKcalPerServing: Double?,
+        sortBy: String?,
+        sortDirection: String?,
+        limit: Int,
+        offset: Int
+    ): List<FavouriteRecipe>
+
+
+
+    @WorkerThread
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeIngredientCrossRef): Long
 
