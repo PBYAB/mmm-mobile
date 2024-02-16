@@ -96,7 +96,7 @@ class FavouriteRecipeListViewModel(
                         sortBy,
                         sortDirection,
                         10,
-                        (nextPage - 1) * 10
+                        if (nextPage == 0) 0 else nextPage * 10
                     )
                 Result.success(content)
             } catch (e: Exception) {
@@ -110,6 +110,9 @@ class FavouriteRecipeListViewModel(
             state = state.copy(error = it?.localizedMessage)
         }
     ) { items, newKey ->
+        items.forEach {
+            Log.d("FavouriteRecipeListViewModel", "paginator: ${it.name}")
+        }
         state = state.copy(
             items = state.items + items,
             page = newKey,
@@ -162,9 +165,7 @@ class FavouriteRecipeListViewModel(
 fun FavouriteRecipesScreen(
     onRecipeClick: (Long) -> Unit,
 ) {
-    val recipeViewModel: FavouriteRecipeListViewModel = viewModel(
-        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
-    )
+    val recipeViewModel: FavouriteRecipeListViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         recipeViewModel.loadNextItems()

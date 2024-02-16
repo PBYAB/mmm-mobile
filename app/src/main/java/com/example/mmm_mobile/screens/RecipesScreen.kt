@@ -169,9 +169,7 @@ fun RecipesScreen(
     onRecipeClick: (Long) -> Unit,
     query: String? = null
 ) {
-    val viewModel: RecipeListViewModel = viewModel(
-        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
-    )
+    val viewModel: RecipeListViewModel = viewModel()
     viewModel.filterRecipes(query, null, null, null, null, null)
 
     val context = LocalContext.current

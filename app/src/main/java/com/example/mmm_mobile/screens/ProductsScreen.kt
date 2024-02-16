@@ -171,9 +171,7 @@ fun ProductsScreen(
     query: String? = null
 ) {
     Log.d("ProductsScreen", "query: $query")
-    val viewModel: ProductsListViewModel = viewModel(
-        viewModelStoreOwner = LocalContext.current as androidx.lifecycle.ViewModelStoreOwner
-    )
+    val viewModel: ProductsListViewModel = viewModel()
     viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
 
     Box(modifier = Modifier) {

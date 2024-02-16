@@ -48,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -76,6 +77,7 @@ import com.example.mmm_mobile.screens.SearchScreen
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.utils.NotificationReceiver
 import com.example.mmm_mobile.utils.NotificationScheduler
+import org.openapitools.client.infrastructure.ApiClient
 
 
 private const val NOTIFICATION_MINUTES_INTERVAL = 1L
@@ -150,9 +152,16 @@ class MainActivity : ComponentActivity() {
                         },
             containerColor = MaterialTheme.colorScheme.onPrimary,
         ) { padding ->
+            var startDestination = Screen.Login.route
+            val tokenManager = TokenManager.getInstance(LocalContext.current)
+            Log.d("MainActivity", "tokenManager.accessToken: ${tokenManager.accessToken}")
+            if (tokenManager.accessToken != null) {
+                startDestination = Screen.ProductList.route
+                ApiClient.accessToken = tokenManager.accessToken
+            }
             NavHost(
                 navController = navController,
-                startDestination = Screen.Login.route,
+                startDestination = startDestination,
                 modifier = Modifier
                     .padding(padding)
                     .semantics {
