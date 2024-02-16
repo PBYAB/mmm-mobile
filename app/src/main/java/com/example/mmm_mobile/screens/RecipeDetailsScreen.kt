@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,7 +34,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,23 +55,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.room.entity.RecipeWithIngredients
 import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
-import com.example.mmm_mobile.services.RecipeDownloadWorker
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -96,7 +87,6 @@ import org.openapitools.client.models.RecipeReviewDTO
 fun RecipeDetailScreen(
     recipeId: Long?,
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier.testTag("recipe_detail_screen")
 ) {
     val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
     val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
@@ -400,7 +390,7 @@ fun RecipeDetails(
     Box{
         when (recipeDetails.image) {
             is ByteArray -> {
-                DisplayImage(
+                DisplayByteImage(
                     imageBytes = recipeDetails.image,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -424,7 +414,7 @@ fun RecipeDetails(
                 )
             }
             is String -> {
-                DisplayImage(
+                DisplayUrlImage(
                     imageUrl = recipeDetails.image,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -656,7 +646,34 @@ fun RecipeDetails(
 }
 
 @Composable
-fun DisplayImage(
+fun DisplayAnyImage(
+    image: Any,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    contentScale: ContentScale = ContentScale.Crop,
+) {
+    when (image) {
+        is ByteArray -> {
+            DisplayByteImage(
+                imageBytes = image,
+                modifier = modifier,
+                contentDescription = contentDescription,
+                contentScale = contentScale
+            )
+        }
+        is String -> {
+            DisplayUrlImage(
+                imageUrl = image,
+                modifier = modifier,
+                contentDescription = contentDescription,
+                contentScale = contentScale
+            )
+        }
+    }
+}
+
+@Composable
+fun DisplayByteImage(
     imageBytes: ByteArray,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
@@ -695,7 +712,7 @@ fun DisplayImage(
 
 
 @Composable
-fun DisplayImage(
+fun DisplayUrlImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
@@ -709,7 +726,6 @@ fun DisplayImage(
                 error(R.mipmap.ic_article_icon_foreground)
             }).build()
     )
-
     Image(
         painter = painter,
         contentDescription = contentDescription,

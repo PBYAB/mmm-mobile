@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 fun SearchScreen(
     onProductSearch: (String) -> Unit,
     onRecipeSearch: (String) -> Unit,
+    onFavoriteSearch: (String) -> Unit,
     previousRoute: String
 ) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -68,12 +69,19 @@ fun SearchScreen(
             active = newQuery.isNotEmpty() // Set active to true if query is not empty
         },
         onSearch = {
-            if (previousRoute == Screen.RecipeList.route) {
-                Log.d("SearchScreen", "Searching for recipes with query: $query")
-                onRecipeSearch(query)
-            } else if (previousRoute == Screen.ProductList.route) {
-                Log.d("SearchScreen", "Searching for products with query: $query")
-                onProductSearch(query)
+            when (previousRoute) {
+                Screen.RecipeList.route -> {
+                    Log.d("SearchScreen", "Searching for recipes with query: $query")
+                    onRecipeSearch(query)
+                }
+                Screen.ProductList.route -> {
+                    Log.d("SearchScreen", "Searching for products with query: $query")
+                    onProductSearch(query)
+                }
+                Screen.FavouriteRecipes.route -> {
+                    Log.d("SearchScreen", "Searching for favorites with query: $query")
+                    onFavoriteSearch(query)
+                }
             }
         },
         active = active,

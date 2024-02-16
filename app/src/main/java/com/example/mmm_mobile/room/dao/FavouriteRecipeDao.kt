@@ -27,7 +27,7 @@ interface FavouriteRecipeDao {
     @WorkerThread
     @Query("""
     SELECT * FROM favourite_recipe 
-    WHERE (:name IS NULL OR name LIKE :name)
+    WHERE (:name IS NULL OR name LIKE '%' || :name || '%')
     AND (servings IN (:servings) OR :servings IS NULL)
     AND (:minKcalPerServing IS NULL OR kcalPerServing >= :minKcalPerServing)
     AND (:maxKcalPerServing IS NULL OR kcalPerServing <= :maxKcalPerServing)

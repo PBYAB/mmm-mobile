@@ -4,7 +4,6 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -30,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,12 +48,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.mmm_mobile.R
+import com.example.mmm_mobile.models.Filterable
 import com.example.mmm_mobile.models.Recipe
+import com.example.mmm_mobile.models.RecipeFilter
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
+import com.example.mmm_mobile.utils.RecipeListViewModelInterface
 import com.example.mmm_mobile.utils.ScreenState
 import com.example.mmm_mobile.utils.ShakeDetector
 import com.example.mmm_mobile.utils.ShakeEventListener
@@ -62,20 +63,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.apis.RecipeApi
 
-class RecipeListViewModel : ViewModel() {
+class RecipeListViewModel: ViewModel(), RecipeListViewModelInterface {
 
     val recipesApi = RecipeApi()
-    var state by mutableStateOf(ScreenState<Recipe>())
+    override var state by mutableStateOf(ScreenState<Recipe>())
+
+    var filter: RecipeFilter by mutableStateOf(RecipeFilter(
+        name = null,
+        sortBy = "id",
+        sortDirection = "ASC",
+        servings = null,
+        minKcalPerServing = null,
+        maxKcalPerServing = null
+    ))
 
     private val _filterApplied = MutableStateFlow(false)
     val filterApplied: StateFlow<Boolean> = _filterApplied
-
-    private var name: String? by mutableStateOf(null)
-    private var servings: List<Int>? by mutableStateOf(null)
-    private var minKcalPerServing: Double? by mutableStateOf(null)
-    private var maxKcalPerServing: Double? by mutableStateOf(null)
-    private var sortBy by mutableStateOf("id")
-    private var sortDirection by mutableStateOf("ASC")
 
     private val paginator = DefaultPaginator(
         initialKey = state.page,
@@ -88,12 +91,12 @@ class RecipeListViewModel : ViewModel() {
                     recipesApi.getRecipes(
                         page = nextPage,
                         size = 10,
-                        name = name,
-                        servings = servings,
-                        minKcalPerServing = minKcalPerServing,
-                        maxKcalPerServing = maxKcalPerServing,
-                        sortBy = sortBy,
-                        sortDirection = sortDirection
+                        name = filter.name,
+                        servings = filter.servings,
+                        minKcalPerServing = filter.minKcalPerServing,
+                        maxKcalPerServing = filter.maxKcalPerServing,
+                        sortBy = filter.sortBy,
+                        sortDirection = filter.sortDirection
                     ).content.orEmpty().map {
                         Recipe(
                             id = it.id,
@@ -134,31 +137,14 @@ class RecipeListViewModel : ViewModel() {
         }
     }
 
-    fun loadNextItems() {
+    override fun loadNextItems() {
         viewModelScope.launch {
             paginator.loadNextItems()
         }
     }
 
-
-    fun filterRecipes(
-        name: String?,
-        servings: List<Int>?,
-        minKcalPerServing: Double?,
-        maxKcalPerServing: Double?,
-        sortBy: String?,
-        sortDirection: String?
-    ) {
-        this.name = name
-        this.servings = servings
-        this.minKcalPerServing = minKcalPerServing
-        this.maxKcalPerServing = maxKcalPerServing
-        if (sortBy != null) {
-            this.sortBy = sortBy
-        }
-        if (sortDirection != null) {
-            this.sortDirection = sortDirection
-        }
+    override fun filterRecipes(filter: RecipeFilter) {
+        this.filter = filter
 
         _filterApplied.value = true
     }
@@ -170,7 +156,17 @@ fun RecipesScreen(
     query: String? = null
 ) {
     val viewModel: RecipeListViewModel = viewModel()
-    viewModel.filterRecipes(query, null, null, null, null, null)
+
+    viewModel.filterRecipes(
+        RecipeFilter(
+        name = query,
+        sortBy = "id",
+        sortDirection = "ASC",
+        servings = null,
+        minKcalPerServing = null,
+        maxKcalPerServing = null
+        )
+    )
 
     val context = LocalContext.current
     val shakeEventListener = onShakeEvent(onRecipeClick, viewModel, )
@@ -208,8 +204,8 @@ fun onShakeEvent(
 
 @Composable
 fun RecipeList(
-    onRecipeSelected: (Long) -> Unit,
-    viewModel: RecipeListViewModel
+    onRecipeClick: (Long) -> Unit,
+    viewModel: RecipeListViewModelInterface
 ) {
 
     val state = viewModel.state
@@ -218,7 +214,8 @@ fun RecipeList(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(columnCount),
-        Modifier.padding(8.dp)
+        Modifier
+            .padding(8.dp)
             .testTag("recipe_list")
     ) {
         items(
@@ -229,7 +226,7 @@ fun RecipeList(
             if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
                 viewModel.loadNextItems()
             }
-            RecipeListItem(recipe = item, onRecipeClick = onRecipeSelected)
+            RecipeListItem(recipe = item, onRecipeClick = onRecipeClick)
         }
         item(span = span) {
             if (state.isLoading) {
@@ -249,14 +246,6 @@ fun RecipeListItem(
     onRecipeClick: (Long) -> Unit,
     recipe: Recipe
 ) {
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current)
-            .data(data = recipe.image)
-            .apply(block = fun ImageRequest.Builder.() {
-                placeholder(R.mipmap.ic_article_icon_foreground)
-                error(R.mipmap.ic_article_icon_foreground)
-            }).build()
-    )
     Card(
         modifier = Modifier
             .fillMaxSize()
@@ -268,9 +257,8 @@ fun RecipeListItem(
             }
             .testTag("recipe_${recipe.id}"),
     ) {
-        Image(
-            painter = painter,
-            contentDescription = stringResource(R.string.recipe_image_info),
+        DisplayAnyImage(
+            recipe.image ?: "",
             modifier = Modifier
                 .fillMaxWidth()
                 .size(200.dp, 150.dp),
@@ -288,7 +276,7 @@ fun RecipeListItem(
         Row(modifier = Modifier.padding(horizontal = 8.dp)) {
 
             Text(
-                text = if (recipe.rating == null) stringResource(id = R.string.avarage_rating) else recipe.rating.toString(),
+                text = if (recipe.rating != null) recipe.rating.toString() else "No rating yet",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp

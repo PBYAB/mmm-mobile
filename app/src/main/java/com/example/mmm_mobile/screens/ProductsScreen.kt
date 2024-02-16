@@ -44,6 +44,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Product
+import com.example.mmm_mobile.models.ProductFilter
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
 import com.example.mmm_mobile.utils.DefaultPaginator
 import com.example.mmm_mobile.utils.ScreenState
@@ -61,15 +62,17 @@ class ProductsListViewModel : ViewModel() {
     val filterApplied: StateFlow<Boolean> = _filterApplied
 
 
-    private var name: String? by mutableStateOf(null)
-    private var quantity: String? by mutableStateOf(null)
-    private var nutriScore: List<Int>? by mutableStateOf(null)
-    private var novaGroups: List<Int>? by mutableStateOf(null)
-    private var category: List<Long>? by mutableStateOf(null)
-    private var allergens: List<Long>? by mutableStateOf(null)
-    private var country: List<Long>? by mutableStateOf(null)
-    private var sortBy by mutableStateOf("id")
-    private var sortDirection by mutableStateOf("ASC")
+    private var filter: ProductFilter by mutableStateOf(ProductFilter(
+        name = null,
+        sortBy = "id",
+        sortDirection = "ASC",
+        quantity = null,
+        nutriScore = null,
+        novaGroups = null,
+        category = null,
+        allergens = null,
+        country = null
+    ))
 
     private val paginator = DefaultPaginator(
         initialKey = state.page,
@@ -82,16 +85,16 @@ class ProductsListViewModel : ViewModel() {
                     productApi.getProducts(
                         page = nextPage,
                         size = 10,
-                        name = name,
-                        quantity = quantity,
-                        nutriScore = nutriScore,
-                        novaGroups = novaGroups,
-                        category = category,
-                        allergens = allergens,
-                        country = country,
-                        sortBy = sortBy,
-                        sortDirection = sortDirection,
-                        hasPhotos = name == null
+                        name = filter.name,
+                        quantity = filter.quantity,
+                        nutriScore = filter.nutriScore,
+                        novaGroups = filter.novaGroups,
+                        category = filter.category,
+                        allergens = filter.allergens,
+                        country = filter.country,
+                        sortBy = filter.sortBy,
+                        sortDirection = filter.sortDirection,
+                        hasPhotos = filter.name == null
                     ).content.orEmpty().map {
                         Product(
                             id = it.id,
@@ -139,26 +142,8 @@ class ProductsListViewModel : ViewModel() {
         }
     }
 
-    fun filterProducts(
-        name: String?,
-        quantity: String?,
-        nutriScore: List<Int>?,
-        novaGroups: List<Int>?,
-        category: List<Long>?,
-        allergens: List<Long>?,
-        country: List<Long>?,
-        sortBy: String?,
-        sortDirection: String?
-    ) {
-        this.name = name
-        this.quantity = quantity
-        this.nutriScore = nutriScore
-        this.novaGroups = novaGroups
-        this.category = category
-        this.allergens = allergens
-        this.country = country
-        this.sortBy = sortBy ?: "id"
-        this.sortDirection = sortDirection ?: "ASC"
+    fun filterProducts(filter: ProductFilter) {
+        this.filter = filter
 
         _filterApplied.value = true
     }
@@ -172,7 +157,19 @@ fun ProductsScreen(
 ) {
     Log.d("ProductsScreen", "query: $query")
     val viewModel: ProductsListViewModel = viewModel()
-    viewModel.filterProducts(query, null, null, null, null, null, null, null, null)
+    viewModel.filterProducts(
+        ProductFilter(
+            name = query,
+            sortBy = "id",
+            sortDirection = "ASC",
+            quantity = null,
+            nutriScore = null,
+            novaGroups = null,
+            category = null,
+            allergens = null,
+            country = null
+        )
+    )
 
     Box(modifier = Modifier) {
         ProductList(onProductSelected = onProductClick ,viewModel = viewModel)

@@ -123,9 +123,14 @@ class MainActivity : ComponentActivity() {
 
                             currentRoute.startsWith(Screen.RecipeList.route)
                                 .or(currentRoute.startsWith(Screen.RecipeDetails.route))
-                                .or(currentRoute.startsWith(Screen.FavouriteRecipes.route))
                             -> navController.navigate(
                                 route = Screen.Search.route + "/${Screen.RecipeList.route}"
+                            )
+
+                            currentRoute.startsWith(Screen.FavouriteRecipes.route)
+                                .or(currentRoute.startsWith("Favorite"))
+                            -> navController.navigate(
+                                route = Screen.Search.route + "/${Screen.FavouriteRecipes.route}"
                             )
                             else -> {}
                         }
@@ -250,6 +255,9 @@ class MainActivity : ComponentActivity() {
                         onRecipeSearch = { recipeQuery ->
                             navController.navigate(Screen.RecipeList.route + if (recipeQuery.isNotEmpty()) "?query=$recipeQuery" else "")
                         },
+                        onFavoriteSearch = { favouriteQuery ->
+                            navController.navigate(Screen.FavouriteRecipes.route + if (favouriteQuery.isNotEmpty()) "?query=$favouriteQuery" else "")
+                        },
                         previousRoute = previousRoute
                     )
                 }
@@ -264,14 +272,19 @@ class MainActivity : ComponentActivity() {
                         snackbarHostState
                     )
                 }
-                composable(Screen.FavouriteRecipes.route) {
+                composable(
+                    Screen.FavouriteRecipes.route + "?query={query}",
+                    arguments = listOf(navArgument("query") { defaultValue = ""; type = NavType.StringType})
+                ){ backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")
                     FavouriteRecipesScreen(
                         onRecipeClick = { recipeId ->
-                            navController.navigate(Screen.RecipeDetails.route + "/$recipeId")
-                        }
+                            navController.navigate(Screen.FavouriteRecipes.route + "/$recipeId")
+                        },
+                        query = if(query.isNullOrEmpty()) null else query
                     )
                 }
-                composable("Favorite/{recipeId}") { backStackEntry ->
+                composable(Screen.FavouriteRecipes.route + "/{recipeId}") { backStackEntry ->
                     val recipeId = backStackEntry.arguments?.getString("recipeId")?.toLongOrNull()
                     RecipeDetailScreen(
                         recipeId = recipeId,

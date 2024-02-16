@@ -1,5 +1,6 @@
 import android.app.Application
 import androidx.annotation.WorkerThread
+import com.example.mmm_mobile.models.RecipeFilter
 import com.example.mmm_mobile.room.dao.FavouriteRecipeDao
 import com.example.mmm_mobile.room.db.RecipeDataBase
 import com.example.mmm_mobile.room.entity.FavouriteRecipe
@@ -85,23 +86,18 @@ class FavouriteRecipeRepository(
 
     @WorkerThread
     suspend fun getFavouriteRecipesWithPaginationAndFilters(
-        name: String?,
-        servings: List<Int>?,
-        minKcalPerServing: Double?,
-        maxKcalPerServing: Double?,
-        sortBy: String?,
-        sortDirection: String?,
+        filter: RecipeFilter,
         limit: Int,
         offset: Int
     ): List<FavouriteRecipe> {
         return withContext(defaultDispatcher) {
             favouriteRecipeDao.getFavouriteRecipesWithPaginationAndFilters(
-                name,
-                servings,
-                minKcalPerServing,
-                maxKcalPerServing,
-                sortBy,
-                sortDirection,
+                filter.name,
+                filter.servings,
+                filter.minKcalPerServing,
+                filter.maxKcalPerServing,
+                filter.sortBy,
+                filter.sortDirection,
                 limit,
                 offset
             )
