@@ -1,28 +1,28 @@
 package com.example.mmm_mobile.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,38 +32,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.ui.theme.MmmmobileTheme
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import com.example.mmm_mobile.viewmodel.ProductDetailsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.openapitools.client.apis.ProductApi
 import org.openapitools.client.models.AllergenDTO
 import org.openapitools.client.models.BrandDTO
 import org.openapitools.client.models.CategoryDTO
@@ -78,58 +82,74 @@ import org.openapitools.client.models.ProductIngredientDTO
 @Composable
 fun ProductDetailScreen(
     productId: Long?,
-    modifier: Modifier = Modifier.testTag("product_detail_screen")
+    modifier: Modifier = Modifier.testTag("product_detail_screen"),
+    snackbarHostState: SnackbarHostState,
 ) {
-    val productDetailsViewModel: ProductDetailsViewModel = viewModel()
+    val productDetailsViewModel: ProductDetailsViewModel = hiltViewModel()
 
     LaunchedEffect(productId) {
         productDetailsViewModel.fetchProduct(productId ?: 0)
     }
 
-    val product by productDetailsViewModel.product.collectAsState()
+    val product = productDetailsViewModel.product.collectAsState().value
 
-    ProductDetails(
-        productDetails = product ?: ProductDTO(
-            id = 0,
-            name = "",
-            barcode = "",
-            quantity = "",
-            allergens = emptySet(),
-            brands = emptySet(),
-            categories = emptySet(),
-            countries = emptySet(),
-            ingredients = emptySet(),
-            nutriScore = 0,
-            novaGroup = 0,
-            ingredientAnalysis = ProductIngredientAnalysisDTO(
-                fromPalmOil = false,
-                ingredientsDescription = "",
-                vegan = false,
-                vegetarian = false,
-                id = 0
+    Scaffold(
+        snackbarHost = { snackbarHostState },
+        containerColor = MaterialTheme.colorScheme.onPrimary,
+
+        ) {paddingValues ->
+
+        ProductDetails(
+            productDetails = product ?: ProductDTO(
+                id = 0,
+                name = "",
+                barcode = "",
+                quantity = "",
+                allergens = emptySet(),
+                brands = emptySet(),
+                categories = emptySet(),
+                countries = emptySet(),
+                ingredients = emptySet(),
+                nutriScore = 0,
+                novaGroup = 0,
+                ingredientAnalysis = ProductIngredientAnalysisDTO(
+                    fromPalmOil = false,
+                    ingredientsDescription = "",
+                    vegan = false,
+                    vegetarian = false,
+                    id = 0
+                ),
+                nutriment = NutrimentDTO(
+                    energyKcalPer100g = 0.0,
+                    fatPer100g = 0.0,
+                    fiberPer100g = 0.0,
+                    proteinsPer100g = 0.0,
+                    saltPer100g = 0.0,
+                    sodiumPer100g = 0.0,
+                    sugarsPer100g = 0.0,
+                    id = 0
+                )
             ),
-            nutriment = NutrimentDTO(
-                energyKcalPer100g = 0.0,
-                fatPer100g = 0.0,
-                fiberPer100g = 0.0,
-                proteinsPer100g = 0.0,
-                saltPer100g = 0.0,
-                sodiumPer100g = 0.0,
-                sugarsPer100g = 0.0,
-                id = 0
-            )
+            modifier = modifier
+                .padding(paddingValues)
         )
-    )
+    }
+
 
 }
 
 @Composable
-fun ProductDetails(productDetails: ProductDTO) {
+fun ProductDetails(
+    productDetails: ProductDTO,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val images = productDetails.images?.toList() ?: emptyList()
-
+    var photoActivated by remember { mutableStateOf(false) }
+    var imageUrl by remember { mutableStateOf("") }
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .testTag("product_detail_lazy_column")
     ) {
         item {
@@ -140,7 +160,13 @@ fun ProductDetails(productDetails: ProductDTO) {
                     .background(color = Color.LightGray)
                     .size(200.dp)
             ) {
-                SwipeableImages(images = images)
+                SwipeableImages(
+                    images = images,
+                    selectedImage = { url ->
+                        imageUrl = url
+                        photoActivated = true
+                    },
+                )
             }
         }
 
@@ -292,12 +318,20 @@ fun ProductDetails(productDetails: ProductDTO) {
             }
         }
     }
+    if (photoActivated == true) {
+        FullScreenImage(
+            photo = Photo(
+                id = 0,
+                url = imageUrl,
+                highResUrl = imageUrl
+            ),
+            onDismiss = { photoActivated = false }
+        )
+    }
 }
 
 @Composable
 fun NutrimentTable(nutriment: NutrimentDTO) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-
         val column1Weight = .2f
         val column2Weight = .2f
 
@@ -333,7 +367,10 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             )
         }
 
-        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text = buildAnnotatedString {
                     withStyle(
@@ -355,7 +392,10 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             )
         }
 
-        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text =buildAnnotatedString {
                     withStyle(
@@ -375,7 +415,10 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
                 weight = column2Weight
             )
         }
-    Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)) {
         TableCell(
             text =buildAnnotatedString {
                 withStyle(
@@ -395,7 +438,10 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
             weight = column2Weight
         )
     }
-        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text = buildAnnotatedString {
                     withStyle(
@@ -415,7 +461,10 @@ fun NutrimentTable(nutriment: NutrimentDTO) {
                 weight = column2Weight
             )
         }
-        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
             TableCell(
                 text =buildAnnotatedString {
                     withStyle(
@@ -631,10 +680,13 @@ fun BrandsList(brands: Set<BrandDTO>) {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun SwipeableImages(images: List<ProductImageDTO>) {
+fun SwipeableImages(
+    images: List<ProductImageDTO>,
+    selectedImage: (String) -> Unit = {},
+    modifier: Modifier = Modifier.testTag("swipeable_images")
+) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
-    var selectedImage by remember { mutableStateOf("") }
 
     val smallImages = images
         .filter { it.propertySize == ProductImageDTO.PropertySize.SMALL }
@@ -646,7 +698,7 @@ fun SwipeableImages(images: List<ProductImageDTO>) {
         Image(
             painter = painterResource(id = R.drawable.baseline_breakfast_dining_24),
             contentDescription = stringResource(R.string.recipe_image_info),
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .clickable { /* Do nothing if there are no images */ },
             contentScale = ContentScale.FillHeight
@@ -672,49 +724,18 @@ fun SwipeableImages(images: List<ProductImageDTO>) {
             Image(
                 painter = painter,
                 contentDescription = stringResource(R.string.recipe_image_info),
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .clickable {
-                        selectedImage = smallImages[index]
+                        selectedImage(smallImages[index])
                         showDialog = true
                     },
                 contentScale = ContentScale.FillHeight
             )
         }
     }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            text = {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(context)
-                            .data(data = selectedImage)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                placeholder(R.drawable.baseline_breakfast_dining_24)
-                                error(R.drawable.baseline_breakfast_dining_24)
-                            }).build()
-                    ),
-                    contentDescription = stringResource(R.string.recipe_image_info),
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
-            },
-            confirmButton = { },
-            modifier = Modifier.wrapContentSize()
-        )
-    }
 }
 
-
-@Composable
-fun DefaultDivider() {
-    Divider(
-        thickness = 3.dp,
-        color = MaterialTheme.colorScheme.primaryContainer,
-    )
-}
 
 fun getAllergenImage(name: String): Int {
     return when {
@@ -771,21 +792,91 @@ fun ProductDetailsPreview() {
     }
 }
 
-class ProductDetailsViewModel(private val productApi: ProductApi = ProductApi()) : ViewModel() {
-    private val _product = MutableStateFlow<ProductDTO?>(null)
-    val product: StateFlow<ProductDTO?> get() = _product.asStateFlow()
-
-    fun fetchProduct(id: Long) {
-        viewModelScope.launch {
-            try {
-                val product = withContext(Dispatchers.IO) {
-                    productApi.getProduct(id)
-                }
-                Log.d("ProductDetailsViewModel", "Product: $product")
-                _product.emit(product)
-            } catch (e: Exception) {
-                Log.e("RecipeDetailsViewModel", "Error fetching recipe", e)
-            }
-        }
+@Composable
+private fun FullScreenImage(
+    photo: Photo,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Scrim(onDismiss, Modifier.fillMaxSize())
+        ImageWithZoom(photo, Modifier.aspectRatio(1f))
     }
+}
+
+private class Photo(
+    val id: Int,
+    val url: String,
+    val highResUrl: String
+)
+
+@Composable
+private fun Scrim(onClose: () -> Unit, modifier: Modifier = Modifier.testTag("scrim")) {
+    val strClose = stringResource(R.string.close)
+    Box(
+        modifier
+            // handle pointer input
+            // [START android_compose_touchinput_pointerinput_scrim_highlight]
+            .pointerInput(onClose) { detectTapGestures { onClose() } }
+            // [END android_compose_touchinput_pointerinput_scrim_highlight]
+            // handle accessibility services
+            .semantics(mergeDescendants = true) {
+                contentDescription = strClose
+                onClick {
+                    onClose()
+                    true
+                }
+            }
+            // handle physical keyboard input
+            .onKeyEvent {
+                if (it.key == Key.Escape) {
+                    onClose()
+                    true
+                } else {
+                    false
+                }
+            }
+            // draw scrim
+            .background(Color.DarkGray.copy(alpha = 0.75f))
+    )
+}
+
+@Composable
+private fun ImageWithZoom(photo: Photo, modifier: Modifier = Modifier) {
+    // [START android_compose_touchinput_pointerinput_double_tap_zoom]
+    var zoomed by remember { mutableStateOf(false) }
+    var zoomOffset by remember { mutableStateOf(Offset.Zero) }
+    Image(
+        painter = rememberAsyncImagePainter(model = photo.highResUrl),
+        contentDescription = null,
+        modifier = modifier
+            .testTag("image_with_zoom")
+            // [START android_compose_touchinput_pointerinput_double_tap_zoom_highlight]
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = { tapOffset ->
+                        zoomOffset = if (zoomed) Offset.Zero else
+                            calculateOffset(tapOffset, size)
+                        zoomed = !zoomed
+                    }
+                )
+            }
+            // [END android_compose_touchinput_pointerinput_double_tap_zoom_highlight]
+            .graphicsLayer {
+                scaleX = if (zoomed) 2f else 1f
+                scaleY = if (zoomed) 2f else 1f
+                translationX = zoomOffset.x
+                translationY = zoomOffset.y
+            }
+    )
+    // [END android_compose_touchinput_pointerinput_double_tap_zoom]
+}
+
+private fun calculateOffset(tapOffset: Offset, size: IntSize): Offset {
+    val offsetX = (-(tapOffset.x - (size.width / 2f)) * 2f)
+        .coerceIn(-size.width / 2f, size.width / 2f)
+    return Offset(offsetX, 0f)
 }

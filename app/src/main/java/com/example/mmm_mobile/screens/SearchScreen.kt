@@ -1,11 +1,13 @@
 package com.example.mmm_mobile.screens
 
-import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,97 +17,65 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mmm_mobile.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    onProductSearch: (String) -> Unit,
-    onRecipeSearch: (String) -> Unit,
-    onFavoriteSearch: (String) -> Unit,
-    previousRoute: String
+    onSearch: (String) -> Unit,
+    previousRoute: String,
+    viewModel: SearchViewModel = viewModel(),
+    snackbarHostState: SnackbarHostState,
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
-    val recipesSuggestions = listOf(
-        "Zupa",
-        "Kotlet",
-        "Kurczak",
-        "Pizza",
-        "Pierogi",
-        "Kapusta",
-        "Kotlet schabowy",
-        "Kotlet mielony",
-        "Kotlet de volaille"
-    )
+    viewModel.previousRoute.value = previousRoute
 
-    val productsSuggestions = listOf(
-        "mleko",
-        "jajka",
-        "mąka",
-        "cukier",
-        "marchewka",
-        "pomidor",
-        "cebula",
-        "ziemniaki",
-    )
+    Scaffold(
+        snackbarHost = { snackbarHostState },
+        containerColor = MaterialTheme.colorScheme.onPrimary,
 
-    val suggestions = when(previousRoute){
-        Screen.RecipeList.route -> recipesSuggestions
-        Screen.ProductList.route -> productsSuggestions
-        else -> listOf()
-    }
-
-    SearchBar(
-        query = query,
-        onQueryChange = { newQuery ->
-            query = newQuery
-            active = newQuery.isNotEmpty() // Set active to true if query is not empty
-        },
-        onSearch = {
-            when (previousRoute) {
-                Screen.RecipeList.route -> {
-                    Log.d("SearchScreen", "Searching for recipes with query: $query")
-                    onRecipeSearch(query)
-                }
-                Screen.ProductList.route -> {
-                    Log.d("SearchScreen", "Searching for products with query: $query")
-                    onProductSearch(query)
-                }
-                Screen.FavouriteRecipes.route -> {
-                    Log.d("SearchScreen", "Searching for favorites with query: $query")
-                    onFavoriteSearch(query)
-                }
-            }
-        },
-        active = active,
-        onActiveChange = { newActiveState -> active = newActiveState },
-        placeholder = { Text(text = "Search") },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon") },
-        modifier = Modifier
-            .fillMaxWidth(),
-        colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        if (active && query.isNotEmpty()) {
-            LazyColumn {
-                items(suggestions.filter { it.contains(query, ignoreCase = true) }) { suggestion ->
-                    Text(
-                        text = suggestion,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                query = suggestion
-                            }
-                            .padding(16.dp)
-                    )
+        ) {paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues))
+        SearchBar(
+            query = viewModel.query.value,
+            onQueryChange = { newQuery ->
+                viewModel.query.value = newQuery
+                viewModel.activeSearchBar.value = newQuery.isNotEmpty()
+            },
+            onSearch = {
+                onSearch(viewModel.query.value)
+            },
+            active = viewModel.activeSearchBar.value,
+            onActiveChange = { newActiveState -> viewModel.activeSearchBar.value = newActiveState },
+            placeholder = { Text(text = "Search") },
+            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon") },
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            if (viewModel.query.value.isNotEmpty()) {
+                LazyColumn {
+                    items(viewModel.suggestions.filter {
+                        it.contains(
+                            viewModel.query.value,
+                            ignoreCase = true
+                        )
+                    })
+                    { suggestion ->
+                        Text(
+                            text = suggestion,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.query.value = suggestion
+                                }
+                                .padding(16.dp)
+                        )
+                    }
                 }
             }
         }

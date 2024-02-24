@@ -3,10 +3,11 @@ package com.example.mmm_mobile.screens
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
-import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,15 +18,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -37,6 +43,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -45,131 +55,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mmm_mobile.R
-import com.example.mmm_mobile.models.Filterable
+import com.example.mmm_mobile.models.Identifiable
 import com.example.mmm_mobile.models.Recipe
 import com.example.mmm_mobile.models.RecipeFilter
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
-import com.example.mmm_mobile.utils.DefaultPaginator
-import com.example.mmm_mobile.utils.RecipeListViewModelInterface
-import com.example.mmm_mobile.utils.ScreenState
+import com.example.mmm_mobile.utils.RecipeListItemSkeletonLoader
 import com.example.mmm_mobile.utils.ShakeDetector
 import com.example.mmm_mobile.utils.ShakeEventListener
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import org.openapitools.client.apis.RecipeApi
+import com.example.mmm_mobile.viewmodel.RecipeListViewModel
+import kotlin.math.ceil
 
-class RecipeListViewModel: ViewModel(), RecipeListViewModelInterface {
-
-    val recipesApi = RecipeApi()
-    override var state by mutableStateOf(ScreenState<Recipe>())
-
-    var filter: RecipeFilter by mutableStateOf(RecipeFilter(
-        name = null,
-        sortBy = "id",
-        sortDirection = "ASC",
-        servings = null,
-        minKcalPerServing = null,
-        maxKcalPerServing = null
-    ))
-
-    private val _filterApplied = MutableStateFlow(false)
-    val filterApplied: StateFlow<Boolean> = _filterApplied
-
-    private val paginator = DefaultPaginator(
-        initialKey = state.page,
-        onLoadUpdated = {
-            state = state.copy(isLoading = it)
-        },
-        onRequest = { nextPage ->
-            try {
-                val content =
-                    recipesApi.getRecipes(
-                        page = nextPage,
-                        size = 10,
-                        name = filter.name,
-                        servings = filter.servings,
-                        minKcalPerServing = filter.minKcalPerServing,
-                        maxKcalPerServing = filter.maxKcalPerServing,
-                        sortBy = filter.sortBy,
-                        sortDirection = filter.sortDirection
-                    ).content.orEmpty().map {
-                        Recipe(
-                            id = it.id,
-                            name = it.name,
-                            servings = it.servings,
-                            image = it.coverImageUrl,
-                            time = it.totalTime,
-                            rating = it.averageRating
-                        )
-                    }
-                Result.success(content)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        },
-        getNextKey = {
-            state.page + 1
-        },
-        onError = {
-            state = state.copy(error = it?.localizedMessage)
-        },
-        onSuccess = { items, newKey ->
-            state = state.copy(
-                items = state.items + items,
-                page = newKey,
-                endReached = items.isEmpty()
-            )
-        }
-    )
-
-    init {
-        viewModelScope.launch {
-            filterApplied.collect {
-                if (it) {
-                    loadNextItems()
-                }
-            }
-        }
-    }
-
-    override fun loadNextItems() {
-        viewModelScope.launch {
-            paginator.loadNextItems()
-        }
-    }
-
-    override fun filterRecipes(filter: RecipeFilter) {
-        this.filter = filter
-
-        _filterApplied.value = true
-    }
-}
 
 @Composable
 fun RecipesScreen(
     onRecipeClick: (Long) -> Unit,
-    query: String? = null
+    query: String? = null,
+    viewModel: RecipeListViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    paddingValues: PaddingValues
 ) {
-    val viewModel: RecipeListViewModel = viewModel()
+    if (query != null){
+        LaunchedEffect(query){
+            viewModel.resetViewModel()
+            viewModel.lazyListState.scrollToItem(0)
+            viewModel.filterRecipes(RecipeFilter(name = query))
+        }
+    }
 
-    viewModel.filterRecipes(
-        RecipeFilter(
-        name = query,
-        sortBy = "id",
-        sortDirection = "ASC",
-        servings = null,
-        minKcalPerServing = null,
-        maxKcalPerServing = null
-        )
-    )
+    viewModel.filterRecipes(RecipeFilter(name = query))
 
     val context = LocalContext.current
-    val shakeEventListener = onShakeEvent(onRecipeClick, viewModel, )
+    val shakeEventListener = onShakeEvent(onRecipeClick, viewModel)
     val shakeDetector = remember { ShakeDetector(shakeEventListener) }
     val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -186,7 +105,30 @@ fun RecipesScreen(
     }
 
 
-    RecipeList(onRecipeClick, viewModel = viewModel)
+    Scaffold(
+        snackbarHost = { snackbarHostState },
+        backgroundColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.padding(paddingValues)
+        ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues))
+        MyLazyVerticalGrid(
+            onItemClick = onRecipeClick,
+            itemContent = { product, onProductClick ->
+                RecipeListItemSkeletonLoader(isLoading = viewModel.isLoading){
+                    RecipeListItem(
+                        onRecipeClick = onProductClick,
+                        recipe = product
+                    )
+                }
+            },
+            loadNextItems = { viewModel.loadNextItems() },
+            items = if (viewModel.isLoading) { List(10) { index -> Recipe(index.toLong(), "", 0, 0, 0, 0.0) }
+            } else { viewModel.state.items },
+            isLoading = viewModel.state.isLoading,
+            lazyGridState = viewModel.lazyListState,
+            endReached = viewModel.state.endReached
+        )
+    }
 }
 
 @Composable
@@ -195,41 +137,43 @@ fun onShakeEvent(
     viewModel: RecipeListViewModel
 ): ShakeEventListener {
     return {
-        viewModel.viewModelScope.launch {
-            val recipeOfTheDay = viewModel.recipesApi.getUserRecipeOfTheDay()
-            onRecipeSelected(recipeOfTheDay.id)
-        }
+        viewModel.getRecipeOfTheDay(onRecipeSelected)
     }
 }
 
 @Composable
-fun RecipeList(
-    onRecipeClick: (Long) -> Unit,
-    viewModel: RecipeListViewModelInterface
+fun <T : Identifiable> MyLazyVerticalGrid(
+    onItemClick: (Long) -> Unit,
+    itemContent: @Composable (T, (Long) -> Unit) -> Unit,
+    loadNextItems: () -> Unit,
+    items: List<T>,
+    isLoading: Boolean,
+    lazyGridState: LazyGridState,
+    endReached: Boolean,
+    modifier: Modifier = Modifier
+        .padding(8.dp)
+        .testTag("composable_list")
 ) {
-
-    val state = viewModel.state
     val columnCount = 2
     val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(columnCount),
-        Modifier
-            .padding(8.dp)
-            .testTag("recipe_list")
+        modifier = modifier,
+        state = lazyGridState
     ) {
         items(
-            state.items.size,
-            key = { index -> state.items[index].id }
+            items.size,
+            key = { index -> items[index].id }
         ) { i ->
-            val item = state.items[i]
-            if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
-                viewModel.loadNextItems()
+            val item = items[i]
+            if (i >= items.size - 1 && !endReached && !isLoading) {
+                loadNextItems()
             }
-            RecipeListItem(recipe = item, onRecipeClick = onRecipeClick)
+            itemContent(item, onItemClick)
+
         }
         item(span = span) {
-            if (state.isLoading) {
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -276,7 +220,7 @@ fun RecipeListItem(
         Row(modifier = Modifier.padding(horizontal = 8.dp)) {
 
             Text(
-                text = if (recipe.rating != null) recipe.rating.toString() else "No rating yet",
+                text = if (recipe.rating != null) String.format("%.2f", recipe.rating) else "No rating yet",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp
@@ -309,7 +253,6 @@ fun RecipeListItem(
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp
-
             )
         }
     }

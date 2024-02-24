@@ -46,6 +46,8 @@ class ExampleStartupBenchmark {
     @Test
     fun scrollAndNavigateCompilationModePartial() = scrollAndNavigate(CompilationMode.Partial())
 
+
+
     fun startup(mode: CompilationMode) = benchmarkRule.measureRepeated(
         packageName = "com.example.mmm_mobile",
         metrics = listOf(StartupTimingMetric(), FrameTimingMetric()),
@@ -132,8 +134,8 @@ fun MacrobenchmarkScope.login() {
 
 fun MacrobenchmarkScope.scrollUpRecipeList() {
     Log.i("ExampleStartupBenchmark", "scrollUpRecipeList")
-    device.wait(Until.hasObject(By.res("recipe_list")), 5000)
-    val list = device.findObject(By.res("recipe_list"))
+    device.wait(Until.hasObject(By.res("composable_list")), 5000)
+    val list = device.findObject(By.res("composable_list"))
 
     while (!device.hasObject(By.textContains("Ciasto biszkoptowe"))) {
         list.setGestureMargin(device.displayWidth / 5)
@@ -148,8 +150,8 @@ fun MacrobenchmarkScope.scrollUpRecipeList() {
 
 fun MacrobenchmarkScope.productListScroll(){
     Log.i("ExampleStartupBenchmark", "productListScroll")
-    device.wait(Until.hasObject(By.textContains("product_list")), 5000)
-    val list = device.findObject(By.res("product_list"))
+    device.wait(Until.hasObject(By.textContains("composable_list")), 5000)
+    val list = device.findObject(By.res("composable_list"))
 
     device.wait(Until.hasObject(By.textContains("Red onions")), 5000)
 
@@ -168,6 +170,15 @@ fun MacrobenchmarkScope.productListScroll(){
 
     device.wait(Until.hasObject(By.textContains("milk")), 5000)
     Log.i("ExampleStartupBenchmark", "productListScroll done")
+
+    Thread.sleep(200)
+    device.wait(Until.hasObject(By.res("swipeable_images")), 5000)
+    device.findObject(By.res("swipeable_images")).click()
+    Thread.sleep(200)
+    val centerX = device.displayWidth / 2
+    val centerY = device.displayHeight / 6
+    device.click(centerX, centerY)
+
 }
 
 fun MacrobenchmarkScope.pressBack() {
@@ -189,58 +200,49 @@ fun MacrobenchmarkScope.navigateToRecipeList() {
 
         login()
     }
-    device.wait(Until.hasObject(By.res("recipe_list")), 5000)
+    device.wait(Until.hasObject(By.res("composable_list")), 5000)
     Log.i("ExampleStartupBenchmark", "navigateToRecipeList done")
 }
 fun MacrobenchmarkScope.recipeListScroll(){
 
     Log.i("ExampleStartupBenchmark", "recipeListScroll")
-    device.wait(Until.hasObject(By.res("recipe_list")), 5000)
-    val list = device.findObject(By.res("recipe_list"))
+    device.wait(Until.hasObject(By.res("composable_list")), 5000)
+    val list = device.findObject(By.res("composable_list"))
 
-    device.wait(Until.hasObject(By.textContains("Ciasto chałwowe")), 5000)
+    device.wait(Until.hasObject(By.textContains("Tort truskawkowy z mascarpone")), 5000)
 
-    while (!device.hasObject(By.textContains("Raffaello"))) {
-        device.wait(Until.hasObject(By.res("recipe_list")), 5000)
-        val list2 = device.findObject(By.res("recipe_list"))
+    while (!device.hasObject(By.textContains("Tort truskawkowy z mascarpone"))) {
+        device.wait(Until.hasObject(By.res("composable_list")), 5000)
+        val list2 = device.findObject(By.res("composable_list"))
 
-        list2.setGestureMargin(device.displayWidth / 5)
-        list2.scroll(Direction.DOWN, 0.5f)
 
-        if(device.hasObject(By.textContains("Raffaello"))){
+        if(device.hasObject(By.textContains("Tort truskawkowy z mascarpon"))){
             break
         }
     }
-    Log.i("ExampleStartupBenchmark", "Raffaello found")
+    Log.i("ExampleStartupBenchmark", "Tort truskawkowy z mascarpon found")
 
-    device.findObject(By.textContains("Raffaello")).click()
+    device.findObject(By.textContains("Tort truskawkowy z mascarpon")).click()
 
     device.wait(Until.hasObject(By.res("recipe_detail_screen")), 5000)
 
-    device.wait(Until.hasObject(By.textContains("Servings: 5")), 5000)
+    device.wait(Until.hasObject(By.textContains("Tort truskawkowy z mascarpon")), 5000)
     Log.i("ExampleStartupBenchmark", "recipeListScroll done")
 }
 
 fun MacrobenchmarkScope.addFavoriteRecipes() {
     Log.i("ExampleStartupBenchmark", "addFavoriteRecipes")
 
-    device.wait(Until.hasObject(By.textContains("Ciasto chałwowe")), 5000)
+    device.wait(Until.hasObject(By.textContains("Tort truskawkowy z mascarpon")), 5000)
 
     val recipesToSave = listOf(
         "Tort truskawkowy z mascarpone",
-        "Ciasto biszkoptowe",
-        "Ciasto chałwowe",
-        "Tort czekoladowy",
-        "Tort czekoladowy z kremem z białej czekolady",
-        "Raffaello",
-        "Rolada bananowa",
-        "Miodowiec z orzechami",
     )
 
     for (recipe in recipesToSave) {
         while (!device.hasObject(By.textContains(recipe))) {
-            device.wait(Until.hasObject(By.res("recipe_list")), 5000)
-            val list = device.findObject(By.res("recipe_list"))
+            device.wait(Until.hasObject(By.res("composable_list")), 5000)
+            val list = device.findObject(By.res("composable_list"))
             list.setGestureMargin(device.displayWidth / 5)
             list.scroll(Direction.DOWN, 0.3f)
         }
@@ -261,31 +263,32 @@ fun MacrobenchmarkScope.addFavoriteRecipes() {
         }
         pressBack()
 
-        device.wait(Until.hasObject(By.res("recipe_list")), 5000)
+        device.wait(Until.hasObject(By.res("composable_list")), 5000)
         Log.i("ExampleStartupBenchmark", "recipe: $recipe back to list")
     }
 }
 
 fun MacrobenchmarkScope.navigateToFavoriteRecipes() {
     Log.i("ExampleStartupBenchmark", "navigateToFavoriteRecipes")
+    device.wait(Until.hasObject(By.textContains("Favourite")), 5000)
     device.findObject(By.textContains("Favourite")).click()
-    device.wait(Until.hasObject(By.res("favourite_recipes_list")), 5000)
+    device.wait(Until.hasObject(By.res("composable_list")), 5000)
     Log.i("ExampleStartupBenchmark", "navigateToFavoriteRecipes done")
 }
 
 fun MacrobenchmarkScope.favoriteRecipeListScroll(){
     Log.i("ExampleStartupBenchmark", "favoriteRecipeListScroll")
-    device.wait(Until.hasObject(By.textContains("favourite_recipes_list")), 5000)
-    val list = device.findObject(By.res("favourite_recipes_list"))
+    device.wait(Until.hasObject(By.textContains("composable_list")), 5000)
+    val list = device.findObject(By.res("composable_list"))
 
-    device.wait(Until.hasObject(By.textContains("Ciasto chałwowe")), 5000)
+    device.wait(Until.hasObject(By.textContains("Tort truskawkowy z mascarpone")), 5000)
 
-    while (!device.hasObject(By.textContains("Miodowiec z orzechami"))) {
+    while (!device.hasObject(By.textContains("Tort truskawkowy z mascarpone"))) {
         list.setGestureMargin(device.displayWidth / 5)
         list.scroll(Direction.DOWN, 0.1f)
     }
 
-    device.findObject(By.textContains("Miodowiec z orzechami")).click()
+    device.findObject(By.textContains("Tort truskawkowy z mascarpone")).click()
 
     device.wait(Until.hasObject(By.res("recipe_detail_screen")), 5000)
 

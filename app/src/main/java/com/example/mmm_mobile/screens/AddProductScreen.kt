@@ -22,10 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -42,6 +44,8 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -103,7 +107,8 @@ import org.openapitools.client.models.ProductIngredientDTO
 @Composable
 fun AddProductScreen(
     onAddProductClick: (Long) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
 
     val viewModel: AddProductViewModel = viewModel()
@@ -147,475 +152,119 @@ fun AddProductScreen(
     var fatPer100g by rememberSaveable { mutableStateOf(nutriment.fatPer100g) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Card(
-        modifier = Modifier.padding(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
-    ) {
-        val mediumPadding = 5.dp
-        val nutrimentPadding = 15.dp
-        Column(
-            verticalArrangement = Arrangement.spacedBy(mediumPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(mediumPadding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .testTag("add_product_screen")
+    Scaffold(
+        scaffoldState = scaffoldState,
+        backgroundColor = MaterialTheme.colorScheme.onPrimary,
+
+        ) {paddingValues ->
+        Card(
+            modifier = Modifier.padding(paddingValues),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
         ) {
-            Text(
-                text = stringResource(R.string.add_product_title),
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                style = typography.displayMedium
-            )
-            Text(
-                text = stringResource(R.string.product_instructions),
-                textAlign = TextAlign.Center,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                style = typography.titleMedium,
-            )
-            OutlinedTextField(
-                value = name,
-                singleLine = true,
-                shape = shapes.large,
+            val mediumPadding = 5.dp
+            val nutrimentPadding = 15.dp
+            Column(
+                verticalArrangement = Arrangement.spacedBy(mediumPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colorScheme.surface,
-                    unfocusedContainerColor = colorScheme.surface,
-                    disabledContainerColor = colorScheme.surface,
-                ),
-                onValueChange = { newValue ->
-                    name = newValue
-                },
-                label = {
-                    Text(
-                        stringResource(R.string.enter_product_name),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                    )
-                },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { }
-                )
-            )
-
-            OutlinedTextField(
-                value = barcode,
-                singleLine = false,
-                shape = shapes.large,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colorScheme.surface,
-                    unfocusedContainerColor = colorScheme.surface,
-                    disabledContainerColor = colorScheme.surface,
-                ),
-                onValueChange = { newValue ->
-                    barcode = newValue
-                },
-                label = {
-                    Text(
-                        stringResource(R.string.enter_barcode), fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                    )
-                },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { }
-                )
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val context = androidx.compose.ui.platform.LocalContext.current
-
-
-            OutlinedTextField(
-                value = quantity,
-                singleLine = true,
-                shape = shapes.large,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colorScheme.surface,
-                    unfocusedContainerColor = colorScheme.surface,
-                    disabledContainerColor = colorScheme.surface,
-                ),
-                onValueChange = { newValue ->
-                    quantity = newValue
-                },
-                label = {
-                    Text(
-                        stringResource(R.string.enter_product_quantity),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                    )
-                },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Number
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {}
-                )
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                    .padding(mediumPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .testTag("add_product_screen")
             ) {
-                selectedBrands = SearchableExpandedDropDownMenu(
-                    setOfItems = brandsState,
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("product_brand_dropdown"),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    displayText = { brand -> brand.name },
-                    filterItems = { items, searchText ->
-                        items.filter {
-                            it.name.contains(
-                                searchText,
-                                true
-                            )
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_brand)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    onDropDownItemSelected = { selectedBrands ->
-                        for (brand in selectedBrands) {
-                            Log.d("Selected Brands", brand.name)
-                        }
-                    },
-                    dropdownItem = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_brand)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    defaultItem = {
-                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                    },
-                    onSearchTextFieldClicked = {
-                        keyboardController?.show()
-                    }
+                Text(
+                    text = stringResource(R.string.add_product_title),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = typography.displayMedium
                 )
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-            ) {
-                selectedAllergens = SearchableExpandedDropDownMenu(
-                    setOfItems = allergensState,
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("product_allergen_dropdown"),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    displayText = { allergen -> allergen.name },
-                    filterItems = { items, searchText ->
-                        items.filter {
-                            it.name.contains(
-                                searchText,
-                                true
-                            ) == true
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_allergen)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                    },
-                    onDropDownItemSelected = { selectedAllergens ->
-                        for (allergen in selectedAllergens) {
-                            Log.d("Selected Allergens", allergen.name)
-                        }
-                    },
-                    dropdownItem = { _ ->
-                        Text(
-                            text = (stringResource(R.string.enter_product_allergen)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                    },
-                    defaultItem = {
-                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                    },
-                    onSearchTextFieldClicked = {
-                        keyboardController?.show()
-                    }
+                Text(
+                    text = stringResource(R.string.product_instructions),
+                    textAlign = TextAlign.Center,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    style = typography.titleMedium,
                 )
-            }
-
-
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-            ) {
-                selectedCategories = SearchableExpandedDropDownMenu(
-                    setOfItems = categoriesState,
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("product_category_dropdown"),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    displayText = { category -> category.name },
-                    filterItems = { items, searchText ->
-                        items.filter {
-                            it.name.contains(
-                                searchText,
-                                true
-                            ) == true
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_category)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                    },
-                    onDropDownItemSelected = { selectedCategories ->
-                        for (category in selectedCategories) {
-                            Log.d("Selected Categories", category.name)
-                        }
-                    },
-                    dropdownItem = { _ ->
-                        Text(
-                            text = (stringResource(R.string.enter_product_category)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                    },
-                    defaultItem = {
-                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                    },
-                    onSearchTextFieldClicked = {
-                        keyboardController?.show()
-                    }
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-            ) {
-                selectedCountries = SearchableExpandedDropDownMenu(
-                    setOfItems = countriesState,
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("product_country_dropdown"),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    displayText = { country -> country.name },
-                    filterItems = { items, searchText ->
-                        items.filter {
-                            it.name.contains(
-                                searchText,
-                                true
-                            )
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_country)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-
-                    onDropDownItemSelected = { selectedCountries ->
-                        for (country in selectedCountries) {
-                            Log.d("Selected Country", country.name)
-                        }
-                    },
-                    dropdownItem = { _ ->
-                        Text(
-                            text = (stringResource(R.string.enter_product_country)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    defaultItem = {
-                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                    },
-                    onSearchTextFieldClicked = {
-                        keyboardController?.show()
-                    }
-                )
-            }
-
-            CheckboxWithLabel(stringResource(R.string.palm_oil),palmOil) { isChecked -> palmOil.value = isChecked }
-            CheckboxWithLabel(stringResource(R.string.vegan), vegan) { isChecked -> vegan.value = isChecked }
-            CheckboxWithLabel(stringResource(R.string.vegetarian), vegetarian) { isChecked ->
-                vegetarian.value = isChecked
-            }
-
-            OutlinedTextField(
-                value = productIngredients,
-                singleLine = false,
-                shape = shapes.large,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colorScheme.surface,
-                    unfocusedContainerColor = colorScheme.surface,
-                    disabledContainerColor = colorScheme.surface,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                onValueChange = { newValue ->
-                    productIngredients = newValue
-                },
-                label = {
-                    Text(
-                        stringResource(R.string.enter_product_ingredients),
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                    )
-                },
-                isError = false,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { }
-                )
-            )
-
-
-            Text(
-                modifier = Modifier
-                    .padding(top = 10.dp),
-                text = stringResource(R.string.product_nutriment_information),
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                style = typography.titleMedium,
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
                 OutlinedTextField(
-                    value = caloriesPer100g,
+                    value = name,
                     singleLine = true,
                     shape = shapes.large,
                     modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
+                        .fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
                     onValueChange = { newValue ->
-                        caloriesPer100g = newValue
+                        name = newValue
                     },
                     label = {
                         Text(
-                            stringResource(R.string.enter_product_nutriment_calorie),
+                            stringResource(R.string.enter_product_name),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                         )
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
+                        imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = {
-                        }
+                        onDone = { }
                     )
                 )
+
                 OutlinedTextField(
-                    value = fatPer100g,
-                    singleLine = true,
+                    value = barcode,
+                    singleLine = false,
                     shape = shapes.large,
                     modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
+                        .fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
                     onValueChange = { newValue ->
-                        fatPer100g = newValue
+                        barcode = newValue
                     },
                     label = {
                         Text(
-                            stringResource(R.string.enter_product_nutriment_fat),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
+                            stringResource(R.string.enter_barcode), fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
                         )
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
+                        imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = {}
+                        onDone = { }
                     )
                 )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val context = androidx.compose.ui.platform.LocalContext.current
+
+
                 OutlinedTextField(
-                    value = fiberPer100g,
+                    value = quantity,
                     singleLine = true,
                     shape = shapes.large,
                     modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
+                        .fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.surface,
                         unfocusedContainerColor = colorScheme.surface,
                         disabledContainerColor = colorScheme.surface,
                     ),
                     onValueChange = { newValue ->
-                        fiberPer100g = newValue
+                        quantity = newValue
                     },
                     label = {
                         Text(
-                            stringResource(R.string.enter_product_nutriment_fiber),
+                            stringResource(R.string.enter_product_quantity),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                         )
@@ -629,270 +278,638 @@ fun AddProductScreen(
                         onDone = {}
                     )
                 )
-
-                OutlinedTextField(
-                    value = saltPer100g,
-                    singleLine = true,
-                    shape = shapes.large,
-                    modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    onValueChange = { newValue ->
-                        saltPer100g = newValue
-                    },
-                    label = {
-                        Text(
-                            stringResource(R.string.enter_product_nutriment_salt),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {}
-                    )
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OutlinedTextField(
-                    value = proteinsPer100g,
-                    singleLine = true,
-                    shape = shapes.large,
-                    modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    onValueChange = { newValue ->
-                        proteinsPer100g = newValue
-                    },
-                    label = {
-                        Text(
-                            stringResource(R.string.enter_product_nutriment_proteins),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {}
-                    )
-                )
-
-                OutlinedTextField(
-                    value = sugarPer100g,
-                    singleLine = true,
-                    shape = shapes.large,
-                    modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    onValueChange = { newValue ->
-                        sugarPer100g = newValue
-                    },
-                    label = {
-                        Text(
-                            stringResource(R.string.enter_product_nutriment_sugar),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {}
-                    )
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OutlinedTextField(
-                    value = sodiumPer100g,
-                    singleLine = true,
-                    shape = shapes.large,
-                    modifier = Modifier
-                        .padding(start = nutrimentPadding)
-                        .weight(1f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    onValueChange = { newValue ->
-                        sodiumPer100g = newValue
-                    },
-                    label = {
-                        Text(
-                            stringResource(R.string.enter_product_nutriment_sodium),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium
-                        )
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {}
-                    )
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
 
                 Box(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth(),
                 ) {
-                    Demo_DropDownMenu2(
-                        stringResource(R.string.nutri_score),
-                        nutriScoreOptions,
-                        onItemSelected = { nutriScore = it }
-                    )
-                }
-
-                Box(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Demo_DropDownMenu2(
-                        stringResource(R.string.nova_group),
-                        novaGroupOptions,
-                        onItemSelected = { novaGroup = it }
-                    )
-                }
-
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-            ) {
-                selectedProductIngredients = SearchableExpandedDropDownMenu(
-                    setOfItems = productIngredientState,
-                    modifier = Modifier.fillMaxWidth()
-                        .testTag("product_ingredients"),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = colorScheme.surface,
-                        unfocusedContainerColor = colorScheme.surface,
-                        disabledContainerColor = colorScheme.surface,
-                    ),
-                    displayText = { productIngredient -> productIngredient.name },
-                    filterItems = { items, searchText ->
-                        items.filter {
-                            it.name.contains(
-                                searchText,
-                                true
-                            )
-                        }
-                    },
-                    placeholder = {
-                        Text(
-                            text = (stringResource(R.string.enter_product_ingredients)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-
-                    onDropDownItemSelected = { _ ->
-                        for (country in selectedCountries) {
-                            Log.d("Selected Country", country.name)
-                        }
-                    },
-                    dropdownItem = { _ ->
-                        Text(
-                            text = (stringResource(R.string.enter_product_ingredients)),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    defaultItem = {
-                        it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
-                    },
-                    onSearchTextFieldClicked = {
-                        keyboardController?.show()
-                    }
-                )
-            }
-
-
-            ElevatedButtonExample(
-                onClick = {
-                    if(isProductValid(selectedAllergens,barcode, selectedBrands, selectedCategories, selectedCountries, productIngredients, selectedProductIngredients,name, novaGroup, nutriScore, caloriesPer100g, fatPer100g,fiberPer100g,proteinsPer100g, saltPer100g, sodiumPer100g, sugarPer100g, quantity)){
-                    val createProductRequest = CreateProductRequest(
-                        selectedAllergens.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
-                        barcode,
-                        selectedBrands.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
-                        selectedCategories.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
-                        selectedCountries.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
-                        CreateProductIngredientAnalysisRequest(palmOil.value, productIngredients ?: "", vegan.value, vegetarian.value),
-                        selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
-                        name ?: "",
-                        novaGroup.toInt() ?: 1,
-                        mapNutriScoreToNumber(nutriScore) ?: 1,
-                        CreateNutrimentRequest(
-                            caloriesPer100g.toDouble() ?: 0.0,
-                            fatPer100g.toDouble() ?: 0.0,
-                            fiberPer100g.toDouble() ?: 0.0,
-                            proteinsPer100g.toDouble() ?: 0.0,
-                            saltPer100g.toDouble() ?: 0.0,
-                            sodiumPer100g.toDouble() ?: 0.0,
-                            sugarPer100g.toDouble() ?: 0.0
+                    selectedBrands = SearchableExpandedDropDownMenu(
+                        setOfItems = brandsState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("product_brand_dropdown"),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
                         ),
-                        quantity ?: ""
+                        displayText = { brand -> brand.name },
+                        filterItems = { items, searchText ->
+                            items.filter {
+                                it.name.contains(
+                                    searchText,
+                                    true
+                                )
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_brand)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        onDropDownItemSelected = { selectedBrands ->
+                            for (brand in selectedBrands) {
+                                Log.d("Selected Brands", brand.name)
+                            }
+                        },
+                        dropdownItem = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_brand)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        defaultItem = {
+                            it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        },
+                        onSearchTextFieldClicked = {
+                            keyboardController?.show()
+                        }
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
+                ) {
+                    selectedAllergens = SearchableExpandedDropDownMenu(
+                        setOfItems = allergensState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("product_allergen_dropdown"),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        displayText = { allergen -> allergen.name },
+                        filterItems = { items, searchText ->
+                            items.filter {
+                                it.name.contains(
+                                    searchText,
+                                    true
+                                ) == true
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_allergen)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        onDropDownItemSelected = { selectedAllergens ->
+                            for (allergen in selectedAllergens) {
+                                Log.d("Selected Allergens", allergen.name)
+                            }
+                        },
+                        dropdownItem = { _ ->
+                            Text(
+                                text = (stringResource(R.string.enter_product_allergen)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        defaultItem = {
+                            it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        },
+                        onSearchTextFieldClicked = {
+                            keyboardController?.show()
+                        }
+                    )
+                }
+
+
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
+                ) {
+                    selectedCategories = SearchableExpandedDropDownMenu(
+                        setOfItems = categoriesState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("product_category_dropdown"),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        displayText = { category -> category.name },
+                        filterItems = { items, searchText ->
+                            items.filter {
+                                it.name.contains(
+                                    searchText,
+                                    true
+                                ) == true
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_category)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        onDropDownItemSelected = { selectedCategories ->
+                            for (category in selectedCategories) {
+                                Log.d("Selected Categories", category.name)
+                            }
+                        },
+                        dropdownItem = { _ ->
+                            Text(
+                                text = (stringResource(R.string.enter_product_category)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        defaultItem = {
+                            it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        },
+                        onSearchTextFieldClicked = {
+                            keyboardController?.show()
+                        }
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
+                ) {
+                    selectedCountries = SearchableExpandedDropDownMenu(
+                        setOfItems = countriesState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("product_country_dropdown"),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        displayText = { country -> country.name },
+                        filterItems = { items, searchText ->
+                            items.filter {
+                                it.name.contains(
+                                    searchText,
+                                    true
+                                )
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_country)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+
+                        onDropDownItemSelected = { selectedCountries ->
+                            for (country in selectedCountries) {
+                                Log.d("Selected Country", country.name)
+                            }
+                        },
+                        dropdownItem = { _ ->
+                            Text(
+                                text = (stringResource(R.string.enter_product_country)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        defaultItem = {
+                            it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        },
+                        onSearchTextFieldClicked = {
+                            keyboardController?.show()
+                        }
+                    )
+                }
+
+                CheckboxWithLabel(stringResource(R.string.palm_oil),palmOil) { isChecked -> palmOil.value = isChecked }
+                CheckboxWithLabel(stringResource(R.string.vegan), vegan) { isChecked -> vegan.value = isChecked }
+                CheckboxWithLabel(stringResource(R.string.vegetarian), vegetarian) { isChecked ->
+                    vegetarian.value = isChecked
+                }
+
+                OutlinedTextField(
+                    value = productIngredients,
+                    singleLine = false,
+                    shape = shapes.large,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.surface,
+                        unfocusedContainerColor = colorScheme.surface,
+                        disabledContainerColor = colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    onValueChange = { newValue ->
+                        productIngredients = newValue
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.enter_product_ingredients),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { }
+                    )
+                )
+
+
+                Text(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    text = stringResource(R.string.product_nutriment_information),
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    style = typography.titleMedium,
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedTextField(
+                        value = caloriesPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            caloriesPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_calorie),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                            }
+                        )
+                    )
+                    OutlinedTextField(
+                        value = fatPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            fatPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_fat),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedTextField(
+                        value = fiberPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            fiberPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_fiber),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
                     )
 
-                    viewModel.addProduct(
-                        createProductRequest,
-                        snackbarHostState,
-                        onAddProduct = onAddProductClick
+                    OutlinedTextField(
+                        value = saltPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            saltPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_salt),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
                     )
-                    } else {
-                        Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
-                            .show()
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedTextField(
+                        value = proteinsPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            proteinsPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_proteins),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = sugarPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            sugarPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_sugar),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedTextField(
+                        value = sodiumPer100g,
+                        singleLine = true,
+                        shape = shapes.large,
+                        modifier = Modifier
+                            .padding(start = nutrimentPadding)
+                            .weight(1f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        onValueChange = { newValue ->
+                            sodiumPer100g = newValue
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.enter_product_nutriment_sodium),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {}
+                        )
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    Box(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Demo_DropDownMenu2(
+                            stringResource(R.string.nutri_score),
+                            nutriScoreOptions,
+                            onItemSelected = { nutriScore = it }
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Demo_DropDownMenu2(
+                            stringResource(R.string.nova_group),
+                            novaGroupOptions,
+                            onItemSelected = { novaGroup = it }
+                        )
                     }
 
                 }
-            )
+
+                Box(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
+                ) {
+                    selectedProductIngredients = SearchableExpandedDropDownMenu(
+                        setOfItems = productIngredientState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("product_ingredients"),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface,
+                            disabledContainerColor = colorScheme.surface,
+                        ),
+                        displayText = { productIngredient -> productIngredient.name },
+                        filterItems = { items, searchText ->
+                            items.filter {
+                                it.name.contains(
+                                    searchText,
+                                    true
+                                )
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = (stringResource(R.string.enter_product_ingredients)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+
+                        onDropDownItemSelected = { _ ->
+                            for (country in selectedCountries) {
+                                Log.d("Selected Country", country.name)
+                            }
+                        },
+                        dropdownItem = { _ ->
+                            Text(
+                                text = (stringResource(R.string.enter_product_ingredients)),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        defaultItem = {
+                            it.name.let { it1 -> Log.e("DEFAULT_ITEM", it1) }
+                        },
+                        onSearchTextFieldClicked = {
+                            keyboardController?.show()
+                        }
+                    )
+                }
+
+
+                ElevatedButtonExample(
+                    onClick = {
+                        if(isProductValid(selectedAllergens,barcode, selectedBrands, selectedCategories, selectedCountries, productIngredients, selectedProductIngredients,name, novaGroup, nutriScore, caloriesPer100g, fatPer100g,fiberPer100g,proteinsPer100g, saltPer100g, sodiumPer100g, sugarPer100g, quantity)){
+                            val createProductRequest = CreateProductRequest(
+                                selectedAllergens.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                                barcode,
+                                selectedBrands.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                                selectedCategories.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                                selectedCountries.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                                CreateProductIngredientAnalysisRequest(palmOil.value, productIngredients ?: "", vegan.value, vegetarian.value),
+                                selectedProductIngredients.map { it.id }.toSet() as Set<Long> ?: emptySet<Long>(),
+                                name ?: "",
+                                novaGroup.toInt() ?: 1,
+                                mapNutriScoreToNumber(nutriScore) ?: 1,
+                                CreateNutrimentRequest(
+                                    caloriesPer100g.toDouble() ?: 0.0,
+                                    fatPer100g.toDouble() ?: 0.0,
+                                    fiberPer100g.toDouble() ?: 0.0,
+                                    proteinsPer100g.toDouble() ?: 0.0,
+                                    saltPer100g.toDouble() ?: 0.0,
+                                    sodiumPer100g.toDouble() ?: 0.0,
+                                    sugarPer100g.toDouble() ?: 0.0
+                                ),
+                                quantity ?: ""
+                            )
+
+                            viewModel.addProduct(
+                                createProductRequest,
+                                snackbarHostState,
+                                onAddProduct = onAddProductClick
+                            )
+                        } else {
+                            Toast.makeText(context, context.getText(R.string.valitation_error).toString(), Toast.LENGTH_LONG)
+                                .show()
+                        }
+
+                    }
+                )
+            }
         }
     }
+
 }
 
 fun mapNutriScoreToNumber(nutriScore: String): Int {

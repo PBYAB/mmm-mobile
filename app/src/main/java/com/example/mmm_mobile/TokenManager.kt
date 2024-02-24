@@ -2,10 +2,10 @@ package com.example.mmm_mobile
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import org.openapitools.client.infrastructure.ApiClient
+import javax.inject.Inject
 
-class TokenManager private constructor(context: Context) {
+class TokenManager @Inject internal constructor(context: Context) {
     companion object {
         private const val tokenKey = "jwtToken"
         private const val sharedPreferencesKey = "MyPref"

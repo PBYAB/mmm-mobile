@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -18,6 +19,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] =
+                    "$projectDir/schemas"
+            }
+        }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -56,6 +66,25 @@ android {
     }
 }
 
+val hiltVersion = "2.50"
+val hiltNavigationVersion = "1.1.0"
+dependencies {
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    ksp("com.google.dagger:hilt-compiler:$hiltVersion")
+
+    implementation("androidx.hilt:hilt-work:$hiltNavigationVersion")
+    ksp("androidx.hilt:hilt-compiler:$hiltNavigationVersion")
+
+    testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kspTest("com.google.dagger:hilt-compiler:$hiltVersion")
+
+    implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationVersion")
+}
+
+val workVersion = "2.9.0"
+dependencies {
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
+}
 
 val glideVersion = "4.12.0"
 
@@ -82,27 +111,25 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 }
 
-val composeVersion = "2023.08.00"
-val runtimeLiveDataVersion = "1.5.4"
+val composeVersion = "2024.02.01"
 val lifecycleExtensionsVersion = "2.2.0"
 val pagingVersion = "3.2.1"
-val lifecycleCommonJava8Version = "2.6.2"
-val navigationComposeVersion = "2.7.6"
+val lifecycleCommonJava8Version = "2.7.0"
+val navigationComposeVersion = "2.7.7"
 val coilComposeVersion = "2.5.0"
-val composeUiVersion = "1.5.4"
-val composeMaterialVersion = "1.5.4"
+val composeMaterialVersion = "1.6.2"
 val cameraCoreVersion = "1.3.1"
 
 // Jetpack Compose i powiązane biblioteki
 dependencies {
-    implementation("androidx.compose.runtime:runtime-livedata:$runtimeLiveDataVersion")
+    implementation("androidx.compose.runtime:runtime-livedata:$composeMaterialVersion")
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
     implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
     implementation("androidx.paging:paging-compose:$pagingVersion")
     ksp("androidx.lifecycle:lifecycle-common-java8:$lifecycleCommonJava8Version")
     implementation("androidx.navigation:navigation-compose:$navigationComposeVersion")
     implementation("io.coil-kt:coil-compose:$coilComposeVersion")
-    implementation("androidx.compose.ui:ui:$composeUiVersion")
+    implementation("androidx.compose.ui:ui:$composeMaterialVersion")
     implementation("androidx.compose.material:material:$composeMaterialVersion")
     implementation("androidx.camera:camera-core:$cameraCoreVersion")
     implementation("androidx.compose.material3:material3")
@@ -110,18 +137,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
     androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
@@ -172,7 +189,7 @@ dependencies {
     implementation ("com.google.mlkit:barcode-scanning:$barcodeScanningVersion")
 }
 
-val lifecycleRuntimeKtxVersion = "2.6.2"
+val lifecycleRuntimeKtxVersion = "2.7.0"
 val activityComposeVersion = "1.8.2"
 val junitVersion = "4.13.2"
 val testExtJUnitVersion = "1.1.5"
@@ -189,13 +206,6 @@ dependencies {
     testImplementation("io.kotlintest:kotlintest-runner-junit5:$kotlintestRunnerJUnit5Version")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
-
-val workVersion = "2.9.0"
-
-//WorkManager
-dependencies {
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
 }
 
 // Kotlinx Collections Immutable

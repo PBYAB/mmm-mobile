@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,10 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,8 +32,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -57,26 +62,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
-import com.example.mmm_mobile.room.entity.RecipeWithIngredients
-import com.example.mmm_mobile.room.viewmodel.FavouriteRecipeViewModel
+import com.example.mmm_mobile.data.entity.RecipeWithIngredients
+import com.example.mmm_mobile.viewmodel.FavouriteRecipeDetailsViewModel
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
-import com.example.mmm_mobile.utils.DefaultPaginator
-import com.example.mmm_mobile.utils.ScreenState
+import com.example.mmm_mobile.viewmodel.RecipeDetailsViewModel
+import com.example.mmm_mobile.viewmodel.ReviewListViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.openapitools.client.apis.RecipeApi
 import org.openapitools.client.apis.RecipeReviewApi
-import org.openapitools.client.apis.UserApi
 import org.openapitools.client.models.CreateRecipeReviewRequest
 import org.openapitools.client.models.RecipeDTO
 import org.openapitools.client.models.RecipeIngredientDTO
@@ -88,195 +89,203 @@ fun RecipeDetailScreen(
     recipeId: Long?,
     snackbarHostState: SnackbarHostState,
 ) {
-    val favouriteRecipeViewModel: FavouriteRecipeViewModel = viewModel()
-    val recipeLiveData = favouriteRecipeViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
+    val favouriteRecipeDetailsViewModel: FavouriteRecipeDetailsViewModel = hiltViewModel()
+    val recipeLiveData = favouriteRecipeDetailsViewModel.getFavouriteRecipeWithIngredients(recipeId ?: 0)
     val recipeFromDB by recipeLiveData.observeAsState()
 
-    val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+    val recipeDetailsViewModel: RecipeDetailsViewModel = hiltViewModel()
 
     LaunchedEffect(recipeId) {
         recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
     }
     val recipeFromApi by recipeDetailsViewModel.recipe.collectAsState()
 
-    if (recipeFromDB != null) {
-        Box {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-                    .testTag("recipe_detail_lazy_column")
-            ) {
-                item { recipeFromDB?.let {
-                    RecipeDetails(
-                        recipeDetails = mapToRecipeDetails(it),
-                        favouriteRecipeViewModel = favouriteRecipeViewModel,
-                        snackbarHostState = snackbarHostState,
-                        isFavourite = true
-                    )
-                } }
-            recipeId?.let { id ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        backgroundColor = MaterialTheme.colorScheme.onPrimary,
+    ) {paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues))
+
+        if (recipeFromDB != null) {
+            Box {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("recipe_detail_lazy_column")
+                ) {
+                    item { recipeFromDB?.let {
+                        RecipeDetails(
+                            recipeDetails = mapToRecipeDetails(it),
+                            favouriteRecipeDetailsViewModel = favouriteRecipeDetailsViewModel,
+                            snackbarHostState = snackbarHostState,
+                            isFavourite = true
+                        )
+                    } }
+                    recipeId?.let { id ->
+                        item {
+                            Column {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Divider(thickness = 5.dp)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                AddReviewInput(
+                                    id,
+                                    ReviewListViewModel(recipeId),
+                                    recipeDetailsViewModel,
+                                    snackbarHostState
+                                )
+                            }
+                        }
+                        recipeFromApi?.averageRating?.let {
+                            item {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(10.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = stringResource(id = R.string.reviews_icon_info),
+                                        modifier = Modifier.size(24.dp),
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(
+                                        text = stringResource(id = R.string.reviews_label),
+                                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+
+                                recipeFromApi?.averageRating?.let {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(4.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(id = R.string.recipe_average_rating_label),
+                                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = String.format("%.2f", it),
+                                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(450.dp)
+                                ) {
+                                    val reviewViewModel =
+                                        viewModel { ReviewListViewModel(recipeId = id) }
+                                    ReviewList(viewModel = reviewViewModel)
+
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
+            var canReview by remember { mutableStateOf(false) }
+            val reviewsApi = RecipeReviewApi()
+
+            LaunchedEffect(recipeId) {
+                try {
+                    recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
+                    canReview = withContext(Dispatchers.IO) {
+                        reviewsApi.checkIfUserReviewed(recipeId ?: 0).canUserCreateReview
+                    }
+                } catch (e: Exception) {
+                    Log.e("RecipeDetailScreen", "Error fetching recipe", e)
+                }
+            }
+
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                item { recipeFromApi?.let { RecipeDetails(
+                    recipeDetails = mapToRecipeDetails(it),
+                    favouriteRecipeDetailsViewModel = favouriteRecipeDetailsViewModel,
+                    snackbarHostState = snackbarHostState
+                ) } }
                 item {
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
                         Divider(thickness = 5.dp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        AddReviewInput(
-                            id,
-                            ReviewListViewModel(recipeId),
-                            recipeDetailsViewModel,
-                            snackbarHostState
-                        )
                     }
                 }
-                recipeFromApi?.averageRating?.let {
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                recipeId?.let { id ->
 
-                            Text(
-                                text = stringResource(id = R.string.reviews_label),
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                color = MaterialTheme.colorScheme.onSurface
+                    if (canReview) {
+                        item {
+                            AddReviewInput(
+                                id,
+                                ReviewListViewModel(recipeId),
+                                recipeDetailsViewModel,
+                                snackbarHostState
                             )
                         }
-
-                        recipeFromApi?.averageRating?.let {
+                    }
+                    recipeFromApi?.averageRating?.let {
+                        item {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(4.dp)
+                                modifier = Modifier.padding(10.dp)
                             ) {
-                                Text(
-                                    text = stringResource(id = R.string.recipe_average_rating_label),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = stringResource(id = R.string.reviews_icon_info),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
+
                                 Text(
-                                    text = String.format("%.2f", it),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    text = stringResource(id = R.string.reviews_label),
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
                             }
-                        }
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(450.dp)
-                        ) {
-                            val reviewViewModel =
-                                viewModel { ReviewListViewModel(recipeId = id) }
-                            ReviewList(viewModel = reviewViewModel)
+                            recipeFromApi?.averageRating?.let {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(4.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.recipe_average_rating_label),
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = String.format("%.2f", it),
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
 
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-            }
-        }
-    }
-    } else {
-        val recipeDetailsViewModel: RecipeDetailsViewModel = viewModel()
-        var canReview by remember { mutableStateOf(false) }
-        val reviewsApi = RecipeReviewApi()
-
-        LaunchedEffect(recipeId) {
-            try {
-                recipeDetailsViewModel.fetchRecipe(recipeId ?: 0)
-                canReview = withContext(Dispatchers.IO) {
-                    reviewsApi.checkIfUserReviewed(recipeId ?: 0).canUserCreateReview
-                }
-            } catch (e: Exception) {
-                Log.e("RecipeDetailScreen", "Error fetching recipe", e)
-            }
-        }
-
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item { recipeFromApi?.let { RecipeDetails(
-                recipeDetails = mapToRecipeDetails(it),
-                favouriteRecipeViewModel = favouriteRecipeViewModel,
-                snackbarHostState = snackbarHostState
-            ) } }
-            item {
-                Column {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Divider(thickness = 5.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-            recipeId?.let { id ->
-
-                if (canReview) {
-                    item {
-                        AddReviewInput(
-                            id,
-                            ReviewListViewModel(recipeId),
-                            recipeDetailsViewModel,
-                            snackbarHostState
-                        )
-                    }
-                }
-                recipeFromApi?.averageRating?.let {
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = stringResource(id = R.string.reviews_icon_info),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = stringResource(id = R.string.reviews_label),
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        recipeFromApi?.averageRating?.let {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(4.dp)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(450.dp)
                             ) {
-                                Text(
-                                    text = stringResource(id = R.string.recipe_average_rating_label),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = String.format("%.2f", it),
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                val reviewViewModel =
+                                    viewModel { ReviewListViewModel(recipeId = id) }
+                                ReviewList(viewModel = reviewViewModel)
+
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(450.dp)
-                        ) {
-                            val reviewViewModel =
-                                viewModel { ReviewListViewModel(recipeId = id) }
-                            ReviewList(viewModel = reviewViewModel)
-
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -286,7 +295,7 @@ fun RecipeDetailScreen(
 
 @Composable
 fun AddDeleteFavoriteButton(
-    favouriteRecipeViewModel: FavouriteRecipeViewModel,
+    favouriteRecipeDetailsViewModel: FavouriteRecipeDetailsViewModel,
     recipe: RecipeDTO?,
     snackbarHostState: SnackbarHostState,
     isFavourite: Boolean,
@@ -299,18 +308,18 @@ fun AddDeleteFavoriteButton(
     IconButton(
         onClick = {
             isFavourite = !isFavourite
-            favouriteRecipeViewModel.viewModelScope.launch {
+            favouriteRecipeDetailsViewModel.viewModelScope.launch {
                 if (isFavourite) {
                     recipe?.let {
                         // Wywołanie Workera do pobrania i zapisania przepisu
-                        favouriteRecipeViewModel.fetchAndSaveRecipeInBackground(recipe.id, context)
+                        favouriteRecipeDetailsViewModel.fetchAndSaveRecipeInBackground(recipe.id, context)
                     }
                     snackbarHostState.showSnackbar(
                         message = "Recipe ${recipe?.name} added to favourites",
                         duration = SnackbarDuration.Short
                     )
                 } else {
-                    favouriteRecipeViewModel.deleteFavouriteRecipeWithIngredients(recipe?.id ?: 0)
+                    favouriteRecipeDetailsViewModel.deleteFavouriteRecipeWithIngredients(recipe?.id ?: 0)
                     snackbarHostState.showSnackbar(
                         message = "Recipe ${recipe?.name} removed from favourites",
                         duration = SnackbarDuration.Short
@@ -380,7 +389,7 @@ fun OpenYoutubeButton(
 @Composable
 fun RecipeDetails(
     recipeDetails: RecipeDetails,
-    favouriteRecipeViewModel: FavouriteRecipeViewModel,
+    favouriteRecipeDetailsViewModel: FavouriteRecipeDetailsViewModel,
     snackbarHostState: SnackbarHostState,
     isFavourite: Boolean = false
 ) {
@@ -388,57 +397,30 @@ fun RecipeDetails(
     var expanded by remember { mutableStateOf(false) }
 
     Box{
-        when (recipeDetails.image) {
-            is ByteArray -> {
-                DisplayByteImage(
-                    imageBytes = recipeDetails.image,
-                    modifier = Modifier.fillMaxWidth()
-                )
+        DisplayAnyImage(
+            image = recipeDetails.image ?: "",
+            modifier = Modifier.fillMaxWidth()
+                .size(200.dp, 300.dp)
+        )
 
-                AddDeleteFavoriteButton(
-                    favouriteRecipeViewModel = favouriteRecipeViewModel,
-                    recipe = RecipeDTO(
-                        id = recipeDetails.id,
-                        name = recipeDetails.name,
-                        servings = recipeDetails.servings,
-                        totalTime = recipeDetails.totalTime,
-                        kcalPerServing = recipeDetails.kcalPerServing,
-                        instructions = recipeDetails.instructions,
-                        coverImageUrl = recipeDetails.image.toString(),
-                        ingredients = recipeDetails.ingredients,
-                        averageRating = recipeDetails.rating,
-                        reviews = recipeDetails.reviews.toSet()
-                    ),
-                    snackbarHostState = snackbarHostState,
-                    isFavourite = isFavourite
-                )
-            }
-            is String -> {
-                DisplayUrlImage(
-                    imageUrl = recipeDetails.image,
-                    modifier = Modifier.fillMaxWidth()
-                )
+        AddDeleteFavoriteButton(
+            favouriteRecipeDetailsViewModel = favouriteRecipeDetailsViewModel,
+            recipe = RecipeDTO(
+                id = recipeDetails.id,
+                name = recipeDetails.name,
+                servings = recipeDetails.servings,
+                totalTime = recipeDetails.totalTime,
+                kcalPerServing = recipeDetails.kcalPerServing,
+                instructions = recipeDetails.instructions,
+                coverImageUrl = recipeDetails.image.toString(),
+                ingredients = recipeDetails.ingredients,
+                averageRating = recipeDetails.rating,
+                reviews = recipeDetails.reviews.toSet()
+            ),
+            snackbarHostState = snackbarHostState,
+            isFavourite = isFavourite
+        )
 
-                AddDeleteFavoriteButton(
-                    favouriteRecipeViewModel = favouriteRecipeViewModel,
-                    recipe = RecipeDTO(
-                        id = recipeDetails.id,
-                        name = recipeDetails.name,
-                        servings = recipeDetails.servings,
-                        totalTime = recipeDetails.totalTime,
-                        kcalPerServing = recipeDetails.kcalPerServing,
-                        instructions = recipeDetails.instructions,
-                        coverImageUrl = recipeDetails.image.toString(),
-                        ingredients = recipeDetails.ingredients,
-                        averageRating = recipeDetails.rating,
-                        reviews = recipeDetails.reviews.toSet()
-                    ),
-                    snackbarHostState = snackbarHostState,
-                    isFavourite = isFavourite
-                )
-            }
-            else -> Text(text = "Loading...")
-        }
     }
     Spacer(modifier = Modifier.height(16.dp))
 
@@ -464,14 +446,14 @@ fun RecipeDetails(
 
         Row(modifier = Modifier.padding(8.dp)) {
         Text(
-            text = recipeDetails.rating.toString(),
+            text = String.format("%.2f", recipeDetails.rating),
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
         val rating = recipeDetails.rating
-        val fullStars = rating.toInt()
+        val fullStars = rating?.toInt() ?: 0
         for (i in 1..fullStars) {
             Icon(
                 Icons.Filled.Star,
@@ -724,7 +706,8 @@ fun DisplayUrlImage(
             .apply(block = fun ImageRequest.Builder.() {
                 placeholder(R.mipmap.ic_article_icon_foreground)
                 error(R.mipmap.ic_article_icon_foreground)
-            }).build()
+            })
+            .build()
     )
     Image(
         painter = painter,
@@ -789,93 +772,17 @@ fun mapToRecipeDetails(recipe: RecipeWithIngredients): RecipeDetails {
 class RecipeDetails(
     val id: Long = 0,
     val name: String = "",
-    val servings: Int = 0,
-    val totalTime: Int = 0,
-    val kcalPerServing: Double = 0.0,
+    val servings: Int? = null,
+    val totalTime: Int? = null,
+    val kcalPerServing: Double? = null,
     val instructions: String = "",
-    val image: Any = "",
+    val image: Any? = null,
     val ingredients: List<RecipeIngredientDTO> = emptyList(),
-    val rating: Double = 0.0,
+    val rating: Double? = null,
     val reviews: List<RecipeReviewDTO> = emptyList()
 )
 
 
-class RecipeDetailsViewModel(private val recipeApi: RecipeApi = RecipeApi()) : ViewModel() {
-    private val _recipe = MutableStateFlow<RecipeDTO?>(null)
-    val recipe: StateFlow<RecipeDTO?> get() = _recipe.asStateFlow()
-
-    fun fetchRecipe(id: Long) {
-        viewModelScope.launch {
-            try {
-                val recipe = withContext(Dispatchers.IO) {
-                    recipeApi.getById(id)
-                }
-                _recipe.emit(recipe)
-            } catch (e: Exception) {
-                Log.e("RecipeDetailsViewModel", "Error fetching recipe", e)
-            }
-        }
-    }
-
-}
-
-
-class ReviewListViewModel(val recipeId: Long) : ViewModel() {
-    val reviewApi = RecipeReviewApi()
-    private val userApi = UserApi()
-    var state by mutableStateOf(ScreenState<RecipeReviewDTO>())
-    var loggedInId by mutableStateOf(0L)
-
-    private val paginator = DefaultPaginator(
-        initialKey = state.page,
-        onLoadUpdated = {
-            state = state.copy(isLoading = it)
-        },
-        onRequest = { nextPage ->
-            try {
-                val content = reviewApi.getReviews(
-                    id = recipeId,
-                    page = nextPage,
-                    size = 10,
-                    sortDirection = "DESC"
-                ).content.orEmpty()
-                Result.success(content)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        },
-        getNextKey = {
-            state.page + 1
-        },
-        onError = {
-            state = state.copy(error = it?.localizedMessage)
-        }
-    ) { items, newKey ->
-        state = state.copy(
-            items = state.items + items,
-            page = newKey,
-            endReached = items.isEmpty()
-        )
-    }
-
-    init {
-        viewModelScope.launch {
-            paginator.loadNextItems()
-
-            try {
-                loggedInId = userApi.getProfile().id
-            } catch (e: Exception) {
-                Log.e("ReviewListViewModel", "Error fetching logged in user", e)
-            }
-        }
-    }
-
-    fun loadNextItems() {
-        viewModelScope.launch {
-            paginator.loadNextItems()
-        }
-    }
-}
 
 @Composable
 fun ReviewList(viewModel: ReviewListViewModel) {

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,9 +22,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
+import com.example.mmm_mobile.viewmodel.LoginViewModel
+import com.example.mmm_mobile.viewmodel.RegistrationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,19 +36,19 @@ import org.openapitools.client.apis.Class1AuthenticationApi
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.models.RegisterRequest
 
+
+
 @Composable
 fun RegistrationScreen(
     onRegistrationClick: () -> Unit = {},
+    viewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val confirmPassword = remember { mutableStateOf("") }
-    val firstName = remember { mutableStateOf("") }
-    val lastName = remember { mutableStateOf("") }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .align(Alignment.Center)
                 .padding(16.dp)
         ) {
@@ -55,8 +60,8 @@ fun RegistrationScreen(
                 color = MaterialTheme.colorScheme.onSurface
             )
             OutlinedTextField(
-                value = firstName.value,
-                onValueChange = { firstName.value = it },
+                value = viewModel.firstName.value,
+                onValueChange = { viewModel.firstName.value = it },
                 label = {
                     Text(
                         context.getText(R.string.firstName).toString(),
@@ -75,8 +80,8 @@ fun RegistrationScreen(
                 ),
             )
             OutlinedTextField(
-                value = lastName.value,
-                onValueChange = { lastName.value = it },
+                value = viewModel.lastName.value,
+                onValueChange = { viewModel.lastName.value = it },
                 label = {
                     Text(
                         context.getText(R.string.lastName).toString(),
@@ -95,8 +100,8 @@ fun RegistrationScreen(
                 ),
             )
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = viewModel.email.value,
+                onValueChange = { viewModel.email.value = it },
                 label = {
                     Text(
                         context.getText(R.string.email).toString(),
@@ -115,47 +120,25 @@ fun RegistrationScreen(
                 ),
             )
 
-            password.value = passwordInput(
-                password = password,
-                type = stringResource(R.string.password)
+            PasswordInput(
+                password = viewModel.password.value,
+                type = stringResource(R.string.password),
+                onValueChange = { viewModel.password.value = it }
             )
 
-            password.value = passwordInput(
-                password = confirmPassword,
-                type = stringResource(R.string.confirmPassword)
+            PasswordInput(
+                password = viewModel.confirmPassword.value,
+                type = stringResource(R.string.confirmPassword),
+                onValueChange = { viewModel.confirmPassword.value = it }
             )
             Button(
                 onClick = {
-                    if (password.value == confirmPassword.value) {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                val apiInstance = Class1AuthenticationApi()
-                                val registerRequest = RegisterRequest(
-                                    email.value,
-                                    firstName.value,
-                                    lastName.value,
-                                    password.value
-                                )
-                                val result = apiInstance.register(registerRequest)
-                                ApiClient.accessToken = result.accessToken
-                                TokenManager.getInstance(context).accessToken = result.accessToken
-                                println(ApiClient.accessToken)
-                                withContext(Dispatchers.Main) {
-                                    onRegistrationClick()
-                                }
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(
-                                        context,
-                                        "Registration failed. Try again",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            }
+                    viewModel.register(
+                        onRegistrationSuccess = onRegistrationClick,
+                        onRegistrationFailure = { message ->
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
-                    }
+                    )
                 },
                 modifier = Modifier.padding(top = 16.dp),
                 colors = ButtonDefaults.textButtonColors(
@@ -163,7 +146,11 @@ fun RegistrationScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Text("Register", fontFamily = poppinsFontFamily, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                Text("Register",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }

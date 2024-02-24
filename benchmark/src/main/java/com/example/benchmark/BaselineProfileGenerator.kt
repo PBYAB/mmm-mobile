@@ -18,7 +18,7 @@ class BaselineProfileGenerator {
     @Test
     fun generateBaselineProfile() = baselineRule.collect(
         packageName = "com.example.mmm_mobile",
-        maxIterations = 10,
+        maxIterations = 5,
     ){
         pressHome()
         startActivityAndWait()

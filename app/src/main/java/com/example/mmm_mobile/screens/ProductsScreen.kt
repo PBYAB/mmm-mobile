@@ -1,11 +1,11 @@
 package com.example.mmm_mobile.screens
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,21 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -37,149 +31,70 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mmm_mobile.R
 import com.example.mmm_mobile.models.Product
 import com.example.mmm_mobile.models.ProductFilter
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
-import com.example.mmm_mobile.utils.DefaultPaginator
-import com.example.mmm_mobile.utils.ScreenState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import org.openapitools.client.apis.ProductApi
-
-class ProductsListViewModel : ViewModel() {
-
-    private val productApi = ProductApi()
-    var state by mutableStateOf(ScreenState<Product>())
-
-    private val _filterApplied = MutableStateFlow(false)
-    val filterApplied: StateFlow<Boolean> = _filterApplied
-
-
-    private var filter: ProductFilter by mutableStateOf(ProductFilter(
-        name = null,
-        sortBy = "id",
-        sortDirection = "ASC",
-        quantity = null,
-        nutriScore = null,
-        novaGroups = null,
-        category = null,
-        allergens = null,
-        country = null
-    ))
-
-    private val paginator = DefaultPaginator(
-        initialKey = state.page,
-        onLoadUpdated = {
-            state = state.copy(isLoading = it)
-        },
-        onRequest = { nextPage ->
-            try {
-                val content =
-                    productApi.getProducts(
-                        page = nextPage,
-                        size = 10,
-                        name = filter.name,
-                        quantity = filter.quantity,
-                        nutriScore = filter.nutriScore,
-                        novaGroups = filter.novaGroups,
-                        category = filter.category,
-                        allergens = filter.allergens,
-                        country = filter.country,
-                        sortBy = filter.sortBy,
-                        sortDirection = filter.sortDirection,
-                        hasPhotos = filter.name == null
-                    ).content.orEmpty().map {
-                        Product(
-                            id = it.id,
-                            name = it.name.orEmpty(),
-                            quantity = it.quantity.orEmpty(),
-                            barcode = it.barcode,
-                            image = it.image?.url.orEmpty(),
-                            nutriScore = it.nutriScore ?: 0,
-                            novaGroup = it.novaGroup ?: 0
-                        )
-                    }
-                Result.success(content)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        },
-        getNextKey = {
-            state.page + 1
-        },
-        onError = {
-            state = state.copy(error = it?.localizedMessage)
-        },
-        onSuccess = { items, newKey ->
-            state = state.copy(
-                items = state.items + items,
-                page = newKey,
-                endReached = items.isEmpty()
-            )
-        }
-    )
-
-    init {
-        viewModelScope.launch {
-            filterApplied.collect {
-                if (it) {
-                    loadNextItems()
-                }
-            }
-        }
-    }
-
-    fun loadNextItems() {
-        viewModelScope.launch {
-            paginator.loadNextItems()
-        }
-    }
-
-    fun filterProducts(filter: ProductFilter) {
-        this.filter = filter
-
-        _filterApplied.value = true
-    }
-}
+import com.example.mmm_mobile.utils.ProductListItemSkeletonLoader
+import com.example.mmm_mobile.viewmodel.ProductListViewModel
 
 
 @Composable
 fun ProductsScreen(
     onProductClick: (Long) -> Unit = {},
-    query: String? = null
+    query: String? = null,
+    viewModel: ProductListViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState,
+    paddingValues: PaddingValues
 ) {
-    Log.d("ProductsScreen", "query: $query")
-    val viewModel: ProductsListViewModel = viewModel()
-    viewModel.filterProducts(
-        ProductFilter(
-            name = query,
-            sortBy = "id",
-            sortDirection = "ASC",
-            quantity = null,
-            nutriScore = null,
-            novaGroups = null,
-            category = null,
-            allergens = null,
-            country = null
-        )
-    )
+    if (query != null) {
+        LaunchedEffect(query){
+            viewModel.resetViewModel()
+            viewModel.lazyListState.scrollToItem(0)
+            viewModel.filterProducts(ProductFilter(name = query))
+        }
+    }
 
-    Box(modifier = Modifier) {
-        ProductList(onProductSelected = onProductClick ,viewModel = viewModel)
+    viewModel.filterProducts(ProductFilter(name = query))
+
+    Scaffold(
+        snackbarHost = { snackbarHostState },
+        containerColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.padding(paddingValues)
+        ){ paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues))
+        MyLazyVerticalGrid(
+            onItemClick = onProductClick,
+            itemContent = { product, onProductClick ->
+                ProductListItemSkeletonLoader(isLoading = viewModel.isLoading) {
+                    ProductListItem(
+                        onProductClick = onProductClick,
+                        product = product
+                    )
+                }
+            },
+            loadNextItems = { viewModel.loadNextItems() },
+            items = if (viewModel.isLoading) {
+                List(10) { index ->
+                    Product(index.toLong(), "", "", 0, 0, "", "")
+                }
+            } else {
+                viewModel.state.items
+            },
+            isLoading = viewModel.state.isLoading,
+            lazyGridState = viewModel.lazyListState,
+            endReached = viewModel.state.endReached,
+        )
     }
 }
 
 @Composable
 fun ProductListItem(
-    onProductSelected: (Long) -> Unit = {},
-    product: Product
+    onProductClick: (Long) -> Unit = {},
+    product: Product,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
@@ -193,11 +108,11 @@ fun ProductListItem(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp)) // Dodajemy zaokrąglenie rogów
+            .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = {})
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                onProductSelected(product.id)
+                onProductClick(product.id)
             }
             .testTag("product_${product.id}"),
     ) {
@@ -210,7 +125,8 @@ fun ProductListItem(
             contentScale = ContentScale.FillBounds
         )
 
-        Text(text = product.name,
+        Text(
+            text = product.name,
             fontFamily = poppinsFontFamily,
             fontWeight= FontWeight.Bold,
             modifier = Modifier.padding(8.dp),
@@ -271,64 +187,28 @@ fun ProductListItem(
     }
 }
 
-
-@Composable
-fun ProductList(
-    onProductSelected: (Long) -> Unit = {},
-    viewModel: ProductsListViewModel
-) {
-    val state = viewModel.state
-    val columnCount = 2
-    val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(columnCount) }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(columnCount),
-        Modifier.padding(8.dp)
-            .testTag("product_list")
-    ) {
-        items(
-            state.items.size,
-            key = { state.items[it].id }
-        ) { i ->
-            val item = state.items[i]
-            if (i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
-                viewModel.loadNextItems()
-            }
-            ProductListItem(product = item, onProductSelected = onProductSelected)
-        }
-        item(span = span) {
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
+    @DrawableRes
+    fun getNutriScoreImage(nutriScore: Int): Int {
+        return when (nutriScore) {
+            in -15..-2 -> R.drawable.nutri_score_a
+            in 0..2 -> R.drawable.nutri_score_b
+            in 3..10 -> R.drawable.nutri_score_c
+            in 11..18 -> R.drawable.nutri_score_d
+            in 19..40 -> R.drawable.nutri_score_e
+            else -> R.drawable.nutri_score_e
         }
     }
-}
 
-@DrawableRes
-fun getNutriScoreImage(nutriScore: Int): Int {
-    return when (nutriScore) {
-        in -15..-2 -> R.drawable.nutri_score_a
-        in 0..2 -> R.drawable.nutri_score_b
-        in 3..10 -> R.drawable.nutri_score_c
-        in 11..18 -> R.drawable.nutri_score_d
-        in 19..40 -> R.drawable.nutri_score_e
-        else -> R.drawable.nutri_score_e
+
+    @DrawableRes
+    fun getNovaGroupImage(novaGroup: Int): Int {
+        return when (novaGroup) {
+            1 -> R.drawable.nova_group_1
+            2 -> R.drawable.nova_group_2
+            3 -> R.drawable.nova_group_3
+            4 -> R.drawable.nova_group_4
+            else -> R.drawable.nova_group_4
+        }
     }
-}
 
 
-@DrawableRes
-fun getNovaGroupImage(novaGroup: Int): Int {
-    return when (novaGroup) {
-        1 -> R.drawable.nova_group_1
-        2 -> R.drawable.nova_group_2
-        3 -> R.drawable.nova_group_3
-        4 -> R.drawable.nova_group_4
-        else -> R.drawable.nova_group_4
-    }
-}

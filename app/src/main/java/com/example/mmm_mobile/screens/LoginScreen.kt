@@ -1,13 +1,16 @@
 package com.example.mmm_mobile.screens
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -20,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,36 +37,27 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mmm_mobile.R
-import com.example.mmm_mobile.TokenManager
 import com.example.mmm_mobile.ui.theme.poppinsFontFamily
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.openapitools.client.apis.Class1AuthenticationApi
+import com.example.mmm_mobile.viewmodel.LoginViewModel
 import org.openapitools.client.infrastructure.ApiClient
-import org.openapitools.client.models.AuthenticationRequest
 
 
 @Composable
 fun LoginScreen(
     onLoginClick: () -> Unit = {},
     onMoveToRegistrationClick: () -> Unit = {},
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val tokenManager = TokenManager.getInstance(context)
-    println("LoginScreen: ${tokenManager.accessToken}")
-    if (tokenManager.accessToken != null) {
-        ApiClient.accessToken = tokenManager.accessToken
-        onLoginClick()
-    }
+    viewModel.checkLoginStatus(onLoginSuccess = onLoginClick)
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .align(Alignment.Center)
                 .padding(16.dp)
         ) {
@@ -74,9 +67,10 @@ fun LoginScreen(
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
             )
+            Log.d("LoginScreen", "Email: ${viewModel.email.value}")
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = viewModel.email.value,
+                onValueChange = { viewModel.email.value = it},
                 label = {
                     Text(
                         stringResource(R.string.email),
@@ -96,39 +90,27 @@ fun LoginScreen(
                 ),
             )
 
-            password.value = passwordInput(
-                password,
-                stringResource(R.string.password)
+            Log.d("LoginScreen", "Password: ${viewModel.password.value}")
+            PasswordInput(
+                password = viewModel.password.value,
+                type = stringResource(R.string.password),
+                onValueChange = { viewModel.password.value = it}
             )
 
 
             Button(
                 onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            val apiInstance = Class1AuthenticationApi()
-                            val loginRequest = AuthenticationRequest(
-                                email.value,
-                                password.value
-                            )
-                            val result = apiInstance.authenticate(loginRequest)
-                            tokenManager.accessToken = result.accessToken
-                            println(ApiClient.accessToken) // TODO: remove
-                            withContext(Dispatchers.Main) {
-                                onLoginClick()
-                            }
-                        } catch (e: Exception) {
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    context,
-                                    "Login failed. Try again",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+                    viewModel.login(
+                        onLoginSuccess = {
+                            viewModel.checkLoginStatus(onLoginSuccess = onLoginClick)
+                        },
+                        onLoginFailure = {
+                            Toast.makeText(context, "Login failed. Try again", Toast.LENGTH_LONG).show()
                         }
-                    }
+                    )
                 },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier
+                    .padding(top = 16.dp)
                     .testTag("login_button"),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface,
@@ -159,15 +141,18 @@ fun LoginScreen(
 }
 
 @Composable
-fun passwordInput(
-    password : MutableState<String> = remember { mutableStateOf("") },
-    type : String = stringResource(R.string.password)
-) : String {
+fun PasswordInput(
+    password: String,
+    type: String = stringResource(R.string.password),
+    onValueChange: (String) -> Unit = {}
+) {
     var passwordVisibility by remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = password.value,
-        onValueChange = { password.value = it },
+        value = password,
+        onValueChange = { newValue ->
+            onValueChange(newValue)
+                        },
         label = {
             Text(
                 type,
@@ -199,5 +184,4 @@ fun passwordInput(
             disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
     )
-    return password.value
 }

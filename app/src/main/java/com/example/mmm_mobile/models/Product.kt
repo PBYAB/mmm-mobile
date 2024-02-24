@@ -1,8 +1,9 @@
 package com.example.mmm_mobile.models
 
 
+
 data class Product(
-    val id: Long,
+    override val id: Long,
 
     val name: String,
 
@@ -15,4 +16,4 @@ data class Product(
     val quantity: String,
 
     val image: String,
-)
+) : Identifiable
