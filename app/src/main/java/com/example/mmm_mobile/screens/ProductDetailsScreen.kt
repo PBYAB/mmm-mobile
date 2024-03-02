@@ -1,6 +1,7 @@
 package com.example.mmm_mobile.screens
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -147,6 +148,12 @@ fun ProductDetails(
     val images = productDetails.images?.toList() ?: emptyList()
     var photoActivated by remember { mutableStateOf(false) }
     var imageUrl by remember { mutableStateOf("") }
+
+    BackHandler(
+        enabled = photoActivated,
+        onBack = { photoActivated = false }
+    )
+
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
@@ -318,7 +325,7 @@ fun ProductDetails(
             }
         }
     }
-    if (photoActivated == true) {
+    if (photoActivated) {
         FullScreenImage(
             photo = Photo(
                 id = 0,

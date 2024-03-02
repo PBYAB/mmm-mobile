@@ -39,21 +39,21 @@ sealed class Screen(
                 when (previousRoute) {
                     FavouriteRecipeList.route -> {
                         slideIntoContainer(
-                            animationSpec = tween(500, easing = EaseIn),
+                            animationSpec = tween(300, easing = EaseIn),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
                         )
                     }
 
                     ProductList.route -> {
                         slideIntoContainer(
-                            animationSpec = tween(500, easing = EaseIn),
+                            animationSpec = tween(300, easing = EaseIn),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     }
 
                     else -> fadeIn(
                         animationSpec = tween(
-                            500, easing = EaseIn
+                            300, easing = EaseIn
                         )
                     )
                 }
@@ -63,21 +63,21 @@ sealed class Screen(
                 when (destinationRoute) {
                     FavouriteRecipeList.route -> {
                         slideOutOfContainer(
-                            animationSpec = tween(500, easing = EaseOut),
+                            animationSpec = tween(300, easing = EaseOut),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     }
 
                     ProductList.route -> {
                         slideOutOfContainer(
-                            animationSpec = tween(500, easing = EaseOut),
+                            animationSpec = tween(300, easing = EaseOut),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
                         )
                     }
 
                     else -> fadeOut(
                         animationSpec = tween(
-                            500, easing = EaseOut
+                            300, easing = EaseOut
                         )
                     )
                 }
@@ -94,14 +94,14 @@ sealed class Screen(
                 when (previousRoute) {
                     RecipeList.route, FavouriteRecipeList.route -> {
                         slideIntoContainer(
-                            animationSpec = tween(500, easing = EaseIn),
+                            animationSpec = tween(300, easing = EaseIn),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
                         )
                     }
 
                     else -> fadeIn(
                         animationSpec = tween(
-                            500, easing = EaseIn
+                            300, easing = EaseIn
                         )
                     )
                 }
@@ -111,14 +111,14 @@ sealed class Screen(
                 when (destinationRoute) {
                     RecipeList.route, FavouriteRecipeList.route -> {
                         slideOutOfContainer(
-                            animationSpec = tween(500, easing = EaseOut),
+                            animationSpec = tween(300, easing = EaseOut),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     }
 
                     else -> fadeOut(
                         animationSpec = tween(
-                            500, easing = EaseOut
+                            300, easing = EaseOut
                         )
                     )
                 }
@@ -142,13 +142,13 @@ sealed class Screen(
                 when (previousRoute) {
                     ProductList.route, RecipeList.route -> {
                         slideIntoContainer(
-                            animationSpec = tween(500, easing = EaseIn),
+                            animationSpec = tween(300, easing = EaseIn),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     }
                     else -> fadeIn(
                         animationSpec = tween(
-                            500, easing = EaseIn
+                            300, easing = EaseIn
                         )
                     )
                 }
@@ -158,13 +158,13 @@ sealed class Screen(
                 when (destinationRoute) {
                     RecipeList.route, ProductList.route -> {
                         slideOutOfContainer(
-                            animationSpec = tween(500, easing = EaseOut),
+                            animationSpec = tween(300, easing = EaseOut),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
                         )
                     }
                     else -> fadeOut(
                         animationSpec = tween(
-                            500, easing = EaseOut
+                            300, easing = EaseOut
                         )
                     )
                 }
@@ -202,10 +202,10 @@ sealed class Screen(
         val defaultEnterTransition: EnterTransitionBuilder = {
                 fadeIn(
                     animationSpec = tween(
-                        700, easing = EaseIn
+                        300, easing = EaseIn
                     )
                 ) + slideIntoContainer(
-                    animationSpec = tween(500, easing = EaseIn),
+                    animationSpec = tween(300, easing = EaseIn),
                     towards = AnimatedContentTransitionScope.SlideDirection.Start
                 )
             }
@@ -213,10 +213,10 @@ sealed class Screen(
         val defaultExitTransition: ExitTransitionBuilder = {
                 fadeOut(
                     animationSpec = tween(
-                        500, easing = EaseOut
+                        300, easing = EaseOut
                     )
                 ) + slideOutOfContainer(
-                    animationSpec = tween(500, easing = EaseOut),
+                    animationSpec = tween(300, easing = EaseOut),
                     towards = AnimatedContentTransitionScope.SlideDirection.End
                 )
             }

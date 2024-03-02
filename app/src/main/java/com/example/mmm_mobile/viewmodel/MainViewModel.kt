@@ -27,6 +27,9 @@ class MainViewModel @Inject constructor(
     var destinationRoute by mutableStateOf("")
     val snackbarHostState = SnackbarHostState()
 
+    var recipesStateRefresh by mutableStateOf(false)
+    var productsStateRefresh by mutableStateOf(false)
+    var favouritesRecipesStateRefresh by mutableStateOf(false)
 
     fun checkToken(
         onTokenValid: () -> Unit,

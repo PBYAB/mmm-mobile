@@ -31,7 +31,6 @@ class RecipeListViewModel @Inject constructor(
 
     val lazyListState: LazyGridState = LazyGridState(0)
 
-    var tapOffset by mutableStateOf(Offset.Zero)
 
     var filter: RecipeFilter by mutableStateOf(
         RecipeFilter(

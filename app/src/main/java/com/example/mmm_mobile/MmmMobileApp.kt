@@ -59,8 +59,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mmm_mobile.models.ProductFilter
-import com.example.mmm_mobile.models.RecipeFilter
 import com.example.mmm_mobile.screens.AddProductScreen
 import com.example.mmm_mobile.screens.AddRecipeScreen
 import com.example.mmm_mobile.screens.BarcodeScreen
@@ -87,9 +85,6 @@ fun MmmMobileApp() {
 @Composable
 fun MmmMobileScaffold(){
     val mainViewModel: MainViewModel = hiltViewModel()
-    val favouriteRecipeViewModel: FavouriteRecipeListViewModel = hiltViewModel()
-    val recipeViewModel: RecipeListViewModel = hiltViewModel()
-    val productViewModel: ProductListViewModel = hiltViewModel()
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -107,19 +102,13 @@ fun MmmMobileScaffold(){
                 onSearchClick = { currentRoute ->
                     when {
                         currentRoute.startsWith(Screen.ProductList.route)
-                        -> navController.navigate(
-                            route = Screen.Search.createRoute(Screen.ProductList.route)
-                        )
+                        -> navController.navigate(route = Screen.Search.createRoute(Screen.ProductList.route))
 
                         currentRoute.startsWith(Screen.RecipeList.route)
-                        -> navController.navigate(
-                            route = Screen.Search.createRoute(Screen.RecipeList.route)
-                        )
+                        -> navController.navigate(route = Screen.Search.createRoute(Screen.RecipeList.route))
 
                         currentRoute.startsWith(Screen.FavouriteRecipeList.route)
-                        -> navController.navigate(
-                            route = Screen.Search.createRoute(Screen.FavouriteRecipeList.route)
-                        )
+                        -> navController.navigate(route = Screen.Search.createRoute(Screen.FavouriteRecipeList.route))
                         else -> {}
                     }
                 },
@@ -145,9 +134,10 @@ fun MmmMobileScaffold(){
                 },
                 onRefreshClick = {
                     when(it) {
-                        (Screen.ProductList.route) -> { productViewModel.refresh() }
-                        (Screen.RecipeList.route) -> { recipeViewModel.refresh() }
-                        (Screen.FavouriteRecipeList.route) -> { favouriteRecipeViewModel.refresh()
+                        (Screen.ProductList.route) -> { mainViewModel.productsStateRefresh = true }
+                        (Screen.RecipeList.route) -> { mainViewModel.recipesStateRefresh = true }
+                        (Screen.FavouriteRecipeList.route) -> { mainViewModel.favouritesRecipesStateRefresh = true }
+                        else -> {
                         }
                     }
                 },
@@ -159,10 +149,7 @@ fun MmmMobileScaffold(){
         MmmMobileNavHost(
             navController,
             padding,
-            mainViewModel,
-            recipeViewModel,
-            productViewModel,
-            favouriteRecipeViewModel
+            mainViewModel
         )
     }
 }
@@ -173,9 +160,6 @@ fun MmmMobileNavHost(
     navController: NavHostController,
     padding: PaddingValues,
     mainViewModel: MainViewModel,
-    recipeViewModel: RecipeListViewModel = hiltViewModel(),
-    productViewModel: ProductListViewModel = hiltViewModel(),
-    favouriteRecipeViewModel: FavouriteRecipeListViewModel = hiltViewModel(),
 ) {
     var startDestination by remember { mutableStateOf("") }
 
@@ -212,6 +196,12 @@ fun MmmMobileNavHost(
             exitTransition = Screen.RecipeList.exitTransition(mainViewModel.destinationRoute)
         ){ backStackEntry ->
             val query = backStackEntry.arguments?.getString("query")
+
+            val recipeViewModel: RecipeListViewModel = hiltViewModel()
+            if (mainViewModel.recipesStateRefresh) {
+                recipeViewModel.refresh()
+                mainViewModel.recipesStateRefresh = false
+            }
             RecipesScreen(
                 onRecipeClick = { recipeId ->
                     navController.navigate(Screen.RecipeDetails.createRoute(recipeId))
@@ -229,6 +219,12 @@ fun MmmMobileNavHost(
             exitTransition = Screen.ProductList.exitTransition(mainViewModel.destinationRoute)
         ) { backStackEntry ->
             val query = backStackEntry.arguments?.getString("query")
+
+            val productViewModel: ProductListViewModel = hiltViewModel()
+            if (mainViewModel.productsStateRefresh) {
+                productViewModel.refresh()
+                mainViewModel.productsStateRefresh = false
+            }
             ProductsScreen(
                 onProductClick = { productId ->
                     navController.navigate(Screen.ProductDetails.createRoute(productId))
@@ -246,6 +242,12 @@ fun MmmMobileNavHost(
             exitTransition = Screen.FavouriteRecipeList.exitTransition(mainViewModel.destinationRoute)
         ){ backStackEntry ->
             val query = backStackEntry.arguments?.getString("query")
+
+            val favouriteRecipeViewModel: FavouriteRecipeListViewModel = hiltViewModel()
+            if (mainViewModel.favouritesRecipesStateRefresh) {
+                favouriteRecipeViewModel.refresh()
+                mainViewModel.favouritesRecipesStateRefresh = false
+            }
             FavouriteRecipesScreen(
                 onRecipeClick = { recipeId ->
                     navController.navigate(Screen.FavouriteRecipeDetails.createRoute(recipeId))

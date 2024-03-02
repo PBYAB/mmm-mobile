@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,21 +17,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -63,7 +60,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
@@ -125,7 +121,7 @@ fun RecipeDetailScreen(
                         item {
                             Column {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Divider(thickness = 5.dp)
+                                HorizontalDivider(thickness = 5.dp)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 AddReviewInput(
                                     id,
@@ -209,7 +205,8 @@ fun RecipeDetailScreen(
             }
 
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                item { recipeFromApi?.let { RecipeDetails(
+                item { recipeFromApi?.let {
+                    RecipeDetails(
                     recipeDetails = mapToRecipeDetails(it),
                     favouriteRecipeDetailsViewModel = favouriteRecipeDetailsViewModel,
                     snackbarHostState = snackbarHostState
@@ -217,7 +214,7 @@ fun RecipeDetailScreen(
                 item {
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Divider(thickness = 5.dp)
+                        HorizontalDivider(thickness = 5.dp)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }

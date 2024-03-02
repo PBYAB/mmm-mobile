@@ -18,5 +18,4 @@ class MainApplication : Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.DEBUG else Log.ERROR)
             .build()
-
 }
