@@ -12,13 +12,13 @@ MMM Mobile App is a mobile application used for managing favorite culinary recip
 - User login and registration
 
 #### Screenshots
-![423738051_1733368953822741_2746378886138661758_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/052730b3-ebc1-41bb-8cdf-ddc7d3c14a2c)
-![423687016_1486458078602416_6036197907087816763_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/6986f2fd-9d94-4be0-8e6e-996bc40a96c9)
-![430725934_1068361837604918_7381078845355086177_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/c3c80742-cd0a-4fe5-b8d2-eea1129e93ff)
-![430449224_423206866872507_7651711544763312285_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/b7e469b9-6305-4107-8b04-791b69f367de)
-![423737587_1704367703730277_7345734612608186973_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/2b9ab2d2-617b-4e42-bbba-7c37dfb3c07a)
-![430320515_928035868899147_2250228952677891399_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/a152d9fb-30d4-449e-8e00-d2c0eb3dd812)
-![423735846_1431875254405031_5735711743005829950_n](https://github.com/PBYAB/mmm-mobile/assets/106178832/bc507385-1ad6-4214-9593-c79123bde746)
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/052730b3-ebc1-41bb-8cdf-ddc7d3c14a2c" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/6986f2fd-9d94-4be0-8e6e-996bc40a96c9" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/c3c80742-cd0a-4fe5-b8d2-eea1129e93ff" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/b7e469b9-6305-4107-8b04-791b69f367de" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/2b9ab2d2-617b-4e42-bbba-7c37dfb3c07a" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/a152d9fb-30d4-449e-8e00-d2c0eb3dd812" width="300">
+<img src="https://github.com/PBYAB/mmm-mobile/assets/106178832/bc507385-1ad6-4214-9593-c79123bde746" width="300">
 
 #### Technologies
 - Programming Language: Kotlin
